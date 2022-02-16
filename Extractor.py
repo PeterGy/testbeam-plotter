@@ -35,7 +35,8 @@ def unabbreviate(str):
     elif str == "e+0.5": return "500 MeV positrons"
     else: return str
 
-             
+def legendName(str):
+    pass
 
 
 
@@ -171,7 +172,7 @@ def main():
                 hist = createHist(plotDict,plotVar,id)         
                 if plotVar == 'Energy as a function of the incoming particle angle':
                     angles = [angle for angle in (0,2,10,20,30,40)]
-                    inFiles= [r.TFile('e-1GeV'+str(angle)+"deg5k.root","READ")  for angle in angles ]
+                    inFiles= [r.TFile('e-1GeV5k'+str(angle)+"deg.root","READ")  for angle in angles ]
                     allDatas=[f.Get("LDMX_Events")  for f in inFiles]
                     for i in range(len(angles)): 
                         filledHist = fillHist(hist, plotVar, allDatas[i],angle=angles[i])

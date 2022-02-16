@@ -1,3 +1,5 @@
+from numpy import *
+
 class filledHist: pass
 
 def barMapLocation(id):
@@ -8,7 +10,7 @@ def barMapLocation(id):
         bar+=2
     return [layer,bar]
 
-def autoBin(hist):
+def autoBin(hist): #this really messes up larger samples. Usage highly deprecated
     hist.BufferEmpty() #figures out the xrange        
     minX = hist.GetXaxis().GetBinLowEdge(1-1)
     maxX = hist.GetXaxis().GetBinLowEdge(hist.GetNbinsX()+1)
@@ -247,7 +249,7 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
                 if h.getID() == barID: 
                     amplitude += h.getAmplitude() 
             hist.Fill( amplitude)            
-        autoBin(hist)    
+        # autoBin(hist)    
     #1.3
     elif plotVar == 'Total number of hits per event': 
         for event in allData: 
@@ -255,7 +257,7 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
                 totalCount+=1
             hist.Fill(totalCount) 
-        autoBin(hist)
+        # autoBin(hist)
     elif plotVar == 'Total number of hits per run':
         runs={}
         for event in allData: 
@@ -265,14 +267,14 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
                 runs[run]+=1        
         for run in runs:
             hist.Fill(runs[run]) 
-        autoBin(hist)
+        # autoBin(hist)
     elif plotVar == 'Sum of pulse height per event': 
         for event in allData: 
             totalAmplitude=0
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
                 totalAmplitude+=h.getAmplitude()
             hist.Fill(totalAmplitude) 
-        autoBin(hist)
+        # autoBin(hist)
     elif plotVar == 'Sum of pulse height per run': 
         runs={}
         for event in allData: 
@@ -283,7 +285,7 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
         for run in runs:
             hist.Fill(runs[run]) 
             print(runs[run])
-        autoBin(hist)
+        # autoBin(hist)
     #1.4
     elif plotVar == 'Distribution of number of hits for TS bars': 
         for event in allData: 
@@ -335,7 +337,7 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
                 if h.getID() == barID: 
                     PEs += h.getPE() 
             hist.Fill(PEs)            
-        autoBin(hist)
+        # autoBin(hist)
 
 
     elif plotVar == 'Mapped Distribution of PEs per HCal bar': 
@@ -343,6 +345,27 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
                 LayerBar = barMapLocation(h.getID())
                 hist.Fill(LayerBar[0],LayerBar[1],h.getPE())            
+    
+
+    elif plotVar == 'Mapped Distribution of average PEs': 
+        countMap = zeros((19,12))
+        PEMap = zeros((19,12))
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+                LayerBar = barMapLocation(h.getID())
+                # countMap[LayerBar[0]]
+                # hist.Fill(LayerBar[0],LayerBar[1],h.getPE())  
+                countMap[LayerBar[0],LayerBar[1]] += 1
+                PEMap[LayerBar[0],LayerBar[1]] += h.getPE()
+
+        countMap[countMap == 0 ] = 1        
+        for i in range(19):
+            for j in range(12):
+                hist.Fill(i,j,PEMap[i,j]/countMap[i,j])
+        
+        # print(PEMap/countMap)        
+
+
 
     elif plotVar == 'TS plots with muons (hit efficiency) (1 plot per bar)': 
         for event in allData: 
@@ -351,7 +374,7 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
                     if h.getBarID() == barID: 
                         hits+=1
             hist.Fill(hits)  
-        autoBin(hist)  
+        # autoBin(hist)  
 
     elif plotVar == 'TS plots with muons (hit efficiency)': 
         eventCount=allData.GetEntries()
@@ -367,7 +390,7 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
             for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
                     if h.getBarID() == barID: 
                         hist.Fill(h.getPE())  
-        autoBin(hist)                
+        # autoBin(hist)                
 
     elif plotVar == 'TS plots with muons (pulse shape)': 
         for event in allData: 
@@ -380,7 +403,7 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
                         #         print(h.getTime())
         # autoBin(hist)
 
-    elif plotVar == 'energy response vs. energy': 
+    elif plotVar == 'energy response vs. energy' or plotVar == 'energy response vs. angle' or plotVar == 'energy response vs. position': 
         for event in allData: 
             energy=0
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
