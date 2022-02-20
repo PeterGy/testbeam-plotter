@@ -46,8 +46,8 @@ def styleHistogramEnergyResponse(histogram,legend):
     histogram.SetMarkerSize(0.75)    
     legend.SetX1(0.7)               
     legend.SetX2(1)  
-    legend.SetY1(0.5)               
-    legend.SetY2(0.8)   
+    legend.SetY1(0.6)               
+    legend.SetY2(0.9)   
 
 def createLabel(fwhm=None,xpos=0.65):
     label = r.TLatex()
@@ -61,13 +61,13 @@ def createLabel(fwhm=None,xpos=0.65):
 def label2D():
     label = r.TLatex()
     label.SetTextFont(42)
-    label.SetTextSize(0.05)
+    label.SetTextSize(0.025)
     label.SetNDC()    
     label.DrawLatex(0,  0.95, "Horizontal bars: even; Vertical bars: odd")
     # if fwhm: label.DrawLatex(xpos,  0.006, "Particle: hepions, Eneregy 11 GeV, Angle: 0 rad, Sample: 12M")
     return label
 
-def createContext(fileName,plotName):
+def createContext(fileName,plotName,fwhm=None,μ=None):
     label = r.TLatex()
     label.SetTextFont(42)
     label.SetTextSize(0.05)
@@ -85,7 +85,11 @@ def createContext(fileName,plotName):
     if plotName == 'energy response vs. energy' and "0.1GeV" in fileName:  energy = '0.1 - 0.5'
     if plotName == 'energy response vs. angle':  angle = '0 - 40'
 
-    label.DrawLatex(0,0.008, "Particle: "+particle+", Eneregy: "+energy+" GeV, Sample: "+sample+"k, Angle: "+angle+" deg")
+    contextString = "Particle: "+particle+", Eneregy: "+energy+" GeV, Sample: "+sample+"k, Angle: "+angle+" deg"
+    if fwhm != None: contextString += ", Fit fwhm: "+str(round(fwhm,6))
+    if μ != None: contextString += ", Fit #mu: "+str(round(μ,6))
+
+    label.DrawLatex(0,0.008, contextString)
     return label
 
 
@@ -95,9 +99,9 @@ def prepareDualPlots(dualPlotMode,c):
         c.Divide(2,1)
         c.cd(1) 
         c.GetPad(1).SetLeftMargin(0.12)
-        c.GetPad(1).SetRightMargin(0.0)
+        c.GetPad(1).SetRightMargin(0.05)
         c.GetPad(2).SetLeftMargin(0.12)
-        c.GetPad(2).SetRightMargin(0.0)
+        c.GetPad(2).SetRightMargin(0.05)
         c.GetPad(1).SetBottomMargin(0.14)
         c.GetPad(2).SetBottomMargin(0.14)
 
@@ -111,6 +115,24 @@ def finishDualPlots(dualPlotMode,c,hist):
         hist2.Draw("E")
         c.cd(0)
         # styleHistogramCommon(hist,hist2,legend)
+
+def prettyLegendName(str):
+    # if str.find('k') == 0: name='0'
+    # else: name = str[str.find('k')+1:]
+    name = str[str.find('k')+1:]
+    if name.find("deg")>-1: name = name[0:2]+" degrees"
+    elif name.find("xpos")>-1: name = name[0:3]+" mm displacement"
+    # else: name = name[name.find('-')+1:name.find('GeV')]+" GeV"
+    else: 
+        name = str[str.find('-')+1:str.find('GeV')]+' GeV'
+    # print(name)
+    return name
+
+def secondPlotZoom(hist):
+    if plotName == 'Distribution of PEs per HCal bar': 
+        hist.GetXaxis().SetRangeUser(50,150) 
+        hist.SetTitle('Distribution of PEs per HCal bar (MIP range only)')  
+    return hist
 
 
 def main():   
@@ -126,19 +148,10 @@ def main():
         for id in bars: 
             extractionName = plotName+"___"+fileName+barName(id)
             dimension = plotDict[plotName]['dimension']
-
-            inFile = r.TFile("extractions/"+extractionName+".root","READ")  
-            
-            
+            inFile = r.TFile("extractions/"+extractionName+".root","READ")    
             hist=inFile.Get(plotName)
-
             c=r.TCanvas('t','The canvas of anything', 1100, 900)
             c.cd()
-            
-            legend = inFile.Get("legend")
-            # inFile.Print("toponly")
-
-
             if dimension == 2:
                 # print(c.GetPad(0).GetRightMargin())
                 c.SetCanvasSize(1800, 800)
@@ -146,122 +159,75 @@ def main():
                 styleHistogram2D(hist)
                 hist.Draw("COLZ")
                 r.gStyle.SetOptStat("")
-                label2D()
-            
+                label2D()            
             elif plotName == 'energy response vs. energy' or plotName == 'energy response vs. angle' or plotName == 'energy response vs. position':
+                c.SetBottomMargin(0.14)
                 lines=[]
-                
-                for line in range(len(plot)):
-                    hist=inFile.Get(plotName+";"+str(line+1))
+                legend = r.TLegend(0.0,0.9,0.18,1)
+                for i in range(len(plot)):
+                    hist=inFile.Get(plotName+";"+str(i+1))
                     lines.append(copy.deepcopy(hist))
+                    legend.AddEntry(lines[-1],prettyLegendName(plot[i][1]),"f")
                 for line in lines:
                     line.Draw("same e")    
-                    # fit = line.Fit('gaus', '', '', 0, 400)
-                    fit = line.Fit('gaus','S')
-                    
+                    fit = line.Fit('gaus','Sq')
                     fwhm = 2.355*fit.Parameter(2)
                     fwhmError = 2.355*fit.ParError(2)
-                    # print(line.GetRMS(),fit.Parameter(2))
-                    # print(fit.Parameter(4))
-                    
-                    # print(dir(line.GetFunction("gaus")))
-                    # fit = line.GetFunction("gaus")
-                    # print(dir(fit))
-                    # fit.GetParErrors()
-                    # print(dir(fit))
-                    # fit.Result().Print()
-                    # print(fit.DerivativeError())
-
                     line.GetFunction("gaus").SetLineColor(rootColors[lines.index(line)])
-                    # line.GetFunction("gaus").Print("top only")
-                    
-                    # fwhm=2.355*line.GetRMS()
-                    # print(fwhm)
+                    label = r.TLatex()
+                    label.SetTextFont(42)
+                    label.SetTextSize(0.05)
+                    label.SetTextColor(rootColors[lines.index(line)])
+                    label.SetNDC()    
+                    label.DrawLatex(0.6,  0.5 - 0.05*lines.index(line), "#mu = "+str(round(fit.Parameter(1),6)))
+                    # label.DrawLatex(0.2,  0.3, "asd")
                     fwhmList.append(fwhm)     
                     fwhmListErrorsBars.append(fwhmError)     
-                    r.gStyle.SetOptStat("nerm")
+                    r.gStyle.SetOptStat("")
+                    print("Average is ",fit.Parameter(1))
                 c.SetLogy()   
-                c.GetPad(0).SetGrid()
-                c.SetBottomMargin(0.14)
+                c.GetPad(0).SetGrid()                
                 styleHistogramEnergyResponse(lines[-1],legend)
                 legend.Draw()
-                # for i in legend.:
-                # print(legend.GetEntry ())
-                # print(legend.GetEntry().GetLabel())
-                # print(legend.GetEntries())
-                # print(legend)
-                # legend.SetEntryLabel("lol")
-                # legend.SetEntryLabel("lol2")
-                # legend.GetEntry().SetLabel("lol3")
-                # r.gStyle.SetOptStat("ne")
-
-            elif plotName == 'Distribution of PEs per HCal bar':
-                dualPlotMode=True
-                prepareDualPlots(dualPlotMode,c)
-                r.gStyle.SetOptStat("nerm")
-                hist.SetName(barNamePretty(id))  
-                # hist.GetXaxis().SetRangeUser(0,150)  
-                fwhm=2.355*hist.GetRMS()
-                print(fwhm)
-                createLabel(fwhm)              
-                hist.Draw("")
-                # hist.Fit('gaus', '', '', 0, 400)
-
-                
-
-
-                # finishDualPlots(dualPlotMode,c,hist)     
-                if dualPlotMode:
-                    hist2=copy.deepcopy(hist)
-                    hist2.GetXaxis().SetRangeUser(50,150) 
-                    hist2.SetTitle('Distribution of PEs per HCal bar (MIP range only)')  
-                    r.gStyle.SetOptStat("nerm")  
-                    c.cd(2) 
-                    # c.GetPad(2).SetLogy()
-                    c.GetPad(2).SetGrid()
-                    c.GetPad(1).SetGrid()
-                    hist2.Draw("")
-                    c.cd(0) 
-
 
             elif dimension == 1:
                 c.SetLeftMargin(0.12)   
                 dualPlotMode=True
                 prepareDualPlots(dualPlotMode,c)   
-                      
-                if id != False:                    
-                    legend.Draw()
-                    hist.SetName(barName(id)) 
-                    hist.Draw("")
-                    r.gStyle.SetOptStat("ne") 
-                else:  
-                    legend.Draw()     
-                    # hist.SetTitle(plotName)                    
-                    hist.Draw("")
-                    r.gStyle.SetOptStat("em")           
-                    fwhm=2.355*hist.GetRMS()
-                                      
-                # finishDualPlots(dualPlotMode,c,hist)    
+                r.gStyle.SetOptStat("nerm")                       
+                if id != False: hist.SetName(barName(id)) 
+                hist.GetRMS()     #this ONE CURSED LINE is somehow the key that makes hist2.GetXaxis().SetRangeUser(50,150) work. Wtf?!?!?!?!             
+                if plotName == 'Reconstructed energy for tags': 
+                    fit = hist.Fit('gaus','Sq')
+                    fwhm = 2.355*fit.Parameter(2)
+                    μ = fit.Parameter(1)
+                hist.Draw("")                      
                 if dualPlotMode:
                     hist2=copy.deepcopy(hist)
+                    if plotName == 'Distribution of PEs per HCal bar':                       
+                        hist2.GetXaxis().SetRangeUser(50,150) 
+                        hist2.SetTitle('Distribution of PEs per HCal bar (MIP range only)') 
+                    r.gStyle.SetOptStat("nerm")
                     c.cd(2) 
                     c.GetPad(2).SetLogy()
                     c.GetPad(2).SetGrid()
                     c.GetPad(1).SetGrid()
-                    hist2.Draw("E")
+                    hist2.Draw("")
                     c.cd(0)
                     # createLabel(fwhm)  
 
             c.cd()
-            createContext(fileName,plotName)
+            if 'fwhm' not in locals(): fwhm = None
+            if 'μ' not in locals(): μ = None
+            createContext(fileName,plotName,fwhm,μ)
             c.SaveAs("plots/"+extractionName+".png")
             c.Close()
+            
 
         import matplotlib
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
-
-        if len(fwhmList)==5:
+        if len(fwhmList)==5 and (plotName == 'energy response vs. angle' or plotName == 'energy response vs. position'):
             if plotName == 'energy response vs. angle':
                 name="Angles"                
                 x=(0,10,20,30,40)
@@ -281,15 +247,17 @@ def main():
             fwhmList=[]   
             fwhmListErrorsBars=[] 
 
+        
         elif len(fwhmList)==10:
             def expected(E,s=1): return s*1/sqrt(E)
             plt.figure("Energies")
             energies = (8,4,2,1,0.5)
-            xfit=linspace(0.5,8,30)
+            # energies = (0.5,0.4,0.3,0.2,0.1)
+            xfit=linspace(min(energies),max(energies),50)
             # plt.plot(energies,fwhmList[0:5],"r*",label='Pions')
-            plt.errorbar(energies,fwhmList[0:5],xerr=0,yerr=fwhmListErrorsBars,label='Pions',color='r',marker=",",linestyle='')
+            plt.errorbar(energies,fwhmList[0:5],xerr=0,yerr=fwhmListErrorsBars[0:5],label='Pions',color='r',marker=",",linestyle='')
             # plt.plot(energies,fwhmList[5:10],"b*",label='Electrons')
-            plt.errorbar(energies,fwhmList[5:10],xerr=0,yerr=fwhmListErrorsBars,label='Electrons',color='r',marker=",",linestyle='')
+            plt.errorbar(energies,fwhmList[5:10],xerr=0,yerr=fwhmListErrorsBars[5:10],label='Electrons',color='b',marker=",",linestyle='')
             from scipy import optimize
             paramsPion,e_ = optimize.curve_fit(expected,energies,fwhmList[0:5])
             paramsElec,e_ = optimize.curve_fit(expected,energies,fwhmList[5:10])
@@ -309,66 +277,6 @@ def main():
             plt.savefig('plots/fwhmsEnergies.png')
             fwhmList=[]
             fwhmListErrorsBars=[]
-
-
-    '''
-    if len(fwhmList)>1:        
-        def expected(E,s=1):
-            return s*1/sqrt(E)
-        import matplotlib
-        matplotlib.use('Agg')
-        import matplotlib.pyplot as plt
-        # plt.ioff()
-        # if len(fwhmList)==5:
-        #     plt.plot((8,4,2,1,0.5),fwhmList,"b*")
-        if len(fwhmList)==5:
-            angles=(0,10,20,30,40)
-            # xfit=linspace(min(angles),max(angles),100)
-            plt.plot(angles,fwhmList[0:5],"r*",label='Angles')
-            # from scipy import optimize
-            # paramsPion,e_ = optimize.curve_fit(expected,angles,fwhmList[0:5])
-            # yfit=[expected(E,s=paramsPion[0]) for E in xfit]
-            # plt.plot(xfit,yfit,"r-",label='An 1/√E fit')
-
-        elif len(fwhmList)==10:
-            xfit=linspace(0.5,8,30)
-            plt.plot((8,4,2,1,0.5),fwhmList[0:5],"r*",label='Pions')
-            plt.plot((8,4,2,1,0.5),fwhmList[5:10],"b*",label='Electrons')
-            from scipy import optimize
-            paramsPion,e_ = optimize.curve_fit(expected,(8,4,2,1,0.5),fwhmList[0:5])
-            paramsElec,e_ = optimize.curve_fit(expected,(8,4,2,1,0.5),fwhmList[5:10])
-            yfitPion=[expected(E,s=paramsPion[0]) for E in xfit]
-            yfitElec=[expected(E,s=paramsElec[0]) for E in xfit]
-            plt.plot(xfit,yfitPion,"r-",label='Pion 1/√E fit')
-            plt.plot(xfit,yfitElec,"b-",label='Electron 1/√E fit')         
-
-        elif len(fwhmList)==8:
-            xfit=linspace(0.1,0.4,30)
-            plt.plot((0.4,0.3,0.2,0.1),fwhmList[0:4],"r*",label='Pions')
-            plt.plot((0.4,0.3,0.2,0.1),fwhmList[4:8],"b*",label='Electrons')
-            from scipy import optimize
-            paramsPion,e_ = optimize.curve_fit(expected,(0.4,0.3,0.2,0.1),fwhmList[0:4])
-            paramsElec,e_ = optimize.curve_fit(expected,(0.4,0.3,0.2,0.1),fwhmList[4:8])
-            yfitPion=[expected(E,s=paramsPion[0]) for E in xfit]
-            yfitElec=[expected(E,s=paramsElec[0]) for E in xfit]
-            plt.plot(xfit,yfitPion,"r-",label='Pion 1/√E fit')
-            plt.plot(xfit,yfitElec,"b-",label='Electron 1/√E fit')  
-
- 
-
-        plt.ylabel("FWHMs")
-        plt.xlabel("Energy [GeV]")
-        plt.title('FWHMs')
-        plt.legend()
-        # plt.xscale('log')
-        plt.grid(visible=True)
-        plt.savefig('plots/fwhms.png')
-    '''
-        
-
-   
-
-
 
 
 main()

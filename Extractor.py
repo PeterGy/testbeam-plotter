@@ -49,17 +49,6 @@ def createLegend():
     return legend    
 
 
-
-
-# def createLabel(fwhm=None):
-#     label = r.TLatex()
-#     label.SetTextFont(42)
-#     label.SetTextSize(0.03)
-#     label.SetNDC()    
-#     if fwhm: label.DrawLatex(0,  0.005, "FWHM:  "+str(round(fwhm,6)))
-#     return label
-
-
 def drawLine(plotDimension,line):
     # hist.SetOption("")
         if plotDimension == 1:
@@ -104,17 +93,10 @@ def createHist(plotDict,plotVar,id,fileName='asd'):
             hist = r.TH2F(histName,histTitle, len(binningX)-1, array('f',binningX) #name, title, nbins, start, finish
             , len(binningY)-1, array('f',binningY)) #nbins, start, finish                    
   
-    # elif plotDict[plotVar]['dimension'] == "bar":
-    #     binLabelsEvtType = ["Nothing hard","1n","2n","#geq 3n","1#pi","2#pi", "1#pi_{0}", "1#pi 1N", "1p","2N","exotics","multi-body"]
-    #     hist.GetXaxis().SetBinLabel(b+1, binLabelsEvtType[b])
 
     hist.SetYTitle(plotDict[plotVar]['yaxis'])
     hist.SetXTitle(plotDict[plotVar]['xaxis'])
-    # hist.SetLineColor(rootColors[len(lines)])
-    # hist.SetFillStyle(0);
-    # hist.SetMarkerStyle(rootMarkers[len(lines)]) 
-    # hist.SetMarkerColor(rootColors[len(lines)])
-    # hist.SetMarkerSize(3)    
+  
     return hist
 
 def loadData(fileName): #can't even make it into a function why is ROOT so awful?
@@ -147,9 +129,6 @@ def getBeamEnergyFromFileName(fileName):
         print('Note: beam energy could not be determined from file name')
         return None    
 
-def decoratePlot(filledHist,plotDimension,legend):
-    if plotDimension == 1 or 2: legend.Draw();
-
 
 def main():       
     fwhmList=[]
@@ -165,11 +144,11 @@ def main():
                 plotVar = var  = j[0]
                 fileName = j[1]   
                 extractionName = plotVar+"___"+fileName+barName(id)
-                        
-
                 inFile = r.TFile(fileName+".root","READ")   
+                #inFile = r.TFile("/home/petergy/Plotting/"+fileName+".root","READ")   #for the aurora
                 allData = inFile.Get("LDMX_Events")                   
                 hist = createHist(plotDict,plotVar,id)         
+
                 if plotVar == 'Energy as a function of the incoming particle angle':
                     angles = [angle for angle in (0,2,10,20,30,40)]
                     inFiles= [r.TFile('e-1GeV5k'+str(angle)+"deg.root","READ")  for angle in angles ]
@@ -189,11 +168,10 @@ def main():
         
             drawLines(plotDimension,lines,options="HIST") 
 
-            decoratePlot(filledHist,plotDimension,legend)
-            # canvas.SaveAs("plots/Plot"+str(plotNumber)+"__"+barName(id)+"_linear.png")
-            # canvas.SaveAs("plots/Plot"+str(plotNumber)+"__"+barName(id)+"_linear.png")
+
 
             file = r.TFile("extractions/"+extractionName+".root", "RECREATE")
+            # file = r.TFile("/home/petergy/Plotting/extractions/"+extractionName+".root", "RECREATE")
 
             for histos in lines:
                 histos.SetDirectory(file)
@@ -204,10 +182,6 @@ def main():
             print("finished extracting",extractionName)
             c.Close()
 
-
-
-            
-            
             try:
                 del filledHist
             except:pass    

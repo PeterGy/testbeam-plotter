@@ -427,4 +427,4 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
     filledHist.hist = hist
     return filledHist   
 
-       
+def fillHists(hists, plotVar, allData, processName="process"): pass 

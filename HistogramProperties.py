@@ -177,7 +177,7 @@ plotDict = {
                     'binningY' : {'nBins':12, 'min':-0.5, 'max':11.5}}, 
     'TS plots with muons (hit efficiency) (1 plot per bar)':{'xaxis' : 'Hits per event', 'yaxis' : 'Number of events', 'binning' : {'nBins':1000, 'min':0, 'max':0}, 'dimension' : 1, 'bars' : trigScintBarIDs()},
     'TS plots with muons (hit efficiency)':{'xaxis' : 'Bar', 'yaxis' : 'Hits', 'binning' : {'nBins':12, 'min':-0.5, 'max':11.5}, 'dimension' : 1,},
-    'TS plots with muons (light yield)':{'xaxis' : 'PE count', 'yaxis' : 'Number of events', 'binning' : {'nBins':1000, 'min':0, 'max':0}, 'dimension' : 1, 'bars' : trigScintBarIDs()},
+    'TS plots with muons (light yield)':{'xaxis' : 'PE count', 'yaxis' : 'Number of events', 'binning' : {'nBins':50, 'min':50, 'max':100}, 'dimension' : 1, 'bars' : trigScintBarIDs()},
     'TS plots with muons (pulse shape)':{'xaxis' : 'Time [ns]', 'yaxis' : 'Amplitude [mV]', 'binning' : {'nBins':100, 'min':2, 'max':3}, 'dimension' : 1, 'bars' : trigScintBarIDs()}, #can be autobinned badly
     'energy response vs. energy'  :{'xaxis' : 'Detector response [#frac{GeV}{GeV}]', 'yaxis' : 'Number of events', 'binning' : {'nBins':60, 'min':0, 'max':0.6}, 'dimension' : 1},
     'energy response vs. angle'   :{'xaxis' : 'Detector response [#frac{GeV}{GeV}]', 'yaxis' : 'Number of events', 'binning' : {'nBins':60, 'min':0, 'max':0.6}, 'dimension' : 1},
