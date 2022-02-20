@@ -149,20 +149,19 @@ def main():
                 allData = inFile.Get("LDMX_Events")                   
                 hist = createHist(plotDict,plotVar,id)         
 
-                if plotVar == 'Energy as a function of the incoming particle angle':
-                    angles = [angle for angle in (0,2,10,20,30,40)]
-                    inFiles= [r.TFile('e-1GeV5k'+str(angle)+"deg.root","READ")  for angle in angles ]
-                    allDatas=[f.Get("LDMX_Events")  for f in inFiles]
-                    for i in range(len(angles)): 
-                        filledHist = fillHist(hist, plotVar, allDatas[i],angle=angles[i])
-                        filledHist.hist.SetMinimum(0.5)                  
+                # if plotVar == 'Energy as a function of the incoming particle angle':
+                #     angles = [angle for angle in (0,2,10,20,30,40)]
+                #     inFiles= [r.TFile('e-1GeV5k'+str(angle)+"deg.root","READ")  for angle in angles ]
+                #     allDatas=[f.Get("LDMX_Events")  for f in inFiles]
+                #     for i in range(len(angles)): 
+                #         filledHist = fillHist(hist, plotVar, allDatas[i],angle=angles[i])
+                # #         filledHist.hist.SetMinimum(0.5)                  
 
-                else:
-                    beamEnergy=getBeamEnergyFromFileName(fileName)
-                    filledHist = fillHist(hist, plotVar, allData, barID=id, beamEnergy=beamEnergy)
-                
-                filledHist.hist.SetLineColor(rootColors[len(lines)])                                       
-                lines.append(copy.deepcopy(filledHist.hist))      
+                # else:
+                beamEnergy=getBeamEnergyFromFileName(fileName)    
+                hist = fillHist(hist, plotVar, allData, barID=id, beamEnergy=beamEnergy)               
+                hist.SetLineColor(rootColors[len(lines)])                                       
+                lines.append(copy.deepcopy(hist))      
                 legend.AddEntry(lines[-1],fileName,"f")            
                 
         
@@ -182,9 +181,6 @@ def main():
             print("finished extracting",extractionName)
             c.Close()
 
-            try:
-                del filledHist
-            except:pass    
 
 
 

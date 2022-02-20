@@ -116,5 +116,5 @@ plotGroups = [
 
        ]     
 
-# plotGroups = testbeamPlotGroups   
+plotGroups = testbeamPlotGroups   
 

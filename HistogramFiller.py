@@ -1,7 +1,5 @@
 from numpy import *
 
-class filledHist: pass
-
 def barMapLocation(id):
     shortID = id-402654208
     layer = int(shortID/1024)
@@ -241,15 +239,7 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
                 if h.getID() == barID: 
                     hits+=1
             hist.Fill(hits)              
-    #1.2
-    elif plotVar == 'Distribution of pulse height of each bar': 
-        for event in allData: 
-            amplitude = 0
-            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                if h.getID() == barID: 
-                    amplitude += h.getAmplitude() 
-            hist.Fill( amplitude)            
-        # autoBin(hist)    
+
     #1.3
     elif plotVar == 'Total number of hits per event': 
         for event in allData: 
@@ -422,9 +412,22 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
                 hist.Fill(h.getEdep())  
         print ("Total simulated energy deposit:",simE)          
         print ("Total reconstructed energy deposit:",recE)   
+ 
+    return hist   
 
+def fillHists(hists, plotVar, allData, processName="process"):  
+    #1.2
+    if plotVar == 'Distribution of pulse height of each bar': 
+        for event in allData: 
+            amplitude = 0
+            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+                if h.getID() == barID: 
+                    amplitude += h.getAmplitude() 
+            hist.Fill( amplitude)            
+        # autoBin(hist)    
 
-    filledHist.hist = hist
-    return filledHist   
-
-def fillHists(hists, plotVar, allData, processName="process"): pass 
+    elif plotVar == 'Distribution of signal amplitude for TS bars (individual bars)': 
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
+                    if h.getBarID() == barID: 
+                        hist.Fill(h.getAmplitude())       
