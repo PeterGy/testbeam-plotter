@@ -72,7 +72,7 @@ def drawLines(plotDimension,lines,options=''):
 def createHist(plotDict,plotVar,id,fileName='asd'):
     if plotDict[plotVar]['dimension'] == 1:     
         histTitle = plotVar
-        histName = plotVar#barName(id)          
+        histName = plotVar+barName(id)          
         binning = plotDict[plotVar]['binning']                
         if type(binning) == type({}):                     
             hist = r.TH1F(histName,histTitle, binning['nBins'],binning['min'],binning['max']) #name, title, nbins, start, finish          
@@ -135,52 +135,61 @@ def main():
     for plotNumber in range(len(plotGroups)): #creates a plot
         plotDimension =  getPlotDimension(plotNumber)
         barIDs = getPlotBars(plotNumber)
+        # barIDs = [2]
         extractionName = ""
-        for id in barIDs: 
-            legend = createLegend()        
-            lines=[]     
-            c=r.TCanvas('t','Total energy with fits', 1600, 900)
-            for j in plotGroups[plotNumber]: #creates a line for each variable in the plot
-                plotVar = var  = j[0]
-                fileName = j[1]   
-                extractionName = plotVar+"___"+fileName+barName(id)
-                inFile = r.TFile(fileName+".root","READ")   
-                #inFile = r.TFile("/home/petergy/Plotting/"+fileName+".root","READ")   #for the aurora
-                allData = inFile.Get("LDMX_Events")                   
-                hist = createHist(plotDict,plotVar,id)         
+        # for id in barIDs: 
+        legend = createLegend()        
+        lines=[]     
+        c=r.TCanvas('t','Total energy with fits', 1600, 900)
+        for j in plotGroups[plotNumber]: #creates a line for each variable in the plot
+            plotVar = var  = j[0]
+            fileName = j[1]   
+            extractionName = plotVar+"___"+fileName#+barName(id)
+            inFile = r.TFile(fileName+".root","READ")   
+            #inFile = r.TFile("/home/petergy/Plotting/"+fileName+".root","READ")   #for the aurora
+            allData = inFile.Get("LDMX_Events")                   
+                   
 
-                # if plotVar == 'Energy as a function of the incoming particle angle':
-                #     angles = [angle for angle in (0,2,10,20,30,40)]
-                #     inFiles= [r.TFile('e-1GeV5k'+str(angle)+"deg.root","READ")  for angle in angles ]
-                #     allDatas=[f.Get("LDMX_Events")  for f in inFiles]
-                #     for i in range(len(angles)): 
-                #         filledHist = fillHist(hist, plotVar, allDatas[i],angle=angles[i])
-                # #         filledHist.hist.SetMinimum(0.5)                  
 
-                # else:
-                beamEnergy=getBeamEnergyFromFileName(fileName)    
-                hist = fillHist(hist, plotVar, allData, barID=id, beamEnergy=beamEnergy)               
-                hist.SetLineColor(rootColors[len(lines)])                                       
+            beamEnergy=getBeamEnergyFromFileName(fileName)    
+            hists={}
+            canvases={}
+            
+            if barIDs == [False]:
+                hist = createHist(plotDict,plotVar,False)  
+                hist = fillHist(hist, plotVar, allData, barID=False, beamEnergy=beamEnergy)     
                 lines.append(copy.deepcopy(hist))      
-                legend.AddEntry(lines[-1],fileName,"f")            
-                
-        
+                legend.AddEntry(lines[-1],fileName,"f")             
+            # hist.SetLineColor(rootColors[len(lines)])   
+            else:
+                for id in barIDs:                                       
+                    hists[id]=createHist(plotDict,plotVar,id)  
+                hists = fillHists(hists, plotVar, allData)    
+
+
+                     
+            
+        if barIDs == [False]:
             drawLines(plotDimension,lines,options="HIST") 
-
-
-
             file = r.TFile("extractions/"+extractionName+".root", "RECREATE")
-            # file = r.TFile("/home/petergy/Plotting/extractions/"+extractionName+".root", "RECREATE")
-
             for histos in lines:
                 histos.SetDirectory(file)
                 histos.Write()
             # legend.SetDirectory(file) 
-            legend.Write("legend")
+            # legend.Write("legend")
             file.Close()
             print("finished extracting",extractionName)
             c.Close()
+        else:
+            for id in barIDs:     
+                hists[id].Draw()
 
+                file = r.TFile("extractions/"+extractionName+barName(id)+".root", "RECREATE")
+                hists[id].SetDirectory(file)
+                hists[id].Write()
+                file.Close()
+                print("finished extracting",extractionName+barName(id))
+                
 
 
 

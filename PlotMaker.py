@@ -85,7 +85,7 @@ def createContext(fileName,plotName,fwhm=None,μ=None):
     if plotName == 'energy response vs. energy' and "0.1GeV" in fileName:  energy = '0.1 - 0.5'
     if plotName == 'energy response vs. angle':  angle = '0 - 40'
 
-    contextString = "Particle: "+particle+", Eneregy: "+energy+" GeV, Sample: "+sample+"k, Angle: "+angle+" deg"
+    contextString = "Particle: "+particle+", Energy: "+energy+" GeV, Sample: "+sample+"k, Angle: "+angle+" deg"
     if fwhm != None: contextString += ", Fit fwhm: "+str(round(fwhm,6))
     if μ != None: contextString += ", Fit #mu: "+str(round(μ,6))
 
@@ -149,7 +149,7 @@ def main():
             extractionName = plotName+"___"+fileName+barName(id)
             dimension = plotDict[plotName]['dimension']
             inFile = r.TFile("extractions/"+extractionName+".root","READ")    
-            hist=inFile.Get(plotName)
+            hist=inFile.Get(plotName+barName(id))
             c=r.TCanvas('t','The canvas of anything', 1100, 900)
             c.cd()
             if dimension == 2:
@@ -166,6 +166,7 @@ def main():
                 legend = r.TLegend(0.0,0.9,0.18,1)
                 for i in range(len(plot)):
                     hist=inFile.Get(plotName+";"+str(i+1))
+                    hist.SetLineColor(rootColors[i])  
                     lines.append(copy.deepcopy(hist))
                     legend.AddEntry(lines[-1],prettyLegendName(plot[i][1]),"f")
                 for line in lines:
@@ -207,12 +208,26 @@ def main():
                     if plotName == 'Distribution of PEs per HCal bar':                       
                         hist2.GetXaxis().SetRangeUser(50,150) 
                         hist2.SetTitle('Distribution of PEs per HCal bar (MIP range only)') 
+                    if plotName == 'TS plots with muons (light yield)':                     
+                        hist2.GetXaxis().SetRangeUser(50,100) 
+                        hist2.SetTitle('TS plots with muons (light yield) (zoomed in)') 
+                        
+                        
+
                     r.gStyle.SetOptStat("nerm")
                     c.cd(2) 
-                    c.GetPad(2).SetLogy()
+                    
                     c.GetPad(2).SetGrid()
                     c.GetPad(1).SetGrid()
-                    hist2.Draw("")
+                    hist2.Draw("e")
+                    c.GetPad(2).SetLogy()
+                    if plotName == 'Distribution of PEs per HCal bar': 
+                        
+                        fit = hist2.Fit('gaus','Sq')
+                        try:
+                            fwhm = 2.355*fit.Parameter(2)
+                            μ = fit.Parameter(1)    
+                        except: pass #sometimes, nothing hits the bar    
                     c.cd(0)
                     # createLabel(fwhm)  
 

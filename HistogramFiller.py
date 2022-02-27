@@ -1,5 +1,7 @@
-from numpy import *
+#processName is actually protosim on aurora
 
+from numpy import *
+import platform 
 def barMapLocation(id):
     shortID = id-402654208
     layer = int(shortID/1024)
@@ -17,6 +19,7 @@ def autoBin(hist): #this really messes up larger samples. Usage highly deprecate
 
 
 def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxEDeposit=float('inf'), barID=False, angle=0, beamEnergy=0):
+    if platform.release() != '5.4.72-microsoft-standard-WSL2': processName="protosim"
     allowNoise= False
     if   plotVar == 'simX': 
         for event in allData: 
@@ -286,12 +289,7 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
         for event in allData: 
             for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
                 hist.Fill(h.getBarID(),h.getAmplitude())
-
-    elif plotVar == 'Distribution of signal amplitude for TS bars (individual bars)': 
-        for event in allData: 
-            for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
-                    if h.getBarID() == barID: 
-                        hist.Fill(h.getAmplitude())               
+   
     #1.5
     elif plotVar == 'Time difference between TS and HCal': 
         for event in allData: #I define time difference based on the first event's time
@@ -375,12 +373,7 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
         # autoBin(hist)
         # print(eventCount)
 
-    elif plotVar == 'TS plots with muons (light yield)': 
-        for event in allData: 
-            for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
-                    if h.getBarID() == barID: 
-                        hist.Fill(h.getPE())  
-        # autoBin(hist)                
+
 
     elif plotVar == 'TS plots with muons (pulse shape)': 
         for event in allData: 
@@ -415,19 +408,68 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
  
     return hist   
 
-def fillHists(hists, plotVar, allData, processName="process"):  
+def fillHists(hists, plotVar, allData, processName="process"): 
+    
+    if platform.release() != '5.4.72-microsoft-standard-WSL2': processName="protosim"
     #1.2
     if plotVar == 'Distribution of pulse height of each bar': 
         for event in allData: 
-            amplitude = 0
+            # amplitude = 0
+            amplitudes = {}
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                if h.getID() == barID: 
-                    amplitude += h.getAmplitude() 
-            hist.Fill( amplitude)            
+                if h.getID() in amplitudes:
+                    amplitudes[h.getID()] += h.getAmplitude()
+                else:
+                    amplitudes[h.getID()] = h.getAmplitude()    
+                # if h.getID() == barID: 
+                #     amplitude += h.getAmplitude() 
+            for barID in amplitudes:    
+                hists[barID].Fill(amplitudes[barID])            
         # autoBin(hist)    
 
+        
+    #1.4
     elif plotVar == 'Distribution of signal amplitude for TS bars (individual bars)': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
-                    if h.getBarID() == barID: 
-                        hist.Fill(h.getAmplitude())       
+                        hists[h.getBarID()].Fill(h.getAmplitude())       
+    
+
+    #3
+    elif plotVar == 'Distribution of PEs per HCal bar': 
+        for event in allData: 
+            # PEs = 0
+            # for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+            #     if h.getID() == barID: 
+            #         PEs += h.getPE() 
+            # hist.Fill(PEs)    
+
+            PEs = {}
+            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+                if h.getID() in PEs:
+                    PEs[h.getID()] += h.getPE()
+                else:
+                    PEs[h.getID()] = h.getPE()    
+                # if h.getID() == barID: 
+                #     amplitude += h.getAmplitude() 
+            for barID in PEs:    
+                hists[barID].Fill(PEs[barID]) 
+
+    #3.2
+    elif plotVar == 'TS plots with muons (light yield)': 
+        # for event in allData: 
+        #     for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
+        #             if h.getBarID() == barID: 
+        #                 hist.Fill(h.getPE())  
+        # autoBin(hist)          
+        for event in allData: 
+            PEs = {}
+            for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
+                if h.getBarID() in PEs:
+                    PEs[h.getBarID()] += h.getPE()
+                else:
+                    PEs[h.getBarID()] = h.getPE()    
+            for barID in PEs:    
+                hists[barID].Fill(PEs[barID])       
+
+    return hists    
