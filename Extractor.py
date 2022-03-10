@@ -81,8 +81,7 @@ def createHist(plotDict,plotVar,id,fileName='asd'):
         # hist.SetMinimum(0.5)      
 
     elif plotDict[plotVar]['dimension'] == 2:
-        histTitle = plotVar
-        # histName = barName(id)    
+        histTitle = plotVar 
         histName = plotVar            
         binningX = plotDict[plotVar]['binningX']
         binningY = plotDict[plotVar]['binningY']                           

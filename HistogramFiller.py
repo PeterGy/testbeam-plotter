@@ -1,14 +1,8 @@
 #processName is actually protosim on aurora
-
+from HistogramProperties import *
 from numpy import *
 import platform 
-def barMapLocation(id):
-    shortID = id-402654208
-    layer = int(shortID/1024)
-    bar = shortID%1024
-    if layer <=8:
-        bar+=2
-    return [layer,bar]
+
 
 def autoBin(hist): #this really messes up larger samples. Usage highly deprecated
     hist.BufferEmpty() #figures out the xrange        
@@ -233,6 +227,7 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
     elif plotVar == 'Mapped distribution of number of hits of each bar': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+                if h.isNoise(): raise("yo this sample has noise")
                 LayerBar = barMapLocation(h.getID())
                 hist.Fill(LayerBar[0],LayerBar[1])   
     elif plotVar == 'Distribution of number of hits of each bar': 
@@ -305,12 +300,19 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
 
 
     #2
-    elif plotVar == 'Reconstructed energy for tags': #might wanna make beam energy automatic
+    elif plotVar == 'Reconstructed energy for tags': 
         for event in allData: 
             energy=0
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
                 energy+=h.getEnergy()
             hist.Fill(energy/beamEnergy) 
+
+    elif plotVar == 'Reconstructed energy for tags (absolute energy)':
+        for event in allData: 
+            energy=0
+            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+                energy+=h.getEnergy()
+            hist.Fill(energy)             
 
     elif plotVar == 'Energy as a function of the incoming particle angle':
         for event in allData:             
@@ -408,8 +410,7 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
  
     return hist   
 
-def fillHists(hists, plotVar, allData, processName="process"): 
-    
+def fillHists(hists, plotVar, allData, processName="process"):     
     if platform.release() != '5.4.72-microsoft-standard-WSL2': processName="protosim"
     #1.2
     if plotVar == 'Distribution of pulse height of each bar': 
@@ -432,7 +433,7 @@ def fillHists(hists, plotVar, allData, processName="process"):
     elif plotVar == 'Distribution of signal amplitude for TS bars (individual bars)': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
-                        hists[h.getBarID()].Fill(h.getAmplitude())       
+                hists[h.getBarID()].Fill(h.getAmplitude()/1000.)       #WARNING: this makes them go from fC to pC
     
 
     #3
@@ -471,5 +472,21 @@ def fillHists(hists, plotVar, allData, processName="process"):
                     PEs[h.getBarID()] = h.getPE()    
             for barID in PEs:    
                 hists[barID].Fill(PEs[barID])       
+
+    elif plotVar == 'simE (individual bars)': 
+        for event in allData: 
+            Energies={}
+            for ih,h in enumerate(getattr(event, "HcalSimHits_"+processName)):
+                if h.getID() in Energies:
+                    Energies[h.getID()]+=h.getEdep() 
+                else:
+                    Energies[h.getID()]=h.getEdep()    
+            for barID in Energies:    
+                hists[barID].Fill(Energies[barID]) 
+
+    elif plotVar == 'recE (individual bars)': 
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+                hists[h.getID()].Fill(h.getEnergy()) 
 
     return hists    
