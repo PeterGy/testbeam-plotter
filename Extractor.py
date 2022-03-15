@@ -33,20 +33,7 @@ def unabbreviate(str):
     elif str == "sim": return "simulation"
     elif str == "e-0.5": return "500 MeV electrons"
     elif str == "e+0.5": return "500 MeV positrons"
-    else: return str
-
-def legendName(str):
-    pass
-
-
-
-def createLegend():
-    # legend = r.TLegend(0.0,0.95,0.18,1)
-    legend = r.TLegend(0.0,0.9,0.18,1)
-
-    # legend = r.TLegend(0.0,0.9,0,1)
-    # legend.SetTextSize(0.025)  
-    return legend    
+    else: return str 
 
 
 def drawLine(plotDimension,line):
@@ -135,9 +122,7 @@ def main():
         plotDimension =  getPlotDimension(plotNumber)
         barIDs = getPlotBars(plotNumber)
         # barIDs = [2]
-        extractionName = ""
-        # for id in barIDs: 
-        legend = createLegend()        
+        extractionName = ""     
         lines=[]     
         c=r.TCanvas('t','Total energy with fits', 1600, 900)
         for j in plotGroups[plotNumber]: #creates a line for each variable in the plot
@@ -157,9 +142,8 @@ def main():
             if barIDs == [False]:
                 hist = createHist(plotDict,plotVar,False)  
                 hist = fillHist(hist, plotVar, allData, barID=False, beamEnergy=beamEnergy)     
-                lines.append(copy.deepcopy(hist))      
-                legend.AddEntry(lines[-1],fileName,"f")             
-            # hist.SetLineColor(rootColors[len(lines)])   
+                lines.append(copy.deepcopy(hist))                
+  
             else:
                 for id in barIDs:                                       
                     hists[id]=createHist(plotDict,plotVar,id)  
@@ -174,8 +158,6 @@ def main():
             for histos in lines:
                 histos.SetDirectory(file)
                 histos.Write()
-            # legend.SetDirectory(file) 
-            # legend.Write("legend")
             file.Close()
             print("finished extracting",extractionName)
             c.Close()
@@ -187,7 +169,7 @@ def main():
                 hists[id].SetDirectory(file)
                 hists[id].Write()
                 file.Close()
-                print("finished extracting",extractionName+barName(id))
+            print("finished extracting the plot types ",extractionName)
                 
 
 
