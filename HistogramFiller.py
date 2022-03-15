@@ -12,7 +12,8 @@ def autoBin(hist): #this really messes up larger samples. Usage highly deprecate
     hist.SetBins(int(maxX)+1-int(minX),int(minX),int(maxX)+1) #makes it so there is one bin per event or ns, and the rightmost bin is still included
 
 
-def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxEDeposit=float('inf'), barID=False, angle=0, beamEnergy=0):
+def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxEDeposit=float('inf'), barID=False, angle=0, beamEnergy=0): 
+    energyErrorCorrection = 0.5 #they did an oopsie in the coding and now I got to correct for it
     if platform.release() != '5.4.72-microsoft-standard-WSL2': processName="protosim"
     allowNoise= False
     if   plotVar == 'simX': 
@@ -35,6 +36,13 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
             for ih,h in enumerate(getattr(event, "HcalSimHits_"+processName)):
                 if h.getEdep() > minEDeposit and h.getEdep() < maxEDeposit:
                     hist.Fill(h.getEdep()) 
+    elif plotVar == 'simETot': 
+        for event in allData: 
+            Energy=0
+            for ih,h in enumerate(getattr(event, "HcalSimHits_"+processName)):
+                if h.getEdep() > minEDeposit and h.getEdep() < maxEDeposit:
+                    Energy+=h.getEdep() 
+            hist.Fill(Energy)             
                 # print("Sim id",h.getID()-4026e5)               
     elif plotVar == 'simEH1': 
         for event in allData: 
@@ -91,12 +99,12 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
                 if h.isNoise() == allowNoise: 
-                    hist.Fill(h.getEnergy()) 
+                    hist.Fill(h.getEnergy()*energyErrorCorrection) 
   
     elif plotVar == 'recENoisy': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                    hist.Fill(h.getEnergy()) 
+                    hist.Fill(h.getEnergy()*energyErrorCorrection) 
   
     elif plotVar == 'recX': 
         for event in allData: 
@@ -133,9 +141,13 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
     elif plotVar == 'simX(Z)': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalSimHits_"+processName)):
-                if h.getEdep() > minEDeposit and h.getEdep() < maxEDeposit:
+                if h.getEdep() > minEDeposit and h.getEdep() < maxEDeposit: 
+                # print(h.getTime())
+                # if h.getTime() == 22 or True: 
                     hist.Fill(h.getPosition()[2],h.getPosition()[0])
                 # hist.Fill(h.getPosition()[2],h.getPosition()[0])
+
+                
     elif plotVar == 'simY(Z)': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalSimHits_"+processName)):
@@ -161,7 +173,10 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
     elif plotVar == 'recX(Z)': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                if h.isNoise() == allowNoise: hist.Fill(h.getZPos(),h.getXPos()) 
+                # if h.isNoise() == allowNoise: 
+                if 22> h.getTime() or h.getTime() >23: 
+                    hist.Fill(h.getZPos(),h.getXPos()) 
+
     elif plotVar == 'recY(Z)': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
@@ -217,8 +232,23 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
                 # print(h.getBarID())
                 # print(h.items()) 
 
+    elif plotVar == 'timeHCal': 
+        for event in allData: #I define time difference based on the first event's time
+            # trigTimes=[]
+            hcalTimes=[]
+            # for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
+            #     trigTimes.append(h.getTime())
+            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+                hist.Fill(h.getTime())
+                print(h.getTime())
+                # hcalTimes.append(h.getTime())   
+            # hist.Fill(min(hcalTimes)) 
 
-
+    # elif plotVar == 'simX(Z)': 
+    #     for event in allData: 
+    #         for ih,h in enumerate(getattr(event, "HcalSimHits_"+processName)):
+    #             if h.getEdep() > minEDeposit and h.getEdep() < maxEDeposit:
+    #                 hist.Fill(h.getPosition()[2],h.getPosition()[0])
 
 
 
@@ -304,20 +334,20 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
         for event in allData: 
             energy=0
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                energy+=h.getEnergy()
+                energy+=h.getEnergy()*energyErrorCorrection
             hist.Fill(energy/beamEnergy) 
 
     elif plotVar == 'Reconstructed energy for tags (absolute energy)':
         for event in allData: 
             energy=0
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                energy+=h.getEnergy()
+                energy+=h.getEnergy()*energyErrorCorrection
             hist.Fill(energy)             
 
     elif plotVar == 'Energy as a function of the incoming particle angle':
         for event in allData:             
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                hist.Fill(angle,h.getEnergy())    
+                hist.Fill(angle,h.getEnergy()*energyErrorCorrection)    
 
     #3
     elif plotVar == 'Distribution of PEs per HCal bar': 
@@ -345,13 +375,13 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
                 LayerBar = barMapLocation(h.getID())
                 # countMap[LayerBar[0]]
                 # hist.Fill(LayerBar[0],LayerBar[1],h.getPE())  
-                countMap[LayerBar[0],LayerBar[1]] += 1
-                PEMap[LayerBar[0],LayerBar[1]] += h.getPE()
+                countMap[LayerBar[0]-1,LayerBar[1]] += 1
+                PEMap[LayerBar[0]-1,LayerBar[1]] += h.getPE()
 
         countMap[countMap == 0 ] = 1        
         for i in range(19):
             for j in range(12):
-                hist.Fill(i,j,PEMap[i,j]/countMap[i,j])
+                hist.Fill(i+1,j,PEMap[i,j]/countMap[i,j])
         
         # print(PEMap/countMap)        
 
@@ -392,7 +422,7 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
         for event in allData: 
             energy=0
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                energy+=h.getEnergy()
+                energy+=h.getEnergy()*energyErrorCorrection
             hist.Fill(energy/beamEnergy) 
 
     elif plotVar == 'rec vs sim':
@@ -400,8 +430,8 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
         simE=0
         for event in allData:             
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                recE+=h.getEnergy()
-                hist.Fill(h.getEnergy())
+                recE+=h.getEnergy()*energyErrorCorrection
+                hist.Fill(h.getEnergy()*energyErrorCorrection)
             for ih,h in enumerate(getattr(event, "HcalSimHits_"+processName)):
                 simE+=h.getEdep()
                 hist.Fill(h.getEdep())  
@@ -411,6 +441,7 @@ def fillHist(hist, plotVar, allData, processName="process" , minEDeposit=0, maxE
     return hist   
 
 def fillHists(hists, plotVar, allData, processName="process"):     
+    energyErrorCorrection = 0.5
     if platform.release() != '5.4.72-microsoft-standard-WSL2': processName="protosim"
     #1.2
     if plotVar == 'Distribution of pulse height of each bar': 
@@ -434,6 +465,8 @@ def fillHists(hists, plotVar, allData, processName="process"):
         for event in allData: 
             for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
                 hists[h.getBarID()].Fill(h.getAmplitude()/1000.)       #WARNING: this makes them go from fC to pC
+
+                if h.getBarID() not in range(0,13): print (h.getBarID())
     
 
     #3
@@ -482,11 +515,12 @@ def fillHists(hists, plotVar, allData, processName="process"):
                 else:
                     Energies[h.getID()]=h.getEdep()    
             for barID in Energies:    
+                # if Energies[barID] > 17: Energies[barID] = 17
                 hists[barID].Fill(Energies[barID]) 
 
     elif plotVar == 'recE (individual bars)': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                hists[h.getID()].Fill(h.getEnergy()) 
+                hists[h.getID()].Fill(h.getEnergy()*energyErrorCorrection) 
 
     return hists    

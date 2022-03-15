@@ -57,6 +57,7 @@ plotDict = {
 
 
     'simE'   :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Counts', 'binning' : {'nBins':40, 'min':0, 'max':40}, 'dimension' : 1 },
+    'simETot'   :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Counts', 'binning' : {'nBins':80, 'min':0, 'max':400}, 'dimension' : 1 },
     'simEH1' :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Counts', 'binning' : {'nBins':40, 'min':0, 'max':10}, 'dimension' : 1 },
     'simEH2' :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Counts', 'binning' : {'nBins':40, 'min':0, 'max':10}, 'dimension' : 1 },
     'simEBar' :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Counts', 'binning' : {'nBins':40, 'min':0, 'max':40}, 'dimension' : 1 },
@@ -101,9 +102,9 @@ plotDict = {
                     
 
 
-    # 'recX(Z)' :{'xaxis' : 'Penetration depth Z [mm]', 'yaxis' : 'X Displacement [mm]', 'dimension' : 2,   
-    #                 'binningX' : barBinsZ,                         
-    #                 'binningY' : barBinsX},                         
+    'recX(Z)' :{'xaxis' : 'Penetration depth Z [mm]', 'yaxis' : 'X Displacement [mm]', 'dimension' : 2,   
+                    'binningX' : barBinsZ,                         
+                    'binningY' : barBinsX},                         
     # 'recY(Z)' :{'xaxis' : 'Penetration depth Z [mm]', 'yaxis' : 'Y Displacement [mm]', 'dimension' : 2,
     #                 'binningX' : barBinsZ, 
     #                 'binningY' : barBinsY},        
@@ -121,9 +122,9 @@ plotDict = {
                     'binningX' : {'nBins':40, 'min':-1000, 'max':1000}, 
                     'binningY' : {'nBins':40, 'min':-1000, 'max':1000}},
 
-    'recX(Z)' :{'xaxis' : 'Penetration depth Z [mm]', 'yaxis' : 'X Displacement [mm]', 'dimension' : 2,
-                    'binningX' : {'nBins':1000, 'min':-500, 'max':500}, 
-                    'binningY' : {'nBins':40, 'min':-1000, 'max':1000}},
+    # 'recX(Z)' :{'xaxis' : 'Penetration depth Z [mm]', 'yaxis' : 'X Displacement [mm]', 'dimension' : 2,
+    #                 'binningX' : {'nBins':1000, 'min':-500, 'max':500}, 
+    #                 'binningY' : {'nBins':40, 'min':-1000, 'max':1000}},
     'recY(Z)' :{'xaxis' : 'Penetration depth Z [mm]', 'yaxis' : 'Y Displacement [mm]', 'dimension' : 2,
                     'binningX' : {'nBins':1000, 'min':-500, 'max':500},  
                     'binningY' : {'nBins':40, 'min':-1000, 'max':1000}},
@@ -135,16 +136,18 @@ plotDict = {
                     'binningX' : {'nBins':1000, 'min':-500, 'max':500},  
                     'binningY' : {'nBins':200, 'min':0, 'max':10}},    
 
+    'timeHCal':{'xaxis' : 'Time [ns]', 'yaxis' : 'Counts', 'binning' : {'nBins':200, 'min':-100, 'max':100}, 'dimension' : 1},                
+
     'trigSimX' :{'xaxis' : 'Distance [mm]', 'yaxis' : 'Counts', 'binning' : {'nBins':80, 'min':-40, 'max':40}, 'dimension' : 1},
     'trigRecX' :{'xaxis' : 'Distance [mm]', 'yaxis' : 'Counts', 'binning' : {'nBins':80, 'min':-1000, 'max':1000}, 'dimension' : 1},
     'trigRecT' :{'xaxis' : 'Time [ns]', 'yaxis' : 'Counts', 'binning' : {'nBins':20, 'min':0, 'max':10}, 'dimension' : 1}, #machine has a resolution of 0.5 ns apparently
     'trigSimE'   :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Counts', 'binning' : {'nBins':40, 'min':0, 'max':1}, 'dimension' : 1 },
     
     'trigSimX(Z)' :{'xaxis' : 'Penetration depth [mm]', 'yaxis' : 'X Displacement [mm]', 'dimension' : 2,
-                    'binningX' : {'nBins':200, 'min':-20, 'max':20}, 
+                    'binningX' : {'nBins':20000, 'min':-770, 'max':-760}, 
                     # 'binningY' : {'nBins':200, 'min':-20, 'max':20}},    
                     # 'binningX' : {'nBins':100, 'min':-400, 'max':900}, 
-                    'binningY' : {'nBins':200, 'min':-20, 'max':20}},                         
+                    'binningY' : {'nBins':20000, 'min':-40, 'max':40}},                         
     'trigSimY(Z)' :{'xaxis' : 'Penetration depth [mm]', 'yaxis' : 'Y Displacement [mm]', 'dimension' : 2,
                     'binningX' : {'nBins':200, 'min':-20, 'max':20}, 
                     'binningY' : {'nBins':200, 'min':-20, 'max':20}},         
@@ -166,7 +169,7 @@ plotDict = {
                     'binningX' : {'nBins':19, 'min':0.5, 'max':19.5}, 
                     'binningY' : {'nBins':12, 'min':-0.5, 'max':11.5}}, 
     #2
-    'Reconstructed energy for tags':{'xaxis' : 'Detector response [#frac{RecE}{BeamE}]', 'yaxis' : 'Number of events', 'binning' : {'nBins':60, 'min':0, 'max':0.3}, 'dimension' : 1},                
+    'Reconstructed energy for tags':{'xaxis' : 'Detector response [#frac{RecE}{BeamE}]', 'yaxis' : 'Number of events', 'binning' : {'nBins':60, 'min':0, 'max':0.15}, 'dimension' : 1},                
     'Reconstructed energy for tags (absolute energy)':{'xaxis' : 'Energy deposited [MeV]', 'yaxis' : 'Number of events', 'binning' : {'nBins':80, 'min':0, 'max':400}, 'dimension' : 1},                
     'Energy as a function of the incoming particle angle':{'xaxis' : 'Angle [deg]', 'yaxis' : 'Energy deposited [MeV]', 'binning' : {'nBins':50, 'min':0, 'max':50}, 'dimension' : 1},
     #3
@@ -181,9 +184,9 @@ plotDict = {
     'TS plots with muons (hit efficiency)':{'xaxis' : 'Bar', 'yaxis' : 'Hits', 'binning' : {'nBins':12, 'min':-0.5, 'max':11.5}, 'dimension' : 1,},
     'TS plots with muons (light yield)':{'xaxis' : 'PE count', 'yaxis' : 'Number of events', 'binning' : {'nBins':150, 'min':0, 'max':150}, 'dimension' : 1, 'bars' : trigScintBarIDs()},
     'TS plots with muons (pulse shape)':{'xaxis' : 'Time [ns]', 'yaxis' : 'Amplitude [mV]', 'binning' : {'nBins':100, 'min':2, 'max':3}, 'dimension' : 1, 'bars' : trigScintBarIDs()}, #can be autobinned badly
-    'energy response vs. energy'  :{'xaxis' : 'Detector response [#frac{RecE}{BeamE}]', 'yaxis' : 'Number of events', 'binning' : {'nBins':60, 'min':0, 'max':0.6}, 'dimension' : 1},
-    'energy response vs. angle'   :{'xaxis' : 'Detector response [#frac{RecE}{BeamE}]', 'yaxis' : 'Number of events', 'binning' : {'nBins':60, 'min':0, 'max':0.6}, 'dimension' : 1},
-    'energy response vs. position':{'xaxis' : 'Detector response [#frac{RecE}{BeamE}]', 'yaxis' : 'Number of events', 'binning' : {'nBins':60, 'min':0, 'max':0.6}, 'dimension' : 1},
+    'energy response vs. energy'  :{'xaxis' : 'Detector response [#frac{RecE}{BeamE}]', 'yaxis' : 'Number of events', 'binning' : {'nBins':60, 'min':0, 'max':0.3}, 'dimension' : 1},
+    'energy response vs. angle'   :{'xaxis' : 'Detector response [#frac{RecE}{BeamE}]', 'yaxis' : 'Number of events', 'binning' : {'nBins':50, 'min':0, 'max':0.25}, 'dimension' : 1},
+    'energy response vs. position':{'xaxis' : 'Detector response [#frac{RecE}{BeamE}]', 'yaxis' : 'Number of events', 'binning' : {'nBins':60, 'min':0, 'max':0.3}, 'dimension' : 1},
     'rec vs sim':{'xaxis' : 'Detector response [GeV/GeV]', 'yaxis' : 'Number of events', 'binning' : {'nBins':110, 'min':0, 'max':1.1}, 'dimension' : 1},
     'simE (individual bars)':{'xaxis' : 'Sim Energy [MeV]', 'yaxis' : 'Number of events', 'binning' : {'nBins':100, 'min':0, 'max':50}, 'dimension' : 1, 'bars' : hcalBarIDs()},
     'recE (individual bars)':{'xaxis' : 'Rec Energy [MeV]', 'yaxis' : 'Number of events', 'binning' : {'nBins':100, 'min':0, 'max':50}, 'dimension' : 1, 'bars' : hcalBarIDs()},

@@ -5,44 +5,8 @@ r.gROOT.SetBatch(1); #makes root not try to display plots in a new window
 import copy
 rootColors=[4,2,3,1,6,7,8,9]
 
-# colors = {
-#     'white': 0,
-#     'black': 1,
-#     'red': 2,
-#     'green': 3,
-#     'blue':4,
-#     'yellow':5,
-#     'magenta':6,
-#     'turqoise':7,
-#     'gray': 15,
-# }
-
-# def styleHistogramCommon(histogram,histogram2,legend):
-#     histogram.SetFillColor(colors['white'])
-#     histogram.SetLineColor(colors['blue'])
-#     histogram2.SetLineColor(colors['blue'])
-#     # histogram.SetMarkerColor(colors['black'])
-#     histogram.SetMarkerSize(0.75)
-#     histogram.SetMarkerSize(0.75)
-#     legend.SetX1(0.43)               
-#     legend.SetX2(0.53)  
-#     legend.SetY1(0.25)               
-#     legend.SetY2(0.60)
-#     legend.Draw()
-    
-    
-
-
-# def styleHistogram2D(histogram):
-#     # histogram.SetFillColor(colors['white'])
-#     # histogram.SetLineColor(colors['black'])
-#     # histogram.SetMarkerColor(colors['black'])
-#     histogram.SetMarkerSize(0.75)
 
 def styleHistogramEnergyResponse(histogram,legend):
-    # histogram.SetFillColor(colors['white'])
-    # histogram.SetLineColor(colors['black'])
-    # histogram.SetMarkerColor(colors['black'])
     histogram.SetMarkerSize(0.75)    
     legend.SetX1(0.7)               
     legend.SetX2(1)  
@@ -64,7 +28,6 @@ def label2D():
     label.SetTextSize(0.025)
     label.SetNDC()    
     label.DrawLatex(0,  0.92, "Odd layers: horizontal bars; Even layers: vertical bars")
-    # if fwhm: label.DrawLatex(xpos,  0.006, "Particle: hepions, Eneregy 11 GeV, Angle: 0 rad, Sample: 12M")
     return label
 
 def createContext(fileName,plotName,fwhm=None,μ=None,σ=None,stacked=False):
@@ -144,6 +107,8 @@ def prettyLegendName(str):
 
 
 def main():   
+    skipUninterestingPlots=False
+    skipUninterestingPlots=True
     fwhmList=[]
     fwhmListErrorsBars=[]
     resolutionList=[]
@@ -220,12 +185,13 @@ def main():
                 legend.Draw()
 
             # elif plotName == 'Reconstructed energy for tags (absolute energy)'  or plotName == 'Total number of hits per event':
-            elif plotName == 'Reconstructed energy for tags (absolute energy)':
+            elif plotName == 'Reconstructed energy for tags (absolute energy)' or plotName == 'simETot':
                 c.SetBottomMargin(0.14)
                 lines=[]
                 legend = r.TLegend(0.0,0.9,0.18,1)
                 for i in range(len(plot)):
                     hist=inFile.Get(plotName+";"+str(i+1))
+                    hist.GetXaxis().SetRangeUser(50, 100);
                     hist.SetLineColor(rootColors[i])  
                     lines.append(copy.deepcopy(hist))
                     legend.AddEntry(lines[-1],prettyLegendName(plot[i][1]),"f")
@@ -303,8 +269,7 @@ def main():
             elif μ: createContext(fileName,plotName,fwhm,μ,σ)
             else: createContext(fileName,plotName)
 
-            skipUninterestingPlots=False
-            # skipUninterestingPlots=True
+
             if skipUninterestingPlots:
                 if id in [False,5,402654208+4]:
                     c.SaveAs("plots/"+extractionName+".png")                

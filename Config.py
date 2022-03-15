@@ -19,8 +19,8 @@ from optparse import OptionParser
 # incidentAngleDegrees = float(options.angle)
 
 
-max_events = 1000
-energy=2 # GeV, certified
+max_events = 10
+energy=1 # GeV, certified
 particle_id='e-'
 incidentAngleDegrees=0
 runNumber=1
