@@ -80,17 +80,6 @@ def prepareDualPlots(dualPlotMode,c):
         c.GetPad(1).SetBottomMargin(0.14)
         c.GetPad(2).SetBottomMargin(0.14)
 
-def finishDualPlots(dualPlotMode,c,hist):
-    if dualPlotMode:
-        hist2=copy.deepcopy(hist)
-        c.cd(2) 
-        c.GetPad(2).SetLogy()
-        c.GetPad(2).SetGrid()
-        c.GetPad(1).SetGrid()
-        hist2.Draw("E")
-        c.cd(0)
-        # styleHistogramCommon(hist,hist2,legend)
-
 def prettyLegendName(str):
     # if str.find('k') == 0: name='0'
     # else: name = str[str.find('k')+1:]
@@ -226,7 +215,7 @@ def main():
                     fwhmListErrorsBars.append(fwhmError)   
                     μ = fit.Parameter(1)
                     σ = fit.Parameter(2)
-                hist.Draw("")                      
+                hist.Draw("HIST")                      
                 if dualPlotMode:
                     hist2=copy.deepcopy(hist)
                     if plotName == 'Distribution of PEs per HCal bar':                       
@@ -245,7 +234,7 @@ def main():
                     
                     c.GetPad(2).SetGrid()
                     c.GetPad(1).SetGrid()
-                    hist2.Draw("e")
+                    hist2.Draw("b")
                     c.GetPad(2).SetLogy()
                     if plotName == 'Distribution of PEs per HCal bar': 
                         
@@ -255,12 +244,9 @@ def main():
                             σ = fit.Parameter(2)
                             μ = fit.Parameter(1)    
                         except: pass #sometimes, nothing hits the bar    
-                    c.cd(0)
-                    # createLabel(fwhm)  
-
+                    c.cd(0) 
             c.cd()
-            # if 'fwhm' not in locals(): fwhm = None
-            # if 'μ' not in locals(): μ = None
+
             
             
             if μ and not dualPlotMode: 

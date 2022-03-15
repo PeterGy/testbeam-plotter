@@ -26,48 +26,6 @@ r.gROOT.SetBatch(1); #makes root not try to display plots in a new window
 # rootColors=[4,2] #a -v+ comparison
 rootColors=[4,2,3,1,6,7,8,9] #Colorblind unfriendly for comparing many things
 rootMarkers=[4,26,32] #this is getting out of hand
-
-
-def unabbreviate(str):
-    if str == "rec": return "reconstruction"
-    elif str == "sim": return "simulation"
-    elif str == "e-0.5": return "500 MeV electrons"
-    elif str == "e+0.5": return "500 MeV positrons"
-    else: return str
-
-def legendName(str):
-    pass
-
-
-
-def createLegend():
-    # legend = r.TLegend(0.0,0.95,0.18,1)
-    legend = r.TLegend(0.0,0.9,0.18,1)
-
-    # legend = r.TLegend(0.0,0.9,0,1)
-    # legend.SetTextSize(0.025)  
-    return legend    
-
-
-def drawLine(plotDimension,line):
-    # hist.SetOption("")
-        if plotDimension == 1:
-            line.Draw("HIST SAME")
-            # lines[-1].Draw("SAME E")
-        if plotDimension == 2:
-            line.Draw("COLZ SAME")  
-
-def drawLines(plotDimension,lines,options=''):
-    # hist.SetOption("")
-        if plotDimension == 1:
-            lines[0].Draw(options)
-            for i in range(1,len(lines)):
-                lines[i].Draw(options+" SAME")
-                # lines[i].Draw("SAME E")
-        if plotDimension == 2:
-            lines[0].Draw("COLZ") #SAME? 
-
-
   
 def createHist(plotDict,plotVar,id,fileName='asd'):
     if plotDict[plotVar]['dimension'] == 1:     
@@ -92,10 +50,8 @@ def createHist(plotDict,plotVar,id,fileName='asd'):
             hist = r.TH2F(histName,histTitle, len(binningX)-1, array('f',binningX) #name, title, nbins, start, finish
             , len(binningY)-1, array('f',binningY)) #nbins, start, finish                    
   
-
     hist.SetYTitle(plotDict[plotVar]['yaxis'])
     hist.SetXTitle(plotDict[plotVar]['xaxis'])
-  
     return hist
 
 def loadData(fileName): #can't even make it into a function why is ROOT so awful?
@@ -130,14 +86,11 @@ def getBeamEnergyFromFileName(fileName):
 
 
 def main():       
-    fwhmList=[]
     for plotNumber in range(len(plotGroups)): #creates a plot
         plotDimension =  getPlotDimension(plotNumber)
         barIDs = getPlotBars(plotNumber)
         # barIDs = [2]
-        extractionName = ""
-        # for id in barIDs: 
-        legend = createLegend()        
+        extractionName = ""     
         lines=[]     
         c=r.TCanvas('t','Total energy with fits', 1600, 900)
         for j in plotGroups[plotNumber]: #creates a line for each variable in the plot
@@ -145,54 +98,37 @@ def main():
             fileName = j[1]   
             extractionName = plotVar+"___"+fileName#+barName(id)
             inFile = r.TFile(fileName+".root","READ")   
-            #inFile = r.TFile("/home/petergy/Plotting/"+fileName+".root","READ")   #for the aurora
             allData = inFile.Get("LDMX_Events")                   
-                   
-
-
             beamEnergy=getBeamEnergyFromFileName(fileName)    
-            hists={}
-            canvases={}
             
             if barIDs == [False]:
                 hist = createHist(plotDict,plotVar,False)  
                 hist = fillHist(hist, plotVar, allData, barID=False, beamEnergy=beamEnergy)     
-                lines.append(copy.deepcopy(hist))      
-                legend.AddEntry(lines[-1],fileName,"f")             
-            # hist.SetLineColor(rootColors[len(lines)])   
+                lines.append(copy.deepcopy(hist))                  
             else:
+                hists={}
                 for id in barIDs:                                       
                     hists[id]=createHist(plotDict,plotVar,id)  
-                hists = fillHists(hists, plotVar, allData)    
-
-
-                     
+                hists = fillHist(hists, plotVar, allData)    
+   
             
         if barIDs == [False]:
-            drawLines(plotDimension,lines,options="HIST") 
             file = r.TFile("extractions/"+extractionName+".root", "RECREATE")
             for histos in lines:
                 histos.SetDirectory(file)
                 histos.Write()
-            # legend.SetDirectory(file) 
-            # legend.Write("legend")
             file.Close()
-            print("finished extracting",extractionName)
             c.Close()
+            print("finished extracting",extractionName)
+            
         else:
             for id in barIDs:     
-                hists[id].Draw()
-
                 file = r.TFile("extractions/"+extractionName+barName(id)+".root", "RECREATE")
                 hists[id].SetDirectory(file)
                 hists[id].Write()
                 file.Close()
-                print("finished extracting",extractionName+barName(id))
+                c.Close()
+            print("finished extracting the plot types ",extractionName)
                 
-
-
-
-
-
 
 main()

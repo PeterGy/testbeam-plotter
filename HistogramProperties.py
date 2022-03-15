@@ -82,6 +82,8 @@ plotDict = {
     'recZ' :{'xaxis' : 'Penetration depth Z [mm]', 'yaxis' : 'Counts', 'binning' : {'nBins':90, 'min':-450, 'max':450}, 'dimension' : 1},        
     'recAmp' :{'xaxis' : 'Amplitude [ns]', 'yaxis' : 'Counts', 'binning' : {'nBins':140, 'min':0, 'max':14}, 'dimension' : 1},        
     
+    'mean light yield vs bar ID' :{'xaxis' : 'bar', 'yaxis' : 'Light yield', 'binning' : {'nBins':12, 'min':0, 'max':12}, 'dimension' : 1},        
+    
     
     
     # 'simX(Z)' :{'xaxis' : 'Penetration depth Z [mm]', 'yaxis' : 'X Displacement [mm]', 'dimension' : 2,   

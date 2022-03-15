@@ -19,9 +19,9 @@ from optparse import OptionParser
 # incidentAngleDegrees = float(options.angle)
 
 
-max_events = 10
-energy=1 # GeV, certified
-particle_id='e-'
+max_events = 1000
+energy=4 # GeV, certified
+particle_id='mu-'
 incidentAngleDegrees=0
 runNumber=1
 xOffset=0 #mm, absorber is 665 mm wide
@@ -67,7 +67,7 @@ from LDMX.SimCore import generators
 from LDMX.SimCore import simulator
 # process = ldmxcfg.Process(simulation_name)
 # process = ldmxcfg.Process("process")
-process = ldmxcfg.Process("process")
+process = ldmxcfg.Process("protosim")
 # simulator = simulator.simulator(simulation_name)
 simulation = simulator.simulator("prototype")
 # simulation.runNumber = int(seed)

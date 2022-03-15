@@ -1,12 +1,7 @@
 from HistogramProperties import *
-
-
-
 #One element for each plot. Each plot is a list of pairs, each element in the list being a line on the plot. 
 #The pair holds the plotvar, then the file it stems from   
-
 testbeamPlotGroups = [
-
     # #1.1
     # # (('Distribution of number of hits of each bar','e-1GeV1k'),), 
     (('Mapped distribution of number of hits of each bar','e-1GeV1k'),),
@@ -14,10 +9,10 @@ testbeamPlotGroups = [
     (('Distribution of pulse height of each bar','e-1GeV1k'),), #192
     
     #1.3
-    (('Sum of pulse height per run','runs'),),
-    (('Sum of pulse height per event','runs'),),    
-    (('Total number of hits per event','runs'),),
-    (('Total number of hits per run','runs'),),    
+    (('Sum of pulse height per run','e-1GeV1k'),),
+    (('Sum of pulse height per event','e-1GeV1k'),),    
+    (('Total number of hits per event','e-1GeV1k'),),
+    (('Total number of hits per run','e-1GeV1k'),),    
     #1.4
     (('Distribution of number of hits for TS bars','e-1GeV1k'),), 
     # # # #(('Distribution of signal amplitude for TS bars','e-1GeV1k'),), #useless
@@ -39,29 +34,14 @@ testbeamPlotGroups = [
     (('TS plots with muons (light yield)','mu-4GeV1k'),), #12
     # (('TS plots with muons (pulse shape)','mu-4GeV1k'),), #12
     #5
-    # (('energy response vs. energy','pi-8GeV1k'),), #1
-    # (('energy response vs. energy','pi-4GeV1k'),), #1
-    # (('energy response vs. energy','pi-2GeV1k'),), #1
-    # (('energy response vs. energy','pi-1GeV1k'),), #1
-    # (('energy response vs. energy','pi-0.5GeV1k'),), #1
-    # (('energy response vs. energy','e-8GeV1k'),), #1
-    # (('energy response vs. energy','e-4GeV1k'),), #1
-    # (('energy response vs. energy','e-2GeV1k'),), #1
-    # (('energy response vs. energy','e-1GeV1k'),), #1
-    # (('energy response vs. energy','e-0.5GeV1k'),), #1
     (('energy response vs. energy','pi-8GeV1k'),('energy response vs. energy','pi-4GeV1k'),('energy response vs. energy','pi-2GeV1k'),('energy response vs. energy','pi-1GeV1k'),('energy response vs. energy','pi-0.5GeV1k'),), #1
     (('energy response vs. energy','e-8GeV1k'),('energy response vs. energy','e-4GeV1k'),('energy response vs. energy','e-2GeV1k'),('energy response vs. energy','e-1GeV1k'),('energy response vs. energy','e-0.5GeV1k'),), #1
     #6
     (('energy response vs. energy','pi-0.5GeV1k'),('energy response vs. energy','pi-0.4GeV1k'),('energy response vs. energy','pi-0.3GeV1k'),('energy response vs. energy','pi-0.2GeV1k'),('energy response vs. energy','pi-0.1GeV1k'),), #1
-    (('energy response vs. energy','e-0.5GeV1k'),('energy response vs. energy','e-0.4GeV1k'),('energy response vs. energy','e-0.3GeV1k'),('energy response vs. energy','e-0.2GeV1k'),('energy response vs. energy','e-0.1GeV1k'),), #1
-    
-    
-
-    
+    (('energy response vs. energy','e-0.5GeV1k'),('energy response vs. energy','e-0.4GeV1k'),('energy response vs. energy','e-0.3GeV1k'),('energy response vs. energy','e-0.2GeV1k'),('energy response vs. energy','e-0.1GeV1k'),), #1   
 ]
 
 testbeamPlotGroupsBig = [
-
     #1.1
     # (('Distribution of number of hits of each bar','e-1GeV1k'),), 
     (('Mapped distribution of number of hits of each bar','e-1GeV100k00deg'),),
@@ -99,33 +79,51 @@ testbeamPlotGroupsBig = [
     #6
     # (('energy response vs. energy','pi-0.5GeV1k'),('energy response vs. energy','pi-0.4GeV1k'),('energy response vs. energy','pi-0.3GeV1k'),('energy response vs. energy','pi-0.2GeV1k'),('energy response vs. energy','pi-0.1GeV1k'),), #1
     # (('energy response vs. energy','e-0.5GeV1k'),('energy response vs. energy','e-0.4GeV1k'),('energy response vs. energy','e-0.3GeV1k'),('energy response vs. energy','e-0.2GeV1k'),('energy response vs. energy','e-0.1GeV1k'),), #1
-    
-    
-
-    
 ]
 
 
 plotGroups = [
+    # (('mean light yield vs bar ID','mu-4GeV200k00deg'),),
+    # (('trigSimX(Z)','e-1GeV1k'),),
+    # (('simX(Z)','e-1GeV1k'),),
+    # (('Distribution of number of hits for TS bars','e-1GeV1k'),), 
 
-    # (
-    #     ('Reconstructed energy for tags (absolute energy)','pi-0.5GeV100k00deg'),
-    #     ('Reconstructed energy for tags (absolute energy)','pi-1GeV100k00deg'),
-    #     ('Reconstructed energy for tags (absolute energy)','pi-2GeV100k00deg'),
-    #     ('Reconstructed energy for tags (absolute energy)','pi-4GeV100k00deg'),
-        
-    # ), 
-    # (
-    #     ('simETot','pi-0.5GeV100k00deg'),
-    #     ('simETot','pi-1GeV100k00deg'),
-    #     ('simETot','pi-2GeV100k00deg'),
-    #     ('simETot','pi-4GeV100k00deg'),
-        
-    # ), 
 
-(('recX(Z)','e-1GeV100k00deg'),),
 # (('timeHCal','e-1GeV0k'),),
+# (('recE','e-1GeV0k'),),
+# (('TS plots with muons (light yield)','e-1GeV1k'),), #12
+# (('TS plots with muons (light yield)','mu-4GeV1k'),), #12
 
+   (('Mapped distribution of number of hits of each bar','e-1GeV1k'),),
+    #1.2
+    (('Distribution of pulse height of each bar','e-1GeV1k'),), #192
+    
+    #1.3
+    (('Sum of pulse height per run','e-1GeV1k'),),
+    (('Sum of pulse height per event','e-1GeV1k'),),    
+    (('Total number of hits per event','e-1GeV1k'),),
+    (('Total number of hits per run','e-1GeV1k'),),    
+    #1.4
+    (('Distribution of number of hits for TS bars','e-1GeV1k'),), 
+    (('Distribution of signal amplitude for TS bars (individual bars)','e-1GeV1k'),), #12
+    #1.5
+    (('Time difference between TS and HCal','e-1GeV1k'),), 
+
+
+    (('energy response vs. angle','e-1GeV1k'),('energy response vs. angle','e-1GeV0k'),('energy response vs. angle','e-1GeV1k'),('energy response vs. angle','e-1GeV1k'),('energy response vs. angle','e-1GeV1k'),),
+    (('energy response vs. position','e-1GeV1k'),('energy response vs. position','e-1GeV0k'),('energy response vs. position','e-1GeV1k'),('energy response vs. position','e-1GeV1k'),('energy response vs. position','e-1GeV1k'),),
+ 
+    #2.3
+    
+    (('Distribution of PEs per HCal bar','mu-4GeV1k'),), #192
+    (('Mapped Distribution of PEs per HCal bar','mu-4GeV1k'),),
+    (('Mapped Distribution of average PEs','mu-4GeV1k'),),
+
+    # 3.2
+
+    (('TS plots with muons (light yield)','mu-4GeV1k'),), #12
+
+   
 
     ]     
 
