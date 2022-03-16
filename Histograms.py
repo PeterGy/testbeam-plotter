@@ -19,7 +19,8 @@ testbeamPlotGroups = [
     (('Distribution of signal amplitude for TS bars (individual bars)','e-1GeV1k'),), #12
     #1.5
     (('Time difference between TS and HCal','e-1GeV1k'),), 
-
+    #2.1
+    (('Reconstructed energy for tags','e-1GeV1k'),), 
     #2.3
     # (('Energy as a function of the incoming particle angle','e-1GeV5k0deg'),),
     (('energy response vs. angle','e-1GeV5k0deg'),('energy response vs. angle','e-1GeV5k10deg'),('energy response vs. angle','e-1GeV5k20deg'),('energy response vs. angle','e-1GeV5k30deg'),('energy response vs. angle','e-1GeV5k40deg'),),
@@ -94,35 +95,44 @@ plotGroups = [
 # (('TS plots with muons (light yield)','e-1GeV1k'),), #12
 # (('TS plots with muons (light yield)','mu-4GeV1k'),), #12
 
-   (('Mapped distribution of number of hits of each bar','e-1GeV1k'),),
-    #1.2
-    (('Distribution of pulse height of each bar','e-1GeV1k'),), #192
+#    (('Mapped distribution of number of hits of each bar','e-1GeV1k'),),
+#     #1.2
+#     (('Distribution of pulse height of each bar','e-1GeV1k'),), #192
     
-    #1.3
-    (('Sum of pulse height per run','e-1GeV1k'),),
-    (('Sum of pulse height per event','e-1GeV1k'),),    
-    (('Total number of hits per event','e-1GeV1k'),),
-    (('Total number of hits per run','e-1GeV1k'),),    
-    #1.4
-    (('Distribution of number of hits for TS bars','e-1GeV1k'),), 
-    (('Distribution of signal amplitude for TS bars (individual bars)','e-1GeV1k'),), #12
-    #1.5
-    (('Time difference between TS and HCal','e-1GeV1k'),), 
+#     #1.3
+#     (('Sum of pulse height per run','e-1GeV1k'),),
+#     (('Sum of pulse height per event','e-1GeV1k'),),    
+#     (('Total number of hits per event','e-1GeV1k'),),
+#     (('Total number of hits per run','e-1GeV1k'),),    
+#     #1.4
+#     (('Distribution of number of hits for TS bars','e-1GeV1k'),), 
+#     (('Distribution of signal amplitude for TS bars (individual bars)','e-1GeV1k'),), #12
+#     #1.5
+#     (('Time difference between TS and HCal','e-1GeV1k'),), 
 
 
-    (('energy response vs. angle','e-1GeV1k'),('energy response vs. angle','e-1GeV1k'),('energy response vs. angle','e-1GeV1k'),('energy response vs. angle','e-1GeV1k'),('energy response vs. angle','e-1GeV1k'),),
-    (('energy response vs. position','e-1GeV1k'),('energy response vs. position','e-1GeV1k'),('energy response vs. position','e-1GeV1k'),('energy response vs. position','e-1GeV1k'),('energy response vs. position','e-1GeV1k'),),
+#     (('energy response vs. angle','e-1GeV1k'),('energy response vs. angle','e-1GeV0k'),('energy response vs. angle','e-1GeV1k'),('energy response vs. angle','e-1GeV1k'),('energy response vs. angle','e-1GeV1k'),),
+#     (('energy response vs. position','e-1GeV1k'),('energy response vs. position','e-1GeV0k'),('energy response vs. position','e-1GeV1k'),('energy response vs. position','e-1GeV1k'),('energy response vs. position','e-1GeV1k'),),
  
-    #2.3
+#     #2.3
     
-    (('Distribution of PEs per HCal bar','mu-4GeV1k'),), #192
-    (('Mapped Distribution of PEs per HCal bar','mu-4GeV1k'),),
-    (('Mapped Distribution of average PEs','mu-4GeV1k'),),
+#     (('Distribution of PEs per HCal bar','mu-4GeV1k'),), #192
+#     (('Mapped Distribution of PEs per HCal bar','mu-4GeV1k'),),
+#     (('Mapped Distribution of average PEs','mu-4GeV1k'),),
 
-    # 3.2
+#     # 3.2
 
-    (('TS plots with muons (light yield)','mu-4GeV1k'),), #12
+#     (('TS plots with muons (light yield)','mu-4GeV1k'),), #12
 
+    (('Reconstructed energy for tags','e-4GeV0k'),
+    ('Reconstructed energy for tags','e-2GeV0k'),
+    ('Reconstructed energy for tags','e-1GeV0k'),
+    ('Reconstructed energy for tags','e-0.5GeV0k'),
+    
+    ), 
+    # (('Reconstructed energy for tags','e-1GeV1k'),), 
+    # (('Reconstructed energy for tags','e-1GeV1k'),), 
+    # (('Reconstructed energy for tags','e-1GeV1k'),), 
    
 
     ]     

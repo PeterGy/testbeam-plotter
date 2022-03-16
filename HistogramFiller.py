@@ -2,11 +2,11 @@
 from HistogramProperties import *
 from numpy import *
 import platform 
-
+#hist can actually be a single histogram or a dictionary of 12 or 192 histograms
 def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, maxEDeposit=float('inf'), barID=False, angle=0, beamEnergy=0): 
     
-    # type(hists) != type({})
-    # print('hmmmm',type(hists) != type({}))
+    # type(hist) != type({})
+    # print('hmmmm',type(hist) != type({}))
     # print('hist type',type(hist))
     energyErrorCorrection = 0.5 #they did an oopsie in the coding and now I got to correct for it
     allowNoise= False
@@ -63,31 +63,6 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
                 except: bars[h.getID()]=h.getPE()                           
             for bar in bars:
                 hist.Fill(bars[bar])   
-
-    elif plotVar == 'recEventBar': 
-        for event in allData: 
-            bars={}
-            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                hist.Fill(h.getID())
-                #402654211:402668549
-
-    elif plotVar == 'recBarEvent': #redo with autobinning
-        layers={}
-        bars={}
-        for event in allData:             
-            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                try: bars[h.getID()]+=1
-                except: bars[h.getID()]=1
-        barOrder=[]                               
-        for bar in bars:
-            barOrder.append(bar)
-        barOrder.sort()      
-        hist = r.TH1F(plotVar,"Event counts in each bar", len(bars) ,0,len(bars)) 
-        for i in range(len(barOrder)):
-            hist.Fill(i,bars[barOrder[i]])
-
-        hist.SetYTitle('counts')
-        hist.SetXTitle('bar ranking in bar ID')
 
     # elif plotVar == 'recE': 
     #     for event in allData: 
@@ -256,16 +231,7 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
         print(PEs)        
         print(barHits)        
 
-    elif plotVar == 'TS plots with muons (light yield)': 
-        for event in allData: 
-            PEs = {}
-            for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
-                if h.getBarID() in PEs:
-                    PEs[h.getBarID()] += h.getPE()
-                else:
-                    PEs[h.getBarID()] = h.getPE()    
-            for barID in PEs:    
-                hists[barID].Fill(PEs[barID])  
+
 
 
 
@@ -284,7 +250,17 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
                 if h.getID() == barID: 
                     hits+=1
             hist.Fill(hits)              
-
+    #1.2
+    if plotVar == 'Distribution of pulse height of each bar': 
+        for event in allData: 
+            amplitudes = {}
+            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+                if h.getID() in amplitudes:
+                    amplitudes[h.getID()] += h.getAmplitude()
+                else:
+                    amplitudes[h.getID()] = h.getAmplitude()    
+            for barID in amplitudes:    
+                hist[barID].Fill(amplitudes[barID])     
     #1.3
     elif plotVar == 'Total number of hits per event': 
         for event in allData: 
@@ -319,7 +295,6 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
                 runs[run]+=h.getAmplitude()       
         for run in runs:
             hist.Fill(runs[run]) 
-            print(runs[run])
         
     #1.4
     elif plotVar == 'Distribution of number of hits for TS bars': 
@@ -331,7 +306,14 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
         for event in allData: 
             for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
                 hist.Fill(h.getBarID(),h.getAmplitude())
-   
+
+    elif plotVar == 'Distribution of signal amplitude for TS bars (individual bars)': 
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
+                hist[h.getBarID()].Fill(h.getAmplitude()/1000.)       #WARNING: this makes them go from fC to pC
+                if h.getBarID() not in range(0,13): print (h.getBarID())
+
+
     #1.5
     elif plotVar == 'Time difference between TS and HCal': 
         for event in allData: #I define time difference based on the first event's time
@@ -364,16 +346,7 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
     elif plotVar == 'Energy as a function of the incoming particle angle':
         for event in allData:             
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                hist.Fill(angle,h.getEnergy()*energyErrorCorrection)    
-
-    #3.1
-    elif plotVar == 'Distribution of PEs per HCal bar': 
-        for event in allData: 
-            PEs = 0
-            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                if h.getID() == barID: 
-                    PEs += h.getPE() 
-            hist.Fill(PEs)            
+                hist.Fill(angle,h.getEnergy()*energyErrorCorrection)      
 
     elif plotVar == 'Mapped Distribution of PEs per HCal bar': 
         for event in allData: 
@@ -441,34 +414,16 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
         print ("Total simulated energy deposit:",simE)          
         print ("Total reconstructed energy deposit:",recE)   
  
-    return hist   
+#     return hist   
 
-def fillHists(hists, plotVar, allData, processName="protosim"):     
-    # print('hmmmm',type(hists) != type({}))
-    energyErrorCorrection = 0.5
-    #1.2
-    if plotVar == 'Distribution of pulse height of each bar': 
-        for event in allData: 
-            # amplitude = 0
-            amplitudes = {}
-            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                if h.getID() in amplitudes:
-                    amplitudes[h.getID()] += h.getAmplitude()
-                else:
-                    amplitudes[h.getID()] = h.getAmplitude()    
-                # if h.getID() == barID: 
-                #     amplitude += h.getAmplitude() 
-            for barID in amplitudes:    
-                hists[barID].Fill(amplitudes[barID])            
+# def fillhist(hist, plotVar, allData, processName="protosim"):     
+#     # print('hmmmm',type(hist) != type({}))
+#     energyErrorCorrection = 0.5
+       
             
 
         
-    #1.4
-    elif plotVar == 'Distribution of signal amplitude for TS bars (individual bars)': 
-        for event in allData: 
-            for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
-                hists[h.getBarID()].Fill(h.getAmplitude()/1000.)       #WARNING: this makes them go from fC to pC
-                if h.getBarID() not in range(0,13): print (h.getBarID())
+
     
 
     #3
@@ -489,7 +444,7 @@ def fillHists(hists, plotVar, allData, processName="protosim"):
                 # if h.getID() == barID: 
                 #     amplitude += h.getAmplitude() 
             for barID in PEs:    
-                hists[barID].Fill(PEs[barID]) 
+                hist[barID].Fill(PEs[barID]) 
 
     #3.2
     elif plotVar == 'TS plots with muons (light yield)': 
@@ -501,7 +456,7 @@ def fillHists(hists, plotVar, allData, processName="protosim"):
                 else:
                     PEs[h.getBarID()] = h.getPE()    
             for barID in PEs:    
-                hists[barID].Fill(PEs[barID])       
+                hist[barID].Fill(PEs[barID])       
 
     elif plotVar == 'simE (individual bars)': 
         for event in allData: 
@@ -513,11 +468,11 @@ def fillHists(hists, plotVar, allData, processName="protosim"):
                     Energies[h.getID()]=h.getEdep()    
             for barID in Energies:    
                 # if Energies[barID] > 17: Energies[barID] = 17
-                hists[barID].Fill(Energies[barID]) 
+                hist[barID].Fill(Energies[barID]) 
 
     elif plotVar == 'recE (individual bars)': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                hists[h.getID()].Fill(h.getEnergy()*energyErrorCorrection) 
+                hist[h.getID()].Fill(h.getEnergy()*energyErrorCorrection) 
 
-    return hists    
+    return hist    

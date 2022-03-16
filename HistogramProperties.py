@@ -67,10 +67,6 @@ plotDict = {
     # 'simZ' :{'xaxis' : 'Penetration depth Z [mm]', 'yaxis' : 'Counts', 'binning' : {'nBins':90, 'min':-450, 'max':450}, 'dimension' : 1},
     'simZ' :{'xaxis' : 'Penetration depth Z [mm]', 'yaxis' : 'Counts', 'binning' : barBinsZ, 'dimension' : 1},
     
-    # 'recEventBar':{'xaxis' : 'Y Displacement [mm]', 'yaxis' : 'Counts', 'binning' : {'nBins':200, 'min':402654210, 'max':402668549}, 'dimension' : 1},
-    'recEventBar':{'xaxis' : 'Bar ID', 'yaxis' : 'Counts', 'binning' : {'nBins':402672650-402656200, 'min':402656200, 'max':402672650}, 'dimension' : 1},
-    
-    'recBarEvent':{'xaxis' : 'Bar number', 'yaxis' : 'Counts', 'binning' : {'nBins':19, 'min':0.5, 'max':19.5}, 'dimension' : 1},
 
 
 
