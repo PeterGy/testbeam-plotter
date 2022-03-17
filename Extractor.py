@@ -27,31 +27,38 @@ r.gROOT.SetBatch(1); #makes root not try to display plots in a new window
 rootColors=[4,2,3,1,6,7,8,9] #Colorblind unfriendly for comparing many things
 rootMarkers=[4,26,32] #this is getting out of hand
   
-def createHist(plotDict,plotVar,id,fileName='asd'):
+def createHist(plotDict,plotVar,barIDs,fileName=''):
+
     if plotDict[plotVar]['dimension'] == 1:     
-        histTitle = plotVar
-        histName = plotVar+barName(id)          
-        binning = plotDict[plotVar]['binning']                
-        if type(binning) == type({}):                     
-            hist = r.TH1F(histName,histTitle, binning['nBins'],binning['min'],binning['max']) #name, title, nbins, start, finish          
-        elif type(binning) == type([]):
-            hist = r.TH1F(histName,histTitle, len(binning)-1, array('f',binning)) #name, title, nbins, binlayout   
-        # hist.SetMinimum(0.5)      
+        hist={}
+        for id in barIDs:                                       
+            histTitle = plotVar
+            histName = plotVar+barName(id)          
+            binning = plotDict[plotVar]['binning']                
+            if type(binning) == type({}):                     
+                hist[id] = r.TH1F(histName,histTitle, binning['nBins'],binning['min'],binning['max']) #name, title, nbins, start, finish          
+            elif type(binning) == type([]):
+                hist[id] = r.TH1F(histName,histTitle, len(binning)-1, array('f',binning)) #name, title, nbins, binlayout   
+            # hist.SetMinimum(0.5)      
+            hist[id].SetYTitle(plotDict[plotVar]['yaxis'])
+            hist[id].SetXTitle(plotDict[plotVar]['xaxis'])
 
     elif plotDict[plotVar]['dimension'] == 2:
-        histTitle = plotVar 
-        histName = plotVar            
-        binningX = plotDict[plotVar]['binningX']
-        binningY = plotDict[plotVar]['binningY']                           
-        if type(binningX) == type({}):
-            hist = r.TH2F(histName,histTitle,binningX['nBins'],binningX['min'],binningX['max'] #name, title, nbins, start, finish
-            ,binningY['nBins'],binningY['min'],binningY['max']) #nbins, start, finish
-        elif type(binningX) == type([]):    
-            hist = r.TH2F(histName,histTitle, len(binningX)-1, array('f',binningX) #name, title, nbins, start, finish
-            , len(binningY)-1, array('f',binningY)) #nbins, start, finish                    
-  
-    hist.SetYTitle(plotDict[plotVar]['yaxis'])
-    hist.SetXTitle(plotDict[plotVar]['xaxis'])
+        hist={}
+        for id in barIDs:   
+            histTitle = plotVar 
+            histName = plotVar            
+            binningX = plotDict[plotVar]['binningX']
+            binningY = plotDict[plotVar]['binningY']                           
+            if type(binningX) == type({}):
+                hist[id] = r.TH2F(histName,histTitle,binningX['nBins'],binningX['min'],binningX['max'] #name, title, nbins, start, finish
+                ,binningY['nBins'],binningY['min'],binningY['max']) #nbins, start, finish
+            elif type(binningX) == type([]):    
+                hist[id] = r.TH2F(histName,histTitle, len(binningX)-1, array('f',binningX) #name, title, nbins, start, finish
+                , len(binningY)-1, array('f',binningY)) #nbins, start, finish                    
+    
+            hist[id].SetYTitle(plotDict[plotVar]['yaxis'])
+            hist[id].SetXTitle(plotDict[plotVar]['xaxis'])
     return hist
 
 def loadData(fileName): #can't even make it into a function why is ROOT so awful?
@@ -101,34 +108,36 @@ def main():
             allData = inFile.Get("LDMX_Events")                   
             beamEnergy=getBeamEnergyFromFileName(fileName)    
             
-            if barIDs == [False]:
-                hist = createHist(plotDict,plotVar,False)  
-                hist = fillHist(hist, plotVar, allData, barID=False, beamEnergy=beamEnergy)     
-                lines.append(copy.deepcopy(hist))                  
-            else:
-                hists={}
-                for id in barIDs:                                       
-                    hists[id]=createHist(plotDict,plotVar,id)  
-                hists = fillHist(hists, plotVar, allData)    
+            # if barIDs == [False]:
+            hist = createHist(plotDict,plotVar,barIDs)  
+            hist = fillHist(hist, plotVar, allData, beamEnergy=beamEnergy)     
+            lines.append(copy.deepcopy(hist))                  
+            # else:
+            #     hists={}
+            #     for id in barIDs:                                       
+            #         hists[id]=createHist(plotDict,plotVar,id)  
+            #     hists = fillHist(hists, plotVar, allData)    
+            #     lines.append(copy.deepcopy(hists))t
    
             
-        if barIDs == [False]:
-            file = r.TFile("extractions/"+extractionName+".root", "RECREATE")
+        # if barIDs == [False]:
+        #     file = r.TFile("extractions/"+extractionName+".root", "RECREATE")
+        #     for histos in lines:
+        #         histos.SetDirectory(file)
+        #         histos.Write()
+        #     file.Close()
+        #     c.Close()
+        #     print("finished extracting",extractionName)
+            
+        # else:
+        for id in barIDs:     
+            file = r.TFile("extractions/"+extractionName+barName(id)+".root", "RECREATE")
             for histos in lines:
-                histos.SetDirectory(file)
-                histos.Write()
+                histos[id].SetDirectory(file)
+                histos[id].Write()
             file.Close()
             c.Close()
-            print("finished extracting",extractionName)
-            
-        else:
-            for id in barIDs:     
-                file = r.TFile("extractions/"+extractionName+barName(id)+".root", "RECREATE")
-                hists[id].SetDirectory(file)
-                hists[id].Write()
-                file.Close()
-                c.Close()
-            print("finished extracting the plot types ",extractionName)
+        print("finished extracting the plot types ",extractionName)
                 
 
 main()

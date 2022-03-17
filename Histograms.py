@@ -124,17 +124,27 @@ plotGroups = [
 
 #     (('TS plots with muons (light yield)','mu-4GeV1k'),), #12
 
-    (('Reconstructed energy for tags','e-4GeV0k'),
-    ('Reconstructed energy for tags','e-2GeV0k'),
-    ('Reconstructed energy for tags','e-1GeV0k'),
-    ('Reconstructed energy for tags','e-0.5GeV0k'),
-    
-    ), 
-    # (('Reconstructed energy for tags','e-1GeV1k'),), 
-    # (('Reconstructed energy for tags','e-1GeV1k'),), 
-    # (('Reconstructed energy for tags','e-1GeV1k'),), 
+#     (('Reconstructed energy for tags','e-4GeV0k'),
+#     ('Reconstructed energy for tags','e-2GeV0k'),
+#     ('Reconstructed energy for tags','e-1GeV0k'),
+#     ('Reconstructed energy for tags','e-0.5GeV0k'),
+#     ), 
+#     (('Reconstructed energy for tags','e-1GeV1k'),), 
+#     (('Reconstructed energy for tags','e-1GeV1k'),), 
+#     (('Reconstructed energy for tags','e-1GeV1k'),), 
    
+#     (('Distribution of pulse height of each bar','e-1GeV1k'),('Distribution of pulse height of each bar','mu-4GeV1k'),),
+    
+    
+#     (('Distribution of number of hits for TS bars','e-1GeV1k'),), 
 
+#     (('Distribution of signal amplitude for TS bars (individual bars)','e-1GeV1k'),('Distribution of signal amplitude for TS bars (individual bars)','e-0.5GeV1k'),), #12
+#     # (('energy response vs. angle','e-1GeV1k'),('energy response vs. angle','e-1GeV0k'),('energy response vs. angle','e-1GeV1k'),('energy response vs. angle','e-1GeV1k'),('energy response vs. angle','e-1GeV1k'),),
+#     # (('Mapped distribution of number of hits of each bar','e-1GeV1k'),),
+
+#     (('energy response vs. energy','e-0.5GeV1k'),('energy response vs. energy','e-1GeV1k'),), #1
+    (('TS plots with muons (light yield)','mu-4GeV200k00deg'),),
+    
     ]     
 
 # plotGroups = testbeamPlotGroups   

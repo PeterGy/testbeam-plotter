@@ -29,7 +29,8 @@ def main():
             c.cd()
             dualPlotMode=False  
             fittyPlots=['energy response vs. energy','energy response vs. angle','energy response vs. position',
-            'Reconstructed energy for tags (absolute energy)','simETot','Reconstructed energy for tags']
+            'Reconstructed energy for tags (absolute energy)','simETot','Reconstructed energy for tags'
+            ,'Distribution of signal amplitude for TS bars (individual bars)']
             if dimension == 2:
                 c.SetCanvasSize(1800, 800)
                 c.GetPad(0).SetRightMargin(0.121)
@@ -46,26 +47,27 @@ def main():
                 lines=[]
                 legend = r.TLegend(0.0,0.9,0.18,1)
                 for i in range(len(plot)):
-                    hist=inFile.Get(plotName+";"+str(i+1))
+                    hist=inFile.Get(plotName+barName(id)+";"+str(i+1))
                     hist.SetLineColor(rootColors[i])  
                     lines.append(copy.deepcopy(hist))
                     legend.AddEntry(lines[-1],prettyLegendName(plot[i][1]),"f")
                 for line in lines:
                     line.Draw("same e")    
-                    fit = line.Fit('gaus','Sq')
 
+                    try:
+                        fit = line.Fit('gaus','Sq')
+                        μ = fit.Parameter(1)
+                        Δμ = fit.ParError(1)
+                        σ = fit.Parameter(2)
+                        Δσ = fit.ParError(2)
+                        resolution=σ/μ
+                        Δresolution=resolution*(Δμ/μ+Δσ/σ)
+                        resolutionList.append(resolution)     
+                        ΔresolutionList.append(Δresolution)     
 
-                    μ = fit.Parameter(1)
-                    Δμ = fit.ParError(1)
-                    σ = fit.Parameter(2)
-                    Δσ = fit.ParError(2)
-                    resolution=σ/μ
-                    Δresolution=resolution*(Δμ/μ+Δσ/σ)
-                    resolutionList.append(resolution)     
-                    ΔresolutionList.append(Δresolution)     
-
-                    line.GetFunction("gaus").SetLineColor(rootColors[lines.index(line)])
-                    labelμ(lines,line,fit)
+                        line.GetFunction("gaus").SetLineColor(rootColors[lines.index(line)])
+                        labelμ(lines,line,fit)
+                    except: pass
 
                     
                 c.SetLogy()   
@@ -78,11 +80,7 @@ def main():
                 c.SetBottomMargin(0.14)
                 r.gStyle.SetOptStat("ne")
                 dualPlotMode=True
-                # r.gStyle.SetOptStat("nerm") 
-                # if not dualPlotMode: 
-                    
-                prepareDualPlots(dualPlotMode,c)   
-                                      
+                prepareDualPlots(dualPlotMode,c)                                       
                 if id != False: hist.SetName(barName(id)) 
                 hist.GetRMS()     #this ONE CURSED LINE is somehow the key that makes hist2.GetXaxis().SetRangeUser(50,150) work. Wtf?!?!?!?!             
                 hist.Draw("HIST")                      
@@ -96,16 +94,13 @@ def main():
                         hist2.SetTitle('TS plots with muons (light yield) (zoomed in)') 
                     else:
                         hist2.SetTitle(hist2.GetTitle()+' (log plot)')     
-
                     r.gStyle.SetOptStat("nerm")
-                    c.cd(2) 
-                    
+                    c.cd(2)                     
                     c.GetPad(2).SetGrid()
                     c.GetPad(1).SetGrid()
                     hist2.Draw("E")
                     c.GetPad(2).SetLogy()
-                    if plotName == 'Distribution of PEs per HCal bar': 
-                        
+                    if plotName == 'Distribution of PEs per HCal bar':   
                         fit = hist2.Fit('gaus','Sq')
                         try:
                             σ = fit.Parameter(2)
@@ -114,12 +109,8 @@ def main():
                     c.cd(0) 
 
             c.cd()
-
-            if μ and not dualPlotMode: 
-                c.SetBottomMargin(0.15)
-                createContext(fileName,plotName,μ,σ,stacked=True)
-            elif μ: createContext(fileName,plotName,μ,σ)
-            else: createContext(fileName,plotName)
+            if μ: c.SetBottomMargin(0.15)
+            createContext(fileName,plotName,μ,σ)
 
             if skipUninterestingPlots:
                 if id in [False,5,402654208+4]:

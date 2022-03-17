@@ -5,6 +5,9 @@ import platform
 #hist can actually be a single histogram or a dictionary of 12 or 192 histograms
 def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, maxEDeposit=float('inf'), barID=False, angle=0, beamEnergy=0): 
     
+    if len(hist)==1:
+        hist=hist[0]
+        
     # type(hist) != type({})
     # print('hmmmm',type(hist) != type({}))
     # print('hist type',type(hist))
@@ -64,12 +67,12 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
             for bar in bars:
                 hist.Fill(bars[bar])   
 
-    # elif plotVar == 'recE': 
-    #     for event in allData: 
-    #         for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):
-    #             print(h.id(),h.isADC(),h.size(),h.soi(),)        
+    elif plotVar == 'recE': 
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):
+                print(h.id())        
 
-    #             'at', 'id', 'isADC', 'isTOT', 'size', 'soi', 'tot' 
+
 
     elif plotVar == 'recE': 
         for event in allData: 
@@ -448,15 +451,20 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
 
     #3.2
     elif plotVar == 'TS plots with muons (light yield)': 
+        values={}
         for event in allData: 
             PEs = {}
             for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
+                if  70<h.getPE() and h.getPE()<80:
+                    values[h.getPE()] =1
+
                 if h.getBarID() in PEs:
                     PEs[h.getBarID()] += h.getPE()
                 else:
                     PEs[h.getBarID()] = h.getPE()    
             for barID in PEs:    
-                hist[barID].Fill(PEs[barID])       
+                hist[barID].Fill(PEs[barID])   
+        print(values)            
 
     elif plotVar == 'simE (individual bars)': 
         for event in allData: 
@@ -475,4 +483,6 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
                 hist[h.getID()].Fill(h.getEnergy()*energyErrorCorrection) 
 
+
+    if type(hist) != type({}): return {False:hist}
     return hist    

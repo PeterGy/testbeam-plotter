@@ -44,21 +44,32 @@ def createContext(fileName,plotName,μ=None,σ=None,stacked=False):
     if plotName == 'energy response vs. energy' and "0.1GeV" in fileName:  energy = '0.1 - 0.5'
     if plotName == 'energy response vs. angle':  angle = '0 - 40'
 
-    if stacked:
-        label2 = r.TLatex()
-        label2.SetTextFont(42)
-        label2.SetTextSize(0.05)
-        label2.SetNDC()  
-        contextString = "Particle: "+particle+", Energy: "+energy+" GeV, Sample: "+sample+"k, Angle: "+angle+" deg"
-        contextString2 = "Fit #sigma: "+str(round(σ,6))+", Fit #mu: "+str(round(μ,6))
-        label.DrawLatex(0,0.008, contextString)
-        label.DrawLatex(0,0.068, contextString2)
-    elif not stacked:
-        contextString = "Particle: "+particle+", Energy: "+energy+" GeV, Sample: "+sample+"k, Angle: "+angle+" deg"
-        if σ != None: contextString += "; Fit #sigma: "+str(round(σ,4))
-        if μ != None: contextString += ", Fit #mu: "+str(round(μ,4))
-        if μ != None and σ != None: contextString += ", Resolution: "+str(round(σ/μ,4))
-        label.DrawLatex(0,0.008, contextString)
+    
+    top = ''
+    if σ != None: top += "#sigma: "+str(round(σ,4))
+    if μ != None: top += ", #mu: "+str(round(μ,4))
+    if μ != None and σ != None: top += ", res: "+str(round(σ/μ,4))
+
+    bottom = "Particle: "+particle+", Energy: "+energy+" GeV, Sample: "+sample+"k, Angle: "+angle+" deg"
+    contextString='#splitline{'+top+'}{'+bottom+'}'
+
+    label.DrawLatex(0,0.038, contextString)
+
+    # if stacked:
+    #     label2 = r.TLatex()
+    #     label2.SetTextFont(42)
+    #     label2.SetTextSize(0.05)
+    #     label2.SetNDC()  
+    #     contextString = "Particle: "+particle+", E nergy: "+energy+" GeV, Sample: "+sample+"k, Angle: "+angle+" deg"
+    #     contextString2 = "Fit #splitline{#sigma: "+str(round(σ,6))+", }{Fit} #mu: "+str(round(μ,6))
+    #     label.DrawLatex(0,0.008, contextString)
+    #     label.DrawLatex(0,0.068, contextString2)
+    # elif not stacked:
+    #     contextString = "Particle: "+particle+", Ene \\ rgy: "+energy+" GeV, Sample: "+sample+"k, Angle: "+angle+" deg"
+    #     if σ != None: contextString += "; Fit #sigma: "+str(round(σ,4))
+    #     if μ != None: contextString += ", Fit #mu: "+str(round(μ,4))
+    #     if μ != None and σ != None: contextString += ", Resolution: "+str(round(σ/μ,4))
+    #     label.DrawLatex(0,0.008, contextString)
     return label
 
 
