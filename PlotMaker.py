@@ -109,7 +109,7 @@ def main():
                     c.cd(0) 
 
             c.cd()
-            if μ: c.SetBottomMargin(0.15)
+            # if μ: c.SetBottomMargin(0.15)
             createContext(fileName,plotName,μ,σ)
 
             if skipUninterestingPlots:
@@ -118,10 +118,9 @@ def main():
             else: c.SaveAs("plots/"+extractionName+".png")
             c.Close()
 
-        
-        plotResolution(resolutionList,ΔresolutionList,plotName)
-        resolutionList=[]
-        ΔresolutionList=[]
+        print(resolutionList)
+        [resolutionList,ΔresolutionList] = plotResolution(resolutionList,ΔresolutionList,plotName)
+
 
 
 main()

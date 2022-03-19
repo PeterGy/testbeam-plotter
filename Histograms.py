@@ -143,7 +143,15 @@ plotGroups = [
 #     # (('Mapped distribution of number of hits of each bar','e-1GeV1k'),),
 
 #     (('energy response vs. energy','e-0.5GeV1k'),('energy response vs. energy','e-1GeV1k'),), #1
-    (('TS plots with muons (light yield)','mu-4GeV200k00deg'),),
+    # (('TS plots with muons (light yield)','mu-4GeV200k00deg'),),
+(('recE','e-3GeV0k'),),
+# (('recE','e-3GeV1000k'),),
+#    (('energy response vs. energy','pi-8GeV100k00deg'),('energy response vs. energy','pi-4GeV100k00deg'),('energy response vs. energy','pi-2GeV100k00deg'),('energy response vs. energy','pi-1GeV100k00deg'),('energy response vs. energy','pi-0.5GeV100k00deg'),), #1
+#     (('energy response vs. energy','e-8GeV100k00deg'), ('energy response vs. energy','e-4GeV100k00deg'), ('energy response vs. energy','e-2GeV100k00deg'), ('energy response vs. energy','e-1GeV100k00deg'), ('energy response vs. energy','e-0.5GeV100k00deg'),), #1
+ 
+#   (('energy response vs. energy','pi-0.5GeV2k'),('energy response vs. energy','pi-0.4GeV2k'),('energy response vs. energy','pi-0.3GeV2k'),('energy response vs. energy','pi-0.2GeV2k'),('energy response vs. energy','pi-0.1GeV2k'),), #1
+#     (('energy response vs. energy','e-0.5GeV2k'),('energy response vs. energy','e-0.4GeV2k'),('energy response vs. energy','e-0.3GeV2k'),('energy response vs. energy','e-0.2GeV2k'),('energy response vs. energy','e-0.1GeV2k'),), #1   
+
     
     ]     
 

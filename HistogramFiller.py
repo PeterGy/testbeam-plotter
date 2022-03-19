@@ -68,9 +68,28 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
                 hist.Fill(bars[bar])   
 
     elif plotVar == 'recE': 
+        valuesDigi={}
+        valuesRec={}
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):
-                print(h.id())        
+                # print(h.id())     
+                valuesDigi[h.id()] =1   
+            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+                valuesRec[h.getID()] =1
+        print(valuesDigi)
+        print(valuesRec)
+
+        listDigi=[]
+        for i in valuesDigi:
+            listDigi.append(i)
+        listDigi.sort()
+        print(len(listDigi))  
+        listRec=[]
+        for i in valuesRec:
+            listRec.append(i)
+        listRec.sort()
+        print(len(listRec))
+                    
 
 
 

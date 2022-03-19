@@ -1,4 +1,5 @@
 import ROOT as r
+from numpy import *
 rootColors=[4,2,3,1,6,7,8,9]
 
 def styleHistogramEnergyResponse(histogram,legend):
@@ -104,10 +105,7 @@ def plotResolution(resolutionList,ΔresolutionList,plotName):
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     from scipy import optimize
-    plt.ylabel("Resolution")            
-    plt.title('Fit quality')
-    plt.legend()
-    plt.grid(visible=True)
+
 
     if len(resolutionList)==5 and (plotName == 'energy response vs. angle' or plotName == 'energy response vs. position'):
         if plotName == 'energy response vs. angle':
@@ -121,6 +119,12 @@ def plotResolution(resolutionList,ΔresolutionList,plotName):
         plt.figure(name)
         plt.errorbar(x,resolutionList,xerr=0,yerr=ΔresolutionList,label=name,color='r',marker=",",linestyle='')
         plt.savefig('plots/resolutions '+name+'.png')
+        plt.ylabel("Resolution")            
+        plt.title('Fit quality')
+        plt.legend()
+        plt.grid(visible=True)
+        plt.savefig('plots/resolutions '+name+'.png')
+        return [[],[]]
 
     elif len(resolutionList)==10:
         def expected(E,s=1): return s*1/sqrt(E)
@@ -138,11 +142,24 @@ def plotResolution(resolutionList,ΔresolutionList,plotName):
         yfitElec=[expected(E,s=paramsElec[0]) for E in xfit]    
         plt.plot(xfit,yfitPion,"r--",label='Pion 1/√E fit')
         plt.plot(xfit,yfitElec,"b--",label='Electron 1/√E fit')    
+        plt.ylabel("Resolution")            
+        plt.title('Fit quality')
+        plt.legend()
+        plt.grid(visible=True)
         plt.savefig('plots/resolutionEnergies.png')
+
+        return [[],[]]
 
     elif len(resolutionList)==4 and (plotName == 'Reconstructed energy for tags'):
         plt.figure("Energies")
         energies = (1,2)
         plt.errorbar(energies,resolutionList[0:2],xerr=0,yerr=ΔresolutionList[0:2],label='Electrons',color='b',marker="_",linestyle='')
         plt.errorbar(energies,resolutionList[2:4],xerr=0,yerr=ΔresolutionList[2:4],label='Pions',color='r',marker="_",linestyle='') 
+        
+        plt.ylabel("Resolution")            
+        plt.title('Fit quality')
+        plt.legend()
+        plt.grid(visible=True)
         plt.savefig('plots/resEnergies.png')
+        return [[],[]]
+    return[resolutionList,ΔresolutionList]    

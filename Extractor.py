@@ -111,7 +111,8 @@ def main():
             # if barIDs == [False]:
             hist = createHist(plotDict,plotVar,barIDs)  
             hist = fillHist(hist, plotVar, allData, beamEnergy=beamEnergy)     
-            lines.append(copy.deepcopy(hist))                  
+            lines.append(copy.deepcopy(hist))          
+            #add a line        
             # else:
             #     hists={}
             #     for id in barIDs:                                       
