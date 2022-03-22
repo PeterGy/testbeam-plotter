@@ -27,7 +27,7 @@ def labelμ(lines,line,fit):
     label.DrawLatex(0.6,  0.5 - 0.05*lines.index(line), "#mu = "+str(round(fit.Parameter(1),6)))
     return label    
 
-def createContext(fileName,plotName,μ=None,σ=None,stacked=False):
+def createContext(fileName,plotName,μ=None,σ=None,χ2=None):
     label = r.TLatex()
     label.SetTextFont(42)
     label.SetTextSize(0.05)
@@ -50,27 +50,15 @@ def createContext(fileName,plotName,μ=None,σ=None,stacked=False):
     if σ != None: top += "#sigma: "+str(round(σ,4))
     if μ != None: top += ", #mu: "+str(round(μ,4))
     if μ != None and σ != None: top += ", res: "+str(round(σ/μ,4))
+    
 
     bottom = "Particle: "+particle+", Energy: "+energy+" GeV, Sample: "+sample+"k, Angle: "+angle+" deg"
+    if χ2 != None: bottom += ", #chi2: "+str(round(χ2,4))
     contextString='#splitline{'+top+'}{'+bottom+'}'
 
     label.DrawLatex(0,0.038, contextString)
 
-    # if stacked:
-    #     label2 = r.TLatex()
-    #     label2.SetTextFont(42)
-    #     label2.SetTextSize(0.05)
-    #     label2.SetNDC()  
-    #     contextString = "Particle: "+particle+", E nergy: "+energy+" GeV, Sample: "+sample+"k, Angle: "+angle+" deg"
-    #     contextString2 = "Fit #splitline{#sigma: "+str(round(σ,6))+", }{Fit} #mu: "+str(round(μ,6))
-    #     label.DrawLatex(0,0.008, contextString)
-    #     label.DrawLatex(0,0.068, contextString2)
-    # elif not stacked:
-    #     contextString = "Particle: "+particle+", Ene \\ rgy: "+energy+" GeV, Sample: "+sample+"k, Angle: "+angle+" deg"
-    #     if σ != None: contextString += "; Fit #sigma: "+str(round(σ,4))
-    #     if μ != None: contextString += ", Fit #mu: "+str(round(μ,4))
-    #     if μ != None and σ != None: contextString += ", Resolution: "+str(round(σ/μ,4))
-    #     label.DrawLatex(0,0.008, contextString)
+
     return label
 
 
@@ -120,7 +108,7 @@ def plotResolution(resolutionList,ΔresolutionList,plotName):
         plt.errorbar(x,resolutionList,xerr=0,yerr=ΔresolutionList,label=name,color='r',marker=",",linestyle='')
         plt.savefig('plots/resolutions '+name+'.png')
         plt.ylabel("Resolution")            
-        plt.title('Fit quality')
+        # plt.title('Fit quality')
         plt.legend()
         plt.grid(visible=True)
         plt.savefig('plots/resolutions '+name+'.png')
@@ -143,7 +131,7 @@ def plotResolution(resolutionList,ΔresolutionList,plotName):
         plt.plot(xfit,yfitPion,"r--",label='Pion 1/√E fit')
         plt.plot(xfit,yfitElec,"b--",label='Electron 1/√E fit')    
         plt.ylabel("Resolution")            
-        plt.title('Fit quality')
+        # plt.title('Fit quality')
         plt.legend()
         plt.grid(visible=True)
         plt.savefig('plots/resolutionEnergies.png')
@@ -157,7 +145,7 @@ def plotResolution(resolutionList,ΔresolutionList,plotName):
         plt.errorbar(energies,resolutionList[2:4],xerr=0,yerr=ΔresolutionList[2:4],label='Pions',color='r',marker="_",linestyle='') 
         
         plt.ylabel("Resolution")            
-        plt.title('Fit quality')
+        # plt.title('Fit quality')
         plt.legend()
         plt.grid(visible=True)
         plt.savefig('plots/resEnergies.png')

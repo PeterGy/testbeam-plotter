@@ -21,6 +21,7 @@ def main():
         for id in bars: 
             μ = None
             σ = None
+            χ2= None
             extractionName = plotName+"___"+fileName+barName(id)
             dimension = plotDict[plotName]['dimension']
             inFile = r.TFile("extractions/"+extractionName+".root","READ")    
@@ -42,7 +43,8 @@ def main():
             
             # == 'energy response vs. energy' or plotName == 'energy response vs. angle' or plotName == 'energy response vs. position'
             elif plotName in fittyPlots:
-                dualPlotMode=False
+                dualPlotMode=True
+                prepareDualPlots(dualPlotMode,c)   
                 c.SetBottomMargin(0.14)
                 lines=[]
                 legend = r.TLegend(0.0,0.9,0.18,1)
@@ -52,28 +54,30 @@ def main():
                     lines.append(copy.deepcopy(hist))
                     legend.AddEntry(lines[-1],prettyLegendName(plot[i][1]),"f")
                 for line in lines:
-                    line.Draw("same e")    
-
-                    try:
-                        fit = line.Fit('gaus','Sq')
-                        μ = fit.Parameter(1)
-                        Δμ = fit.ParError(1)
-                        σ = fit.Parameter(2)
-                        Δσ = fit.ParError(2)
-                        resolution=σ/μ
-                        Δresolution=resolution*(Δμ/μ+Δσ/σ)
-                        resolutionList.append(resolution)     
-                        ΔresolutionList.append(Δresolution)     
-
-                        line.GetFunction("gaus").SetLineColor(rootColors[lines.index(line)])
-                        labelμ(lines,line,fit)
-                    except: pass
+                    if len(lines)==1: line.Draw("same e")    
+                    # if len(lines)==1: line.Draw("HIST")  
+                    # try:
+                    fit = line.Fit('gaus','Sq')
+                    μ = fit.Parameter(1)
+                    Δμ = fit.ParError(1)
+                    σ = fit.Parameter(2)
+                    Δσ = fit.ParError(2)
+                    resolution=σ/μ
+                    Δresolution=resolution*(Δμ/μ+Δσ/σ)
+                    resolutionList.append(resolution)     
+                    ΔresolutionList.append(Δresolution)     
+                    χ2=fit.Chi2()
+                    line.GetFunction("gaus").SetLineColor(rootColors[lines.index(line)])
+                    labelμ(lines,line,fit)
+                    # except: pass
 
                     
-                c.SetLogy()   
-                c.GetPad(0).SetGrid()                
+               
                 styleHistogramEnergyResponse(lines[-1],legend)
-                legend.Draw()
+                if len(lines)>1:
+                    c.SetLogy()   
+                    c.GetPad(0).SetGrid() 
+                    legend.Draw()
 
             elif dimension == 1:
                 c.SetLeftMargin(0.12)   
@@ -83,8 +87,9 @@ def main():
                 prepareDualPlots(dualPlotMode,c)                                       
                 if id != False: hist.SetName(barName(id)) 
                 hist.GetRMS()     #this ONE CURSED LINE is somehow the key that makes hist2.GetXaxis().SetRangeUser(50,150) work. Wtf?!?!?!?!             
-                hist.Draw("HIST")                      
-                if dualPlotMode:
+                hist.Draw("HIST")      
+
+            if dualPlotMode:
                     hist2=copy.deepcopy(hist)
                     if plotName == 'Distribution of PEs per HCal bar':                       
                         hist2.GetXaxis().SetRangeUser(50,150) 
@@ -101,7 +106,7 @@ def main():
                     hist2.Draw("E")
                     c.GetPad(2).SetLogy()
                     if plotName == 'Distribution of PEs per HCal bar':   
-                        fit = hist2.Fit('gaus','Sq')
+                        fit = hist2.Fit('landau','Sq')
                         try:
                             σ = fit.Parameter(2)
                             μ = fit.Parameter(1)    
@@ -110,7 +115,7 @@ def main():
 
             c.cd()
             # if μ: c.SetBottomMargin(0.15)
-            createContext(fileName,plotName,μ,σ)
+            createContext(fileName,plotName,μ,σ,χ2)
 
             if skipUninterestingPlots:
                 if id in [False,5,402654208+4]:
@@ -118,7 +123,7 @@ def main():
             else: c.SaveAs("plots/"+extractionName+".png")
             c.Close()
 
-        print(resolutionList)
+        # print(resolutionList)
         [resolutionList,ΔresolutionList] = plotResolution(resolutionList,ΔresolutionList,plotName)
 
 

@@ -19,15 +19,15 @@ from optparse import OptionParser
 # incidentAngleDegrees = float(options.angle)
 
 
-max_events = 1
-energy=3 # GeV, certified
+max_events = 1000
+energy=1 # GeV, certified
 particle_id='e-'
-incidentAngleDegrees=0
+incidentAngleDegrees=90
 runNumber=1
 xOffset=0 #mm, absorber is 665 mm wide
 
-simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"
-# simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"+str(incidentAngleDegrees)+"deg"
+# simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"
+simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"+str(incidentAngleDegrees)+"deg"
 # simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"+str(xOffset)+"xpos"
 
 

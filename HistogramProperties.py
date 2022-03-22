@@ -43,6 +43,15 @@ def barName(id):
     [layer,bar] = barMapLocation(id) 
     return " layer "+str(layer)+", bar "+str(bar)    
 
+def sipmMapLocation(id):
+    shortID = id-411042047-1
+    side= int(shortID/2**19)
+    shortID -= side*2**19
+    layer = int(shortID/256)+1
+    bar = shortID%256
+    if layer <=9:
+        bar+=2
+    return [layer,bar,side]
 
 
 barBinsX = range(-1000,1001,50)
@@ -189,5 +198,10 @@ plotDict = {
     'simE (individual bars)':{'xaxis' : 'Sim Energy [MeV]', 'yaxis' : 'Number of events', 'binning' : {'nBins':100, 'min':0, 'max':50}, 'dimension' : 1, 'bars' : hcalBarIDs()},
     'recE (individual bars)':{'xaxis' : 'Rec Energy [MeV]', 'yaxis' : 'Number of events', 'binning' : {'nBins':100, 'min':0, 'max':50}, 'dimension' : 1, 'bars' : hcalBarIDs()},
     
-    
+    'Mapped SiPM hits':{'xaxis' : 'Layer number', 'yaxis' : 'Bar number', 'dimension' : 2,
+                    'binningX' : {'nBins':39, 'min':0.5, 'max':39.5}, 
+                    'binningY' : {'nBins':12, 'min':-0.5, 'max':11.5}}, 
+    'Mapped ADC average':{'xaxis' : 'Layer number', 'yaxis' : 'Bar number', 'dimension' : 2,
+                    'binningX' : {'nBins':39, 'min':0.5, 'max':39.5}, 
+                    'binningY' : {'nBins':12, 'min':-0.5, 'max':11.5}},
     }    

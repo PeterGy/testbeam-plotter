@@ -76,18 +76,20 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
                 valuesDigi[h.id()] =1   
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
                 valuesRec[h.getID()] =1
-        print(valuesDigi)
-        print(valuesRec)
+        # print(valuesDigi)
+        # print(valuesRec)
 
         listDigi=[]
         for i in valuesDigi:
             listDigi.append(i)
         listDigi.sort()
+        print(listDigi)  
         print(len(listDigi))  
         listRec=[]
         for i in valuesRec:
             listRec.append(i)
         listRec.sort()
+        print(listRec)
         print(len(listRec))
                     
 
@@ -161,7 +163,19 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
             for ih,h in enumerate(getattr(event, "HcalSimHits_"+processName)):
                 if h.getEdep() > minEDeposit and h.getEdep() < maxEDeposit:
                     hist.Fill(h.getPosition()[2],h.getEdep()) 
-    
+
+    elif plotVar == 'recX(Z)': #only for pion checking!
+        for event in allData: 
+            eventE=0
+            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+                eventE+=h.getEnergy()*energyErrorCorrection
+            if 70<eventE     and eventE<90:
+                for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+
+                # if 22> h.getTime() or h.getTime() >23: 
+                    hist.Fill(h.getZPos(),h.getXPos()) 
+
+
     elif plotVar == 'recX(Z)': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
@@ -262,7 +276,6 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
     elif plotVar == 'Mapped distribution of number of hits of each bar': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                if h.isNoise(): raise("yo this sample has noise")
                 LayerBar = barMapLocation(h.getID())
                 hist.Fill(LayerBar[0],LayerBar[1])   
     elif plotVar == 'Distribution of number of hits of each bar': 
@@ -503,5 +516,61 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
                 hist[h.getID()].Fill(h.getEnergy()*energyErrorCorrection) 
 
 
+
+    elif plotVar == 'Mapped distribution of number of hits of each bar': 
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+                LayerBar = barMapLocation(h.getID())
+                hist.Fill(LayerBar[0],LayerBar[1])   
+#experimental
+    elif plotVar == 'Mapped SiPM hits': 
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):   
+                LayerBarSide = sipmMapLocation(h.id()) 
+                if LayerBarSide[2]==1: LayerBarSide[0] +=20
+                hist.Fill(LayerBarSide[0],LayerBarSide[1])  
+
+    elif plotVar == 'Mapped ADC average': 
+        countMap = zeros((39,12))
+        ADCMap = zeros((39,12))
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):   
+                LayerBarSide = sipmMapLocation(h.id()) 
+                if LayerBarSide[2]==1: LayerBarSide[0] +=20
+                
+                for i in range(h.size()) :
+                    countMap[LayerBarSide[0]-1,LayerBarSide[1]] += 1
+                    ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] += h.at(i).adc_t()
+                    if h.at(i).adc_t() > 256: print(h.at(i).adc_t()) #I don't know why the adc_t values are so high
+                    # print(dir(h.at(i)))
+                    # if LayerBarSide == [19,4,0]: print (h.at(i).adc_t())
+                # for i in range(h.size()) :
+                #     print(h.at(i).adc_t())
+
+                # print (h.size())
+        countMap[countMap == 0 ] = 1
+        for i in range(39):
+            for j in range(12):
+                # if ADCMap[i,j]/countMap[i,j] > 200: print(i,j)
+                hist.Fill(i+1,j,ADCMap[i,j]/countMap[i,j])
+
+                # hist.Fill(LayerBarSide[0],LayerBarSide[1])  
+
+
+    elif plotVar == 'Mapped Distribution of average PEs': 
+        countMap = zeros((19,12))
+        PEMap = zeros((19,12))
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+                LayerBar = barMapLocation(h.getID())
+                countMap[LayerBar[0]-1,LayerBar[1]] += 1
+                PEMap[LayerBar[0]-1,LayerBar[1]] += h.getPE()
+        countMap[countMap == 0 ] = 1        
+        for i in range(19):
+            for j in range(12):
+                hist.Fill(i+1,j,PEMap[i,j]/countMap[i,j])
+
     if type(hist) != type({}): return {False:hist}
     return hist    
+
+
