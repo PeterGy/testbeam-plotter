@@ -38,8 +38,8 @@ testbeamPlotGroups = [
     (('energy response vs. energy','pi-8GeV1k'),('energy response vs. energy','pi-4GeV1k'),('energy response vs. energy','pi-2GeV1k'),('energy response vs. energy','pi-1GeV1k'),('energy response vs. energy','pi-0.5GeV1k'),), #1
     (('energy response vs. energy','e-8GeV1k'),('energy response vs. energy','e-4GeV1k'),('energy response vs. energy','e-2GeV1k'),('energy response vs. energy','e-1GeV1k'),('energy response vs. energy','e-0.5GeV1k'),), #1
     #6
-    (('energy response vs. energy','pi-0.5GeV1k'),('energy response vs. energy','pi-0.4GeV1k'),('energy response vs. energy','pi-0.3GeV1k'),('energy response vs. energy','pi-0.2GeV1k'),('energy response vs. energy','pi-0.1GeV1k'),), #1
-    (('energy response vs. energy','e-0.5GeV1k'),('energy response vs. energy','e-0.4GeV1k'),('energy response vs. energy','e-0.3GeV1k'),('energy response vs. energy','e-0.2GeV1k'),('energy response vs. energy','e-0.1GeV1k'),), #1   
+    (('energy response vs. energy','pi-0.5GeV2k'),('energy response vs. energy','pi-0.4GeV2k'),('energy response vs. energy','pi-0.3GeV2k'),('energy response vs. energy','pi-0.2GeV2k'),('energy response vs. energy','pi-0.1GeV2k'),), #1
+    (('energy response vs. energy','e-0.5GeV2k'),('energy response vs. energy','e-0.4GeV2k'),('energy response vs. energy','e-0.3GeV2k'),('energy response vs. energy','e-0.2GeV2k'),('energy response vs. energy','e-0.1GeV2k'),), #1
 ]
 
 testbeamPlotGroupsBig = [
@@ -78,16 +78,49 @@ testbeamPlotGroupsBig = [
     (('energy response vs. energy','pi-8GeV100k00deg'),('energy response vs. energy','pi-4GeV100k00deg'),('energy response vs. energy','pi-2GeV100k00deg'),('energy response vs. energy','pi-1GeV100k00deg'),('energy response vs. energy','pi-0.5GeV100k00deg'),), #1
     (('energy response vs. energy','e-8GeV100k00deg'), ('energy response vs. energy','e-4GeV100k00deg'), ('energy response vs. energy','e-2GeV100k00deg'), ('energy response vs. energy','e-1GeV100k00deg'), ('energy response vs. energy','e-0.5GeV100k00deg'),), #1
     #6
-    # (('energy response vs. energy','pi-0.5GeV1k'),('energy response vs. energy','pi-0.4GeV1k'),('energy response vs. energy','pi-0.3GeV1k'),('energy response vs. energy','pi-0.2GeV1k'),('energy response vs. energy','pi-0.1GeV1k'),), #1
-    # (('energy response vs. energy','e-0.5GeV1k'),('energy response vs. energy','e-0.4GeV1k'),('energy response vs. energy','e-0.3GeV1k'),('energy response vs. energy','e-0.2GeV1k'),('energy response vs. energy','e-0.1GeV1k'),), #1
+    # (('energy response vs. energy','pi-0.5GeV2k'),('energy response vs. energy','pi-0.4GeV2k'),('energy response vs. energy','pi-0.3GeV2k'),('energy response vs. energy','pi-0.2GeV2k'),('energy response vs. energy','pi-0.1GeV2k'),), #1
+    # (('energy response vs. energy','e-0.5GeV2k'),('energy response vs. energy','e-0.4GeV2k'),('energy response vs. energy','e-0.3GeV2k'),('energy response vs. energy','e-0.2GeV2k'),('energy response vs. energy','e-0.1GeV2k'),), #1
 ]
 
 
 plotGroups = [
     # (('recE','e-3GeV0k'),), 
-    # (('Mapped SiPM hits','e-1GeV1k'),), 
-    (('Mapped ADC average','e-1GeV1k'),), 
+    # (('Mapped SiPM hits (individual event)','e-1GeV1k'),), 
+    # (('Mapped ADC average','e-3GeV0k'),), 
     # (('Mapped distribution of number of hits of each bar','e-1GeV1k'),),
+
+#    (('energy response vs. energy','pi-0.5GeV2k'),('energy response vs. energy','pi-0.4GeV2k'),('energy response vs. energy','pi-0.3GeV2k'),('energy response vs. energy','pi-0.2GeV2k'),('energy response vs. energy','pi-0.1GeV2k'),), #1
+    # (('energy response vs. energy','e-0.5GeV2k'),('energy response vs. energy','e-0.4GeV2k'),('energy response vs. energy','e-0.3GeV2k'),('energy response vs. energy','e-0.2GeV2k'),('energy response vs. energy','e-0.1GeV2k'),), #1   
+#   (('energy response vs. energy','pi-8GeV100k00deg'),('energy response vs. energy','pi-4GeV100k00deg'),('energy response vs. energy','pi-2GeV100k00deg'),('energy response vs. energy','pi-1GeV100k00deg'),('energy response vs. energy','pi-0.5GeV100k00deg'),), #1
+#     (('energy response vs. energy','e-8GeV100k00deg'), ('energy response vs. energy','e-4GeV100k00deg'), ('energy response vs. energy','e-2GeV100k00deg'), ('energy response vs. energy','e-1GeV100k00deg'), ('energy response vs. energy','e-0.5GeV100k00deg'),), #1
+    # (('Mapped distribution of number of hits of each bar','e-1GeV100k40deg'),),
+    # (('trigRecE (per bar)','e-1GeV1kLYSO'),), 
+    # (('trigRecE (per bar)','e-1GeV1kLYSO'),), 
+    # (('trigRecE (per bar)','e-1GeV1kPlastic'),), 
+    # (('Reconstructed energy for tags','e-1GeV1k'),), 
+    # (('trigSimX(Z)','e-1GeV1k'),), 
+    # (('trigSimX(Z)','e-1GeV1kPlastic'),), #12
+    # (('trigSimX(Z)','e-1GeV1kBad'),), #12
+    # (('trigSimX(Z)','e-1GeV1kLYSO'),), #12
+
+    # (('trigRecE (per bar)','e-1GeV1kPlastic'),), #12
+    # (('trigSimE (per bar)','e-1GeV1kPlastic'),), #12
+    # (('trigRecE (per bar)','e-1GeV1kLYSO'),), #12
+    # (('trigSimE (per bar)','e-1GeV1kLYSO'),), #12
+
+    # (('trigRecE (per bar)','e-1GeV1kBad'),), #12
+    # (('trigSimE (per bar)','e-1GeV1kBad'),), #12
+    # (('Distribution of number of hits for TS bars','e-0.5GeV1k'),), 
+    # (('Distribution of signal amplitude for TS bars (individual bars)','e-0.5GeV1k'),), #12 
+
+    (('energy response vs. position','e-1GeV10k000xpos'),('energy response vs. position','e-1GeV10k100xpos'),('energy response vs. position','e-1GeV10k200xpos'),('energy response vs. position','e-1GeV10k300xpos'),('energy response vs. position','e-1GeV10k400xpos'),),
+
+    # (('trigRecE (per bar)','e-1GeV10k_TSonlyPlastic'),), #12
+    # (('trigSimE','e-1GeV10k_TSonlyPlastic'),), #1
+    # (('trigRecE','e-1GeV10k_TSonlyPlastic'),), #1
+
+
+
 
 
     ]     

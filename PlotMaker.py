@@ -8,7 +8,7 @@ import copy
 
 def main():   
     skipUninterestingPlots=False
-    skipUninterestingPlots=True
+    # skipUninterestingPlots=True
     resolutionList=[]
     ΔresolutionList=[]
 
@@ -43,7 +43,7 @@ def main():
             
             # == 'energy response vs. energy' or plotName == 'energy response vs. angle' or plotName == 'energy response vs. position'
             elif plotName in fittyPlots:
-                dualPlotMode=True
+                dualPlotMode=False
                 prepareDualPlots(dualPlotMode,c)   
                 c.SetBottomMargin(0.14)
                 lines=[]
@@ -54,7 +54,7 @@ def main():
                     lines.append(copy.deepcopy(hist))
                     legend.AddEntry(lines[-1],prettyLegendName(plot[i][1]),"f")
                 for line in lines:
-                    if len(lines)==1: line.Draw("same e")    
+                    line.Draw("same e")    
                     # if len(lines)==1: line.Draw("HIST")  
                     # try:
                     fit = line.Fit('gaus','Sq')
@@ -68,6 +68,7 @@ def main():
                     ΔresolutionList.append(Δresolution)     
                     χ2=fit.Chi2()
                     line.GetFunction("gaus").SetLineColor(rootColors[lines.index(line)])
+                    if len(plot) ==1: line.GetFunction("gaus").SetLineColor(2)
                     labelμ(lines,line,fit)
                     # except: pass
 

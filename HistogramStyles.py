@@ -47,13 +47,13 @@ def createContext(fileName,plotName,μ=None,σ=None,χ2=None):
 
     
     top = ''
-    if σ != None: top += "#sigma: "+str(round(σ,4))
-    if μ != None: top += ", #mu: "+str(round(μ,4))
-    if μ != None and σ != None: top += ", res: "+str(round(σ/μ,4))
+    # if σ != None: top += "#sigma: "+str(round(σ,4))
+    # if μ != None: top += ", #mu: "+str(round(μ,4))
+    # if μ != None and σ != None: top += "Resolution: "+str(round(σ/μ,4))
     
 
     bottom = "Particle: "+particle+", Energy: "+energy+" GeV, Sample: "+sample+"k, Angle: "+angle+" deg"
-    if χ2 != None: bottom += ", #chi2: "+str(round(χ2,4))
+    # if χ2 != None: bottom += ", #chi2: "+str(round(χ2,4))
     contextString='#splitline{'+top+'}{'+bottom+'}'
 
     label.DrawLatex(0,0.038, contextString)
@@ -77,16 +77,16 @@ def prepareDualPlots(dualPlotMode,c):
 def prettyLegendName(str):
     # if str.find('k') == 0: name='0'
     # else: name = str[str.find('k')+1:]
-    if str.find("100k")>-1:  
-        name = str[str.find('-')+1:str.find('GeV')]+' GeV'
-    else:
+    # if str.find("100k")>-1:  
+    #     name = str[str.find('-')+1:str.find('GeV')]+' GeV'
+    # else:
         name = str[str.find('k')+1:]
         if name.find("deg")>-1: name = name[0:2]+" degrees"
-        elif name.find("xpos")>-1: name = str[0:3]+" particle"
-        # elif name.find("xpos")>-1: name = name[0:3]+" mm displacement"
+        # elif name.find("xpos")>-1: name = str[0:3]+" particle"
+        elif name.find("xpos")>-1: name = name[0:3]+" mm displacement"
         # else: name = name[name.find('-')+1:name.find('GeV')]+" GeV"
         else: name = str[str.find('-')+1:str.find('GeV')]+' GeV'
-    return name
+        return name
 
 def plotResolution(resolutionList,ΔresolutionList,plotName):
     import matplotlib
@@ -115,10 +115,11 @@ def plotResolution(resolutionList,ΔresolutionList,plotName):
         return [[],[]]
 
     elif len(resolutionList)==10:
-        def expected(E,s=1): return s*1/sqrt(E)
+        def expected(E,s,p): return p+s*1/sqrt(E)
         plt.figure("Energies")
-        # energies = (8,4,2,1,0.5)
-        energies = (0.5,0.4,0.3,0.2,0.1)
+        energies = (8,4,2,1,0.5)
+        # energies = (0.5,0.4,0.3,0.2,0.1)
+
         xfit=linspace(min(energies),max(energies),50)
         
         plt.errorbar(energies,resolutionList[0:5],xerr=0,yerr=ΔresolutionList[0:5],label='Pions',color='r',marker="_",linestyle='')
@@ -126,11 +127,13 @@ def plotResolution(resolutionList,ΔresolutionList,plotName):
         
         paramsPion,e_ = optimize.curve_fit(expected,energies,resolutionList[0:5])
         paramsElec,e_ = optimize.curve_fit(expected,energies,resolutionList[5:10])
-        yfitPion=[expected(E,s=paramsPion[0]) for E in xfit]
-        yfitElec=[expected(E,s=paramsElec[0]) for E in xfit]    
+        yfitPion=[expected(E,paramsPion[0],paramsPion[1]) for E in xfit]
+        yfitElec=[expected(E,paramsElec[0],paramsElec[1]) for E in xfit]    
         plt.plot(xfit,yfitPion,"r--",label='Pion 1/√E fit')
         plt.plot(xfit,yfitElec,"b--",label='Electron 1/√E fit')    
+        plt.title("Energy resolution")            
         plt.ylabel("Resolution")            
+        plt.xlabel("Energy [GeV]")            
         # plt.title('Fit quality')
         plt.legend()
         plt.grid(visible=True)

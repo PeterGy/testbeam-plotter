@@ -19,15 +19,18 @@ from optparse import OptionParser
 # incidentAngleDegrees = float(options.angle)
 
 
-max_events = 1000
+max_events = 10000
 energy=1 # GeV, certified
 particle_id='e-'
-incidentAngleDegrees=90
+incidentAngleDegrees=0
 runNumber=1
-xOffset=0 #mm, absorber is 665 mm wide
+xOffset=000 #mm, absorber is 665 mm wide
+beamSmear=[40.,40.,0.]
 
-# simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"
-simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"+str(incidentAngleDegrees)+"deg"
+simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k_TSonlyPlastic"
+# simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"kLYSO"
+# simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"kBad"
+# simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"+str(incidentAngleDegrees)+"deg"
 # simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"+str(xOffset)+"xpos"
 
 
@@ -80,7 +83,8 @@ gun.energy    = energy
 gun.position  = position
 gun.direction = direction
 simulation.generators=[gun]
-simulation.beamSpotSmear=[0., 0., 0.] #make it zero for very good measure
+
+simulation.beamSpotSmear=beamSmear #make it zero for very good measure
 
 
 

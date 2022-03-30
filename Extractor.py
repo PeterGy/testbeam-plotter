@@ -20,6 +20,11 @@ from optparse import OptionParser
 gSystem.Load("libFramework.so") #this library is vital for it to run. It might be old though?
 r.gROOT.SetBatch(1); #makes root not try to display plots in a new window
 
+parser = OptionParser()
+parser.add_option("-e", "--event", default=1, help="For the single event plot, which event you want",)
+(options, args) = parser.parse_args()
+eventOfInterest=options.event
+# print(eventOfInterest)
 
 # rootColors=[1,2,4,28,7] #a presumably color-blind friendly color palette
 # rootColors=[28,2,4] #a three-compare color-blind friendly color palette
@@ -110,7 +115,7 @@ def main():
             
             # if barIDs == [False]:
             hist = createHist(plotDict,plotVar,barIDs)  
-            hist = fillHist(hist, plotVar, allData, beamEnergy=beamEnergy)     
+            hist = fillHist(hist, plotVar, allData, beamEnergy=beamEnergy,eventOfInterest=eventOfInterest)     
             lines.append(copy.deepcopy(hist))          
             #add a line        
             # else:

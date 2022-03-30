@@ -3,7 +3,7 @@ from HistogramProperties import *
 from numpy import *
 import platform 
 #hist can actually be a single histogram or a dictionary of 12 or 192 histograms
-def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, maxEDeposit=float('inf'), barID=False, angle=0, beamEnergy=0): 
+def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, maxEDeposit=float('inf'), barID=False, angle=0, beamEnergy=0, eventOfInterest=None): 
     
     if len(hist)==1:
         hist=hist[0]
@@ -203,6 +203,7 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
         for event in allData: 
             for ih,h in enumerate(getattr(event, "TriggerPadUpSimHits_"+processName)):
                 hist.Fill(h.getPosition()[2],h.getPosition()[0])   
+                # print(h)
     elif plotVar == 'trigSimY(Z)': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "TriggerPadUpSimHits_"+processName)):
@@ -229,6 +230,8 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
                 if h.getBarID() ==6: hist.Fill(h.getTime()) 
                 # print(h.getBarID())
                 # print(h.items()) 
+
+
 
     elif plotVar == 'timeHCal': 
         for event in allData: #I define time difference based on the first event's time
@@ -524,11 +527,23 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
                 hist.Fill(LayerBar[0],LayerBar[1])   
 #experimental
     elif plotVar == 'Mapped SiPM hits': 
-        for event in allData: 
+        for event in allData:             
             for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):   
                 LayerBarSide = sipmMapLocation(h.id()) 
                 if LayerBarSide[2]==1: LayerBarSide[0] +=20
                 hist.Fill(LayerBarSide[0],LayerBarSide[1])  
+
+    elif plotVar == 'Mapped SiPM hits (individual event)': 
+        eventCounter=0
+        for event in allData:             
+            eventCounter+=1            
+            if eventCounter == int(eventOfInterest):
+                for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):   
+                    LayerBarSide = sipmMapLocation(h.id()) 
+                    if LayerBarSide[2]==1: LayerBarSide[0] +=20
+                    hist.Fill(LayerBarSide[0],LayerBarSide[1])  
+
+
 
     elif plotVar == 'Mapped ADC average': 
         countMap = zeros((39,12))
@@ -541,7 +556,7 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
                 for i in range(h.size()) :
                     countMap[LayerBarSide[0]-1,LayerBarSide[1]] += 1
                     ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] += h.at(i).adc_t()
-                    if h.at(i).adc_t() > 256: print(h.at(i).adc_t()) #I don't know why the adc_t values are so high
+                    # if h.at(i).adc_t() > 256: print(h.at(i).adc_t()) #I don't know why the adc_t values are so high
                     # print(dir(h.at(i)))
                     # if LayerBarSide == [19,4,0]: print (h.at(i).adc_t())
                 # for i in range(h.size()) :
@@ -569,6 +584,16 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
         for i in range(19):
             for j in range(12):
                 hist.Fill(i+1,j,PEMap[i,j]/countMap[i,j])
+
+    elif plotVar == 'trigRecE (per bar)': 
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):    
+                hist[h.getBarID()].Fill(h.getEnergy())      
+                # print(h.getEnergy())            
+    elif plotVar == 'trigRecE': 
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):   
+                hist.Fill(h.getEnergy())          
 
     if type(hist) != type({}): return {False:hist}
     return hist    
