@@ -19,6 +19,9 @@ from ROOT import gSystem
 from optparse import OptionParser
 gSystem.Load("libFramework.so") #this library is vital for it to run. It might be old though?
 r.gROOT.SetBatch(1); #makes root not try to display plots in a new window
+import libDetDescr as DD
+
+
 
 parser = OptionParser()
 parser.add_option("-e", "--event", default=1, help="For the single event plot, which event you want",)
@@ -93,8 +96,8 @@ def getBeamEnergyFromFileName(fileName):
         energy=fileName[fileName.find('-')+1:fileName.find('GeV')]
         return (float(energy)*1e3)
     except:
-        print('Note: beam energy could not be determined from file name')
-        return None    
+        # print('Note: beam energy could not be determined from file name. Assuming 1 GeV')
+        return 1000    
 
 
 def main():       
@@ -109,12 +112,15 @@ def main():
             plotVar = var  = j[0]
             fileName = j[1]   
             extractionName = plotVar+"___"+fileName#+barName(id)
-            inFile = r.TFile(fileName+".root","READ")   
-            allData = inFile.Get("LDMX_Events")                   
+            inFile = r.TFile("reconstructions/"+fileName+".root","READ")   
+            allData = inFile.Get("LDMX_Events")        
+
             beamEnergy=getBeamEnergyFromFileName(fileName)    
             
             # if barIDs == [False]:
             hist = createHist(plotDict,plotVar,barIDs)  
+            # try: hist = fillHist(hist, plotVar, allData, beamEnergy=beamEnergy,eventOfInterest=eventOfInterest,processName='unpack')     
+            # except: hist = fillHist(hist, plotVar, allData, beamEnergy=beamEnergy,eventOfInterest=eventOfInterest)     
             hist = fillHist(hist, plotVar, allData, beamEnergy=beamEnergy,eventOfInterest=eventOfInterest)     
             lines.append(copy.deepcopy(hist))          
             #add a line        

@@ -36,6 +36,10 @@ def barMapLocation(id):
         bar+=2
     return [layer,bar]
 
+def getLayer(id):
+    return  barMapLocation(id)[0]         
+
+
 def barName(id):
     if id is False: return ''#"Machine"
     if id <20: return " bar "+str(id) #it means it is TS
@@ -51,7 +55,7 @@ def sipmMapLocation(id):
     bar = shortID%256
     if layer <=9:
         bar+=2
-    return [layer,bar,side]
+    return  [layer,bar,side]
 
 
 barBinsX = range(-1000,1001,50)
@@ -80,6 +84,7 @@ plotDict = {
 
 
     'recE' :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Counts', 'binning' : {'nBins':30, 'min':0, 'max':300} , 'dimension' : 1},
+    'reconstructed energy' :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Counts', 'binning' : {'nBins':30, 'min':0, 'max':300} , 'dimension' : 1},
     'recENoisy' :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Counts', 'binning' : {'nBins':40, 'min':0, 'max':40} , 'dimension' : 1},
     'recPE' :{'xaxis' : 'Number of Photo-electrons', 'yaxis' : 'Counts', 'binning' : {'nBins':40, 'min':0, 'max':40} , 'dimension' : 1},
     'recX' :{'xaxis' : 'X Displacement [mm]', 'yaxis' : 'Counts', 'binning' : {'nBins':200, 'min':-1000, 'max':1000}, 'dimension' : 1},
@@ -129,9 +134,9 @@ plotDict = {
                     'binningX' : {'nBins':40, 'min':-1000, 'max':1000}, 
                     'binningY' : {'nBins':40, 'min':-1000, 'max':1000}},
 
-    # 'recX(Z)' :{'xaxis' : 'Penetration depth Z [mm]', 'yaxis' : 'X Displacement [mm]', 'dimension' : 2,
-    #                 'binningX' : {'nBins':1000, 'min':-500, 'max':500}, 
-    #                 'binningY' : {'nBins':40, 'min':-1000, 'max':1000}},
+    'recX(Z)' :{'xaxis' : 'Penetration depth Z [mm]', 'yaxis' : 'X Displacement [mm]', 'dimension' : 2,
+                    'binningX' : {'nBins':40, 'min':-500, 'max':500}, 
+                    'binningY' : {'nBins':2000, 'min':-5000, 'max':5000}},
     'recY(Z)' :{'xaxis' : 'Penetration depth Z [mm]', 'yaxis' : 'Y Displacement [mm]', 'dimension' : 2,
                     'binningX' : {'nBins':1000, 'min':-500, 'max':500},  
                     'binningY' : {'nBins':40, 'min':-1000, 'max':1000}},
@@ -150,7 +155,11 @@ plotDict = {
     'trigRecT' :{'xaxis' : 'Time [ns]', 'yaxis' : 'Counts', 'binning' : {'nBins':20, 'min':0, 'max':10}, 'dimension' : 1}, #machine has a resolution of 0.5 ns apparently
     'trigRecE (per bar)' :{'xaxis' : 'E', 'yaxis' : 'Number of events', 'binning' : {'nBins':150, 'min':0, 'max':1}, 'dimension' : 1, 'bars' : trigScintBarIDs()},  
     'trigRecE'   :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Counts', 'binning' : {'nBins':150, 'min':0, 'max':1}, 'dimension' : 1 },
+    'trigRecPE'   :{'xaxis' : 'PEs', 'yaxis' : 'Counts', 'binning' : {'nBins':350, 'min':0, 'max':350}, 'dimension' : 1 },
+    'trigRecQ'   :{'xaxis' : 'Charge', 'yaxis' : 'Counts', 'binning' : {'nBins':100, 'min':0, 'max':0}, 'dimension' : 1 },
+    'trigRecQ (per bar)'   :{'xaxis' : 'Charge', 'yaxis' : 'Counts', 'binning' : {'nBins':100, 'min':0, 'max':0}, 'dimension' : 1 ,'bars' : trigScintBarIDs()},
     'trigSimE'   :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Counts', 'binning' : {'nBins':150, 'min':0, 'max':1}, 'dimension' : 1 },
+    'trigSimEBar'   :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Counts', 'binning' : {'nBins':150, 'min':0, 'max':1}, 'dimension' : 1 },
     
     'trigSimX(Z)' :{'xaxis' : 'Penetration depth [mm]', 'yaxis' : 'X Displacement [mm]', 'dimension' : 2,
                     'binningX' : {'nBins':200, 'min':-770, 'max':-760}, 
@@ -208,6 +217,7 @@ plotDict = {
     'energy response vs. energy'  :{'xaxis' : 'Detector response [#frac{RecE}{BeamE}]', 'yaxis' : 'Number of events', 'binning' : {'nBins':60, 'min':0, 'max':0.3}, 'dimension' : 1},
     'energy response vs. angle'   :{'xaxis' : 'Detector response [#frac{RecE}{BeamE}]', 'yaxis' : 'Number of events', 'binning' : {'nBins':50, 'min':0, 'max':0.25}, 'dimension' : 1},
     'energy response vs. position':{'xaxis' : 'Detector response [#frac{RecE}{BeamE}]', 'yaxis' : 'Number of events', 'binning' : {'nBins':60, 'min':0, 'max':0.3}, 'dimension' : 1},
+    'energy response vs. bar displacement':{'xaxis' : 'Detector response [#frac{RecE}{BeamE}]', 'yaxis' : 'Number of events', 'binning' : {'nBins':60, 'min':0, 'max':0.3}, 'dimension' : 1},
     'rec vs sim':{'xaxis' : 'Detector response [GeV/GeV]', 'yaxis' : 'Number of events', 'binning' : {'nBins':110, 'min':0, 'max':1.1}, 'dimension' : 1},
     'simE (individual bars)':{'xaxis' : 'Sim Energy [MeV]', 'yaxis' : 'Number of events', 'binning' : {'nBins':100, 'min':0, 'max':50}, 'dimension' : 1, 'bars' : hcalBarIDs()},
     'recE (individual bars)':{'xaxis' : 'Rec Energy [MeV]', 'yaxis' : 'Number of events', 'binning' : {'nBins':100, 'min':0, 'max':50}, 'dimension' : 1, 'bars' : hcalBarIDs()},
@@ -221,4 +231,13 @@ plotDict = {
     'Mapped ADC average':{'xaxis' : 'Layer number', 'yaxis' : 'Bar number', 'dimension' : 2,
                     'binningX' : {'nBins':39, 'min':0.5, 'max':39.5}, 
                     'binningY' : {'nBins':12, 'min':-0.5, 'max':11.5}},
+    'total energy deposited FPGA0'  :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Number of events', 'binning' : {'nBins':150, 'min':0, 'max':150}, 'dimension' : 1},
+    'total energy deposited FPGA0 horizontal bars'  :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Number of events', 'binning' : {'nBins':150, 'min':0, 'max':150}, 'dimension' : 1},
+    'Pulse shape'  :{'xaxis' : 'Time sample', 'yaxis' : 'ADC', 'binning' : {'nBins':8, 'min':0, 'max':8}, 'dimension' : 1,'bars' : hcalBarIDs()},
+    'Pulse shape (end0) (no pedestal subtraction)'  :{'xaxis' : 'Time sample', 'yaxis' : 'ADC', 'binning' : {'nBins':8, 'min':0, 'max':8}, 'dimension' : 1,'bars' : hcalBarIDs()},
+    'Pulse shape (end1) (no pedestal subtraction)'  :{'xaxis' : 'Time sample', 'yaxis' : 'ADC', 'binning' : {'nBins':8, 'min':0, 'max':8}, 'dimension' : 1,'bars' : hcalBarIDs()},
+    'Pulse shape (end0) (pedestal subtraction)'  :{'xaxis' : 'Time sample', 'yaxis' : 'ADC', 'binning' : {'nBins':8, 'min':0, 'max':8}, 'dimension' : 1,'bars' : hcalBarIDs()},
+    'Pulse shape (end1) (pedestal subtraction)'  :{'xaxis' : 'Time sample', 'yaxis' : 'ADC', 'binning' : {'nBins':8, 'min':0, 'max':8}, 'dimension' : 1,'bars' : hcalBarIDs()},
+    # 'Pulse shape'  :{'xaxis' : 'Time sample', 'yaxis' : 'ADC', 'binning' : {'nBins':8, 'min':0, 'max':8}, 'dimension' : 1},
+
     }    

@@ -2,15 +2,29 @@
 from HistogramProperties import *
 from numpy import *
 import platform 
+import libDetDescr as DD
+import csv
+
+# def pedestal_subtractor(hist):
+csv_reader = csv.reader(open('pedestals/pedestals_20220424.csv'), delimiter=',')
+pedestals ={}
+for row in csv_reader:
+    try:  pedestals[int(row[0],0)] = float(row[1])
+    except:pass
+# print(pedestals)    
+    # for digi_ID in pedestals:    
+    #     ID=DD.HcalDigiID(digi_ID)
+    #     HCal_ID=DD.HcalID(ID.section(),ID.layer(),ID.strip()).raw()
+    #     hist[HCal_ID].Add(1)
+    # print(pedestals)
+
+
 #hist can actually be a single histogram or a dictionary of 12 or 192 histograms
-def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, maxEDeposit=float('inf'), barID=False, angle=0, beamEnergy=0, eventOfInterest=None): 
+def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, maxEDeposit=float('inf'), barID=False, angle=0, beamEnergy=1, eventOfInterest=None): 
     
     if len(hist)==1:
         hist=hist[0]
         
-    # type(hist) != type({})
-    # print('hmmmm',type(hist) != type({}))
-    # print('hist type',type(hist))
     energyErrorCorrection = 0.5 #they did an oopsie in the coding and now I got to correct for it
     allowNoise= False
     if   plotVar == 'simX': 
@@ -67,17 +81,17 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
             for bar in bars:
                 hist.Fill(bars[bar])   
 
-    elif plotVar == 'recE': 
-        valuesDigi={}
-        valuesRec={}
-        for event in allData: 
-            for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):
-                # print(h.id())     
-                valuesDigi[h.id()] =1   
-            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                valuesRec[h.getID()] =1
-        # print(valuesDigi)
-        # print(valuesRec)
+    # elif plotVar == 'recE': 
+    #     valuesDigi={}
+    #     valuesRec={}
+    #     for event in allData: 
+    #         for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):
+    #             # print(h.id())     
+    #             valuesDigi[h.id()] =1   
+    #         for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+    #             valuesRec[h.getID()] =1
+    #     # print(valuesDigi)
+    #     # print(valuesRec)
 
         listDigi=[]
         for i in valuesDigi:
@@ -98,8 +112,7 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
     elif plotVar == 'recE': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                if h.isNoise() == allowNoise: 
-                    hist.Fill(h.getEnergy()*energyErrorCorrection) 
+                   hist.Fill(h.getEnergy()*energyErrorCorrection) 
 
                 
   
@@ -111,15 +124,16 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
     elif plotVar == 'recX': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                if h.isNoise() == allowNoise: hist.Fill(h.getXPos()) 
+                if getLayer(h.getID())%2==1:
+                    hist.Fill(h.getXPos()) 
     elif plotVar == 'recY': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                if h.isNoise() == allowNoise: hist.Fill(h.getYPos()) 
+                hist.Fill(h.getYPos()) 
     elif plotVar == 'recZ': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                if h.isNoise() == allowNoise: hist.Fill(h.getZPos()) 
+                hist.Fill(h.getZPos()) 
 
 
 
@@ -169,9 +183,10 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
             eventE=0
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
                 eventE+=h.getEnergy()*energyErrorCorrection
-            if 70<eventE     and eventE<90:
+            # if 70<eventE     and eventE<90:
+            # if 70>eventE  or eventE>90:
+            if 0<eventE     and eventE<1000000:
                 for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-
                 # if 22> h.getTime() or h.getTime() >23: 
                     hist.Fill(h.getZPos(),h.getXPos()) 
 
@@ -195,10 +210,7 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
         for event in allData: 
             for ih,h in enumerate(getattr(event, "TriggerPadUpSimHits_"+processName)):
                 hist.Fill(h.getPosition()[0])       
-    elif plotVar == 'trigSimE': 
-        for event in allData: 
-            for ih,h in enumerate(getattr(event, "TriggerPadUpSimHits_"+processName)):
-                hist.Fill(h.getEdep())             
+         
     elif plotVar == 'trigSimX(Z)': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "TriggerPadUpSimHits_"+processName)):
@@ -367,12 +379,17 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
 
 
     #2
+    
     elif plotVar == 'Reconstructed energy for tags': 
         for event in allData: 
             energy=0
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+                print(h.getEnergy())
                 energy+=h.getEnergy()*energyErrorCorrection
+            print(energy)    
             hist.Fill(energy/beamEnergy) 
+
+
 
     elif plotVar == 'Reconstructed energy for tags (absolute energy)':
         for event in allData: 
@@ -432,7 +449,7 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
                         #         print(h.getTime())
         
 
-    elif plotVar == 'energy response vs. energy' or plotVar == 'energy response vs. angle' or plotVar == 'energy response vs. position': 
+    elif plotVar == 'energy response vs. energy' or plotVar == 'energy response vs. angle' or plotVar == 'energy response vs. position'  or plotVar == 'energy response vs. bar displacement': 
         for event in allData: 
             energy=0
             for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
@@ -519,12 +536,45 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
                 hist[h.getID()].Fill(h.getEnergy()*energyErrorCorrection) 
 
 
-
     elif plotVar == 'Mapped distribution of number of hits of each bar': 
         for event in allData: 
-            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                LayerBar = barMapLocation(h.getID())
-                hist.Fill(LayerBar[0],LayerBar[1])   
+            for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
+                print(dir(h))
+                # print(h.id())
+                # print(h.isTOT())
+         
+            break    
+
+    # elif plotVar == 'Mapped distribution of number of hits of each bar': 
+    #     for event in allData: 
+    #         recoList=[]
+    #         digiList=[]
+    #         PEList=[]
+    #         import libDetDescr as DD
+    #         for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+    #             # LayerBar = barMapLocation(h.getID())
+    #             # hist.Fill(LayerBar[0],LayerBar[1])  
+    #             recoList.append(h.getID()) 
+    #             PEList.append(h.getPE())
+    #         for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
+    #         # for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):  
+    #             digiList.append(h.id()) 
+    #         print('The following reco IDs are present in an event:')
+    #         print('rawID,layer,strip')
+    #         for i in range(0,len(recoList)):
+    #             h=DD.HcalID(recoList[i])
+    #             print('recID',h.raw(),h.layer(),h.strip(),'which had PEs',PEList[i])
+    #         print('The following digi IDs are present in an event:')    
+    #         print('rawID,layer,strip,end')
+    #         for i in range(0,len(digiList)):    
+    #             d=DD.HcalDigiID(digiList[i])
+
+    #             d_translated=DD.HcalID(d.section(),d.layer(),d.strip()).raw()
+    #             print('digiID',d.raw(),d.layer(),d.strip(),d.end(),'which should convert into','recID',d_translated,' Is in the event?:',(d_translated in recoList)  )
+                
+
+    #         break    
+
 #experimental
     elif plotVar == 'Mapped SiPM hits': 
         for event in allData:             
@@ -545,31 +595,48 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
 
 
 
+    # elif plotVar == 'Mapped ADC average': 
+    #     countMap = zeros((39,12))
+    #     ADCMap = zeros((39,12))
+    #     for event in allData: 
+    #         for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
+    #             # print("HcalDigis_"+processName)      
+    #             #for i in 'at', 'id', 'isADC', 'isTOT', 'size', 'soi', 'tot']
+    #             # print(h.at(3).adc_t())      
+      
+
+    #             LayerBarSide = sipmMapLocation(h.id()) 
+    #             if LayerBarSide[2]==1: LayerBarSide[0] +=20
+                
+    #             for i in range(h.size()) :
+    #                 countMap[LayerBarSide[0]-1,LayerBarSide[1]] += 1
+    #                 ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] += h.at(i).adc_t()
+    #     countMap[countMap == 0 ] = 1
+    #     for i in range(39):
+    #         for j in range(12):
+    #             hist.Fill(i+1,j,ADCMap[i,j]/countMap[i,j])
+
     elif plotVar == 'Mapped ADC average': 
         countMap = zeros((39,12))
         ADCMap = zeros((39,12))
         for event in allData: 
-            for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):   
+            for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):
+            # for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):   
+                # print("HcalDigis_"+processName)      
+                #for i in 'at', 'id', 'isADC', 'isTOT', 'size', 'soi', 'tot']
+                print(h.at(3).adc_t())      
+      
+
                 LayerBarSide = sipmMapLocation(h.id()) 
                 if LayerBarSide[2]==1: LayerBarSide[0] +=20
                 
                 for i in range(h.size()) :
                     countMap[LayerBarSide[0]-1,LayerBarSide[1]] += 1
                     ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] += h.at(i).adc_t()
-                    # if h.at(i).adc_t() > 256: print(h.at(i).adc_t()) #I don't know why the adc_t values are so high
-                    # print(dir(h.at(i)))
-                    # if LayerBarSide == [19,4,0]: print (h.at(i).adc_t())
-                # for i in range(h.size()) :
-                #     print(h.at(i).adc_t())
-
-                # print (h.size())
         countMap[countMap == 0 ] = 1
         for i in range(39):
             for j in range(12):
-                # if ADCMap[i,j]/countMap[i,j] > 200: print(i,j)
                 hist.Fill(i+1,j,ADCMap[i,j]/countMap[i,j])
-
-                # hist.Fill(LayerBarSide[0],LayerBarSide[1])  
 
 
     elif plotVar == 'Mapped Distribution of average PEs': 
@@ -593,7 +660,146 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
     elif plotVar == 'trigRecE': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):   
-                hist.Fill(h.getEnergy())          
+                hist.Fill(h.getEnergy()) 
+                print(h.getBarID())  
+    elif plotVar == 'trigRecPE': 
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):   
+                hist.Fill(h.getPE())                 
+    elif plotVar == 'trigRecQ': 
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):   
+                hist.Fill(h.getAmplitude())                 
+    elif plotVar == 'trigRecQ (per bar)': 
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):   
+                hist[h.getBarID()].Fill(h.getAmplitude())                 
+
+    elif plotVar == 'trigSimE': 
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "TriggerPadUpSimHits_"+processName)):
+                hist.Fill(h.getEdep())    
+                print(h.getID())
+    elif plotVar == 'trigSimEBar': 
+        for event in allData: 
+            IDs={}
+            for ih,h in enumerate(getattr(event, "TriggerPadUpSimHits_"+processName)):
+                if h.getID() in IDs: IDs[h.getID()] += h.getEdep()
+                else: IDs[h.getID()] = h.getEdep()
+                
+            for id in IDs:    
+                hist.Fill(IDs[id])    
+                print(IDs[id])
+
+    elif plotVar == 'reconstructed energy': 
+        for event in allData: 
+            energy=0
+            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+                energy+=h.getEnergy()*energyErrorCorrection
+            hist.Fill(energy) 
+
+    elif plotVar == 'total energy deposited FPGA0': 
+        for event in allData: 
+            energy=0
+            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+                # print(getLayer(h.getID()))
+                if getLayer(h.getID())<=11:
+                    energy+=h.getEnergy()*energyErrorCorrection
+            hist.Fill(energy) 
+    elif plotVar == 'total energy deposited FPGA0 horizontal bars': 
+        for event in allData: 
+            energy=0
+            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+                # print(getLayer(h.getID()))
+                if getLayer(h.getID())<=11 and getLayer(h.getID())%2==1:
+                    energy+=h.getEnergy()*energyErrorCorrection
+            hist.Fill(energy)    
+
+    # getLayer(h.getID())%2==1 these are the horizontal bars
+
+
+
+    # elif plotVar == 'Pulse shape' or plotVar == 'Pulse shape (end0)': 
+    #     hitCount={}
+    #     for event in allData: 
+    #         for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
+    #             ID=DD.HcalDigiID(h.id())
+    #             HCal_ID=DD.HcalID(ID.section(),ID.layer(),ID.strip()).raw()
+                
+    #             if HCal_ID not in hitCount: hitCount[HCal_ID]=0
+    #             if ID.end()==0:
+    #                 ADCs=[h.at(i).adc_t() for i in range(h.size())]
+    #                 if max(ADCs)>200:
+    #                     hitCount[HCal_ID]+=1
+    #                     for i in range(h.size()):
+    #                         # hist[HCal_ID].Fill(i,h.at(i).adc_t()-pedestals[h.id()]) 
+    #                         hist[HCal_ID].Fill(i,h.at(i).adc_t()-0) 
+    #     for h in hist:
+    #         try:
+    #             hist[h].Scale(1./hitCount[h])
+    #         except: pass    
+        # pedestal_subtractor(hist)
+
+    # elif plotVar == 'Pulse shape (end1)': 
+    #     hitCount={}
+    #     for event in allData: 
+    #         for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
+    #             ID=DD.HcalDigiID(h.id())
+    #             HCal_ID=DD.HcalID(ID.section(),ID.layer(),ID.strip()).raw()
+                
+    #             if HCal_ID not in hitCount: hitCount[HCal_ID]=0
+    #             if ID.end()==1:
+    #                 ADCs=[h.at(i).adc_t() for i in range(h.size())]
+    #                 if max(ADCs)>200:
+    #                     hitCount[HCal_ID]+=1
+    #                     for i in range(h.size()):
+    #                         hist[HCal_ID].Fill(i,h.at(i).adc_t()-pedestals[h.id()]) 
+    #     for h in hist:
+    #         try:
+    #             hist[h].Scale(1./hitCount[h])
+    #         except: pass   
+        # pedestal_subtractor(hist)    
+                       
+    #'at', 'id', 'isADC', 'isTOT', 'size', 'soi', 'tot'
+                      
+    elif 'Pulse shape' in plotVar:
+        if '(end0)' in plotVar: end=0
+        elif '(end1)' in plotVar: end=1
+        else: end=0
+        if '(no pedestal subtraction)' in plotVar: usePedestals=False
+        elif '(pedestal subtraction)' in plotVar: usePedestals=True
+        else: usePedestals=False
+        hitCount={}
+        for event in allData: 
+
+            # opposing_sipm_adc={}
+            for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
+                ID=DD.HcalDigiID(h.id())
+                HCal_ID=DD.HcalID(ID.section(),ID.layer(),ID.strip()).raw()
+                if HCal_ID not in hitCount: hitCount[HCal_ID]=0
+                if ID.end()==end:
+                    ADCs=[h.at(i).adc_t() for i in range(h.size())]
+                    if max(ADCs)>200:
+                        hitCount[HCal_ID]+=1
+                        for i in range(h.size()):
+                            if usePedestals: 
+                                hist[HCal_ID].Fill(i,h.at(i).adc_t()-pedestals[h.id()]) 
+                            else:   
+                                hist[HCal_ID].Fill(i,h.at(i).adc_t()) 
+                            # print(pedestals[h.id()])
+                    # else: opposing_sipm_adc[HCal_ID] = False       
+       
+        for h in hist:
+            try:
+                hist[h].Scale(1./hitCount[h])
+            except: pass 
+
+         
+      
+
+
+
+
 
     if type(hist) != type({}): return {False:hist}
     return hist    

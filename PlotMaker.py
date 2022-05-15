@@ -4,11 +4,11 @@ from Histograms import *
 from HistogramStyles import *
 r.gROOT.SetBatch(1); #makes root not try to display plots in a new window
 import copy
-
+import libDetDescr as DD
 
 def main():   
     skipUninterestingPlots=False
-    # skipUninterestingPlots=True
+    skipUninterestingPlots=True
     resolutionList=[]
     ΔresolutionList=[]
 
@@ -30,8 +30,14 @@ def main():
             c.cd()
             dualPlotMode=False  
             fittyPlots=['energy response vs. energy','energy response vs. angle','energy response vs. position',
+            'energy response vs. bar displacement',
             'Reconstructed energy for tags (absolute energy)','simETot','Reconstructed energy for tags'
-            ,'Distribution of signal amplitude for TS bars (individual bars)']
+            ,'Distribution of signal amplitude for TS bars (individual bars)',
+            'total energy deposited FPGA0',
+            'total energy deposited FPGA0 horizontal bars',
+            'Pulse shape (end0) (no pedestal subtraction)','Pulse shape (end1) (no pedestal subtraction)',
+            'Pulse shape (end0) (pedestal subtraction)','Pulse shape (end1) (pedestal subtraction)'
+            ]
             if dimension == 2:
                 c.SetCanvasSize(1800, 800)
                 c.GetPad(0).SetRightMargin(0.121)
@@ -49,34 +55,40 @@ def main():
                 lines=[]
                 legend = r.TLegend(0.0,0.9,0.18,1)
                 for i in range(len(plot)):
-                    hist=inFile.Get(plotName+barName(id)+";"+str(i+1))
+                    plotName = plot[i][0]
+                    hist=inFile.Get(plotName+barName(id)+";")
+                    # hist=inFile.Get(plotName+barName(id)+";"+str(i+1))
+                    # print(hist)
+                    hist.GetYaxis().SetRangeUser(0, 400)
                     hist.SetLineColor(rootColors[i])  
                     lines.append(copy.deepcopy(hist))
-                    legend.AddEntry(lines[-1],prettyLegendName(plot[i][1]),"f")
+                    # legend.AddEntry(lines[-1],LegendName(plot[i][1]),"f")
+                    legend.AddEntry(lines[-1],LegendName2(plot[i][0]),"f")
                 for line in lines:
-                    line.Draw("same e")    
+                    line.Draw("same hist e")    
                     # if len(lines)==1: line.Draw("HIST")  
                     # try:
-                    fit = line.Fit('gaus','Sq')
-                    μ = fit.Parameter(1)
-                    Δμ = fit.ParError(1)
-                    σ = fit.Parameter(2)
-                    Δσ = fit.ParError(2)
-                    resolution=σ/μ
-                    Δresolution=resolution*(Δμ/μ+Δσ/σ)
-                    resolutionList.append(resolution)     
-                    ΔresolutionList.append(Δresolution)     
-                    χ2=fit.Chi2()
-                    line.GetFunction("gaus").SetLineColor(rootColors[lines.index(line)])
-                    if len(plot) ==1: line.GetFunction("gaus").SetLineColor(2)
-                    labelμ(lines,line,fit)
+                    # fit = line.Fit('gaus','Sq')
+                    # μ = fit.Parameter(1)
+                    # Δμ = fit.ParError(1)
+                    # σ = fit.Parameter(2)
+                    # Δσ = fit.ParError(2)
+                    # resolution=σ/μ
+                    # Δresolution=resolution*(Δμ/μ+Δσ/σ)
+                    # resolutionList.append(resolution)     
+                    # ΔresolutionList.append(Δresolution)     
+                    # χ2=fit.Chi2()
+                    # line.GetFunction("gaus").SetLineColor(rootColors[lines.index(line)])
+                    # if len(plot) ==1: line.GetFunction("gaus").SetLineColor(2)
+                    # labelμ(lines,line,fit)
                     # except: pass
 
                     
                
                 styleHistogramEnergyResponse(lines[-1],legend)
                 if len(lines)>1:
-                    c.SetLogy()   
+                    # c.SetLogy()   
+                    
                     c.GetPad(0).SetGrid() 
                     legend.Draw()
 
@@ -84,11 +96,14 @@ def main():
                 c.SetLeftMargin(0.12)   
                 c.SetBottomMargin(0.14)
                 r.gStyle.SetOptStat("ne")
-                dualPlotMode=True
+                dualPlotMode=False
                 prepareDualPlots(dualPlotMode,c)                                       
                 if id != False: hist.SetName(barName(id)) 
                 hist.GetRMS()     #this ONE CURSED LINE is somehow the key that makes hist2.GetXaxis().SetRangeUser(50,150) work. Wtf?!?!?!?!             
                 hist.Draw("HIST")      
+                hist.GetYaxis().SetRangeUser(0, 400)
+
+                # c.SetLogy()
 
             if dualPlotMode:
                     hist2=copy.deepcopy(hist)
@@ -119,8 +134,12 @@ def main():
             createContext(fileName,plotName,μ,σ,χ2)
 
             if skipUninterestingPlots:
-                if id in [False,5,402654208+4]:
-                    c.SaveAs("plots/"+extractionName+".png")                
+                # if id in [False,5,402654208+4]:
+                if DD.HcalID(id).strip()==2 and DD.HcalID(id).layer()<10:
+                    # if DD.HcalID(id).layer()%2==0 :
+                # if DD.HcalID(id).strip()==3 and DD.HcalID(id).layer()<10:
+                # if DD.HcalID(id).layer()<10:
+                        c.SaveAs("plots/"+extractionName+".png")                
             else: c.SaveAs("plots/"+extractionName+".png")
             c.Close()
 

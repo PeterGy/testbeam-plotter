@@ -1,14 +1,14 @@
 from optparse import OptionParser
  
 
-# parser = OptionParser()	
+parser = OptionParser()	
 # parser.add_option('-e','--energy', dest='energy', default = '0.5',help='beam energy in GeV')
 # parser.add_option('-p','--particle', dest='particle', default = 'e-',help='type of particle in beam')
 # parser.add_option('-a','--angle', dest='angle', default = '0', help='incidence angle')
 # parser.add_option('-f','--file', dest='file', default = 'Output', help='Name of the file (without the .root)')
 # parser.add_option('-n','--events', dest='events', default = '100', help='Number of events')
-# parser.add_option('-s','--seed', dest='seed', default = '1', help='Seed upon which the simulation is randomised')
-# options = parser.parse_args()[0]
+parser.add_option('-s','--seed', dest='seed', default = '1', help='Seed upon which the simulation is randomised')
+options = parser.parse_args()[0]
 
 
 #easy config interface
@@ -19,15 +19,17 @@ from optparse import OptionParser
 # incidentAngleDegrees = float(options.angle)
 
 
-max_events = 10000
+max_events = 1
 energy=1 # GeV, certified
 particle_id='e-'
 incidentAngleDegrees=0
-runNumber=1
+runNumber=int(options.seed)
 xOffset=000 #mm, absorber is 665 mm wide
 beamSmear=[40.,40.,0.]
+beamSmear=[0.,0.,0.]
 
-simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k_TSonlyPlastic"
+simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"
+# simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k_barsslide000mm_"+str(options.seed)
 # simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"kLYSO"
 # simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"kBad"
 # simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"+str(incidentAngleDegrees)+"deg"

@@ -84,40 +84,47 @@ testbeamPlotGroupsBig = [
 
 
 plotGroups = [
-    # (('recE','e-3GeV0k'),), 
-    # (('Mapped SiPM hits (individual event)','e-1GeV1k'),), 
-    # (('Mapped ADC average','e-3GeV0k'),), 
-    # (('Mapped distribution of number of hits of each bar','e-1GeV1k'),),
+    # (('total energy deposited FPGA0','mu-4GeV1k'),('total energy deposited FPGA0','fpga0_287'),),
+    # (('Mapped distribution of number of hits of each bar','fpga0_287'),),
+    # (('Mapped ADC average','fpga0_287'),),    
+    # (('Mapped ADC average','mu-4GeV1k'),),
+    # (('Mapped distribution of number of hits of each bar','mu-4GeV1k'),),
+    # (('Mapped Distribution of average PEs','fpga0_287'),),
+    # (('Mapped SiPM hits','fpga0_287'),),
+    # (('Distribution of pulse height of each bar','fpga0_287'),),
+    # (('Mapped distribution of number of hits of each bar','mu-4GeV1k'),),
+    # (('Mapped Distribution of average PEs','mu-4GeV1k'),),
+    # (('Mapped distribution of number of hits of each bar','mu-4GeV1k'),),
 
-#    (('energy response vs. energy','pi-0.5GeV2k'),('energy response vs. energy','pi-0.4GeV2k'),('energy response vs. energy','pi-0.3GeV2k'),('energy response vs. energy','pi-0.2GeV2k'),('energy response vs. energy','pi-0.1GeV2k'),), #1
-    # (('energy response vs. energy','e-0.5GeV2k'),('energy response vs. energy','e-0.4GeV2k'),('energy response vs. energy','e-0.3GeV2k'),('energy response vs. energy','e-0.2GeV2k'),('energy response vs. energy','e-0.1GeV2k'),), #1   
-#   (('energy response vs. energy','pi-8GeV100k00deg'),('energy response vs. energy','pi-4GeV100k00deg'),('energy response vs. energy','pi-2GeV100k00deg'),('energy response vs. energy','pi-1GeV100k00deg'),('energy response vs. energy','pi-0.5GeV100k00deg'),), #1
-#     (('energy response vs. energy','e-8GeV100k00deg'), ('energy response vs. energy','e-4GeV100k00deg'), ('energy response vs. energy','e-2GeV100k00deg'), ('energy response vs. energy','e-1GeV100k00deg'), ('energy response vs. energy','e-0.5GeV100k00deg'),), #1
-    # (('Mapped distribution of number of hits of each bar','e-1GeV100k40deg'),),
-    # (('trigRecE (per bar)','e-1GeV1kLYSO'),), 
-    # (('trigRecE (per bar)','e-1GeV1kLYSO'),), 
-    # (('trigRecE (per bar)','e-1GeV1kPlastic'),), 
-    # (('Reconstructed energy for tags','e-1GeV1k'),), 
-    # (('trigSimX(Z)','e-1GeV1k'),), 
-    # (('trigSimX(Z)','e-1GeV1kPlastic'),), #12
-    # (('trigSimX(Z)','e-1GeV1kBad'),), #12
-    # (('trigSimX(Z)','e-1GeV1kLYSO'),), #12
+    # (('total energy deposited FPGA0 horizontal bars','fpga0_235'),
+    # ('total energy deposited FPGA0 horizontal bars','fpga0_243'),
+    # ('total energy deposited FPGA0 horizontal bars','fpga0_241'),    ),
+        
 
-    # (('trigRecE (per bar)','e-1GeV1kPlastic'),), #12
-    # (('trigSimE (per bar)','e-1GeV1kPlastic'),), #12
-    # (('trigRecE (per bar)','e-1GeV1kLYSO'),), #12
-    # (('trigSimE (per bar)','e-1GeV1kLYSO'),), #12
 
-    # (('trigRecE (per bar)','e-1GeV1kBad'),), #12
-    # (('trigSimE (per bar)','e-1GeV1kBad'),), #12
-    # (('Distribution of number of hits for TS bars','e-0.5GeV1k'),), 
-    # (('Distribution of signal amplitude for TS bars (individual bars)','e-0.5GeV1k'),), #12 
 
-    (('energy response vs. position','e-1GeV10k000xpos'),('energy response vs. position','e-1GeV10k100xpos'),('energy response vs. position','e-1GeV10k200xpos'),('energy response vs. position','e-1GeV10k300xpos'),('energy response vs. position','e-1GeV10k400xpos'),),
+    # (('Pulse shape','fpga0_287'),),
+    # (('Pulse shape (end0) (no pedestal subtraction)','fpga0_235'),('Pulse shape (end0) (no pedestal subtraction)','fpga0_243'),('Pulse shape (end0) (no pedestal subtraction)','fpga0_241'),),    
+    # (('Pulse shape (end1)','fpga0_235'),('Pulse shape (end1)','fpga0_243'),('Pulse shape (end1)','fpga0_241'),),    
+    # (
+    # ('Pulse shape (end1) (no pedestal subtraction)','fpga0_225'),
+    # ('Pulse shape (end1) (no pedestal subtraction)','fpga0_226'),
+    # ('Pulse shape (end1) (no pedestal subtraction)','fpga0_227'),
+    # ('Pulse shape (end1) (no pedestal subtraction)','fpga0_228'),
+    # ('Pulse shape (end1) (no pedestal subtraction)','fpga0_229'),
+    # ),    
+    # (('Pulse shape (end0) (no pedestal subtraction)','fpga0_287_1k'),
+    # ('Pulse shape (end0) (pedestal subtraction)','fpga0_287_1k'),)
+    (
+    ('Pulse shape (end1) (pedestal subtraction)','fpga0_287'),
+    ('Pulse shape (end0) (pedestal subtraction)','fpga0_287'),
+    ('Pulse shape (end1) (no pedestal subtraction)','fpga0_287'),
+    ('Pulse shape (end0) (no pedestal subtraction)','fpga0_287'),
+    )
+    # (('Pulse shape (end0)','fpga0_287'),('Pulse shape (end1)','fpga0_287'),)
+    # (('Pulse shape (end1)','fpga0_287'),),
 
-    # (('trigRecE (per bar)','e-1GeV10k_TSonlyPlastic'),), #12
-    # (('trigSimE','e-1GeV10k_TSonlyPlastic'),), #1
-    # (('trigRecE','e-1GeV10k_TSonlyPlastic'),), #1
+
 
 
 

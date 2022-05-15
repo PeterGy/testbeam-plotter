@@ -1,13 +1,18 @@
 import ROOT as r
 from numpy import *
-rootColors=[4,2,3,1,6,7,8,9]
+# rootColors=[4,2,3,1,6,7,8,9]
+# rootColors=[90,95,99]
+# rootColors=[4,6,2]
+# rootColors=[60,64,68,72,74]
+rootColors=[60,70,80,90,99]
+rootColors=[60,65,99,95]
 
 def styleHistogramEnergyResponse(histogram,legend):
     histogram.SetMarkerSize(0.75)    
     legend.SetX1(0.7)               
     legend.SetX2(1)  
     legend.SetY1(0.6)               
-    legend.SetY2(0.9)   
+    legend.SetY2(0.8)   
 
 def label2D():
     label = r.TLatex()
@@ -45,14 +50,16 @@ def createContext(fileName,plotName,μ=None,σ=None,χ2=None):
     if plotName == 'energy response vs. energy' and "0.1GeV" in fileName:  energy = '0.1 - 0.5'
     if plotName == 'energy response vs. angle':  angle = '0 - 40'
 
-    
-    top = ''
+    if 'end0' in plotName:    top = 'left side SiPMs'
+    elif 'end1' in plotName:    top = 'right side SiPMs'
+    else: top = 'end0=left;end1=right'
     # if σ != None: top += "#sigma: "+str(round(σ,4))
     # if μ != None: top += ", #mu: "+str(round(μ,4))
     # if μ != None and σ != None: top += "Resolution: "+str(round(σ/μ,4))
     
 
-    bottom = "Particle: "+particle+", Energy: "+energy+" GeV, Sample: "+sample+"k, Angle: "+angle+" deg"
+    # bottom = "Particle: "+particle+", Energy: "+energy+" GeV, Sample: "+sample+"k, Angle: "+angle+" deg"
+    bottom = "Particle: #mu Energy: 4 GeV, Sample: 10k"
     # if χ2 != None: bottom += ", #chi2: "+str(round(χ2,4))
     contextString='#splitline{'+top+'}{'+bottom+'}'
 
@@ -82,11 +89,39 @@ def prettyLegendName(str):
     # else:
         name = str[str.find('k')+1:]
         if name.find("deg")>-1: name = name[0:2]+" degrees"
-        # elif name.find("xpos")>-1: name = str[0:3]+" particle"
+        elif name.find("barsslide")>-1: name = name[-5:-2]+" mm hor. bar disp."
         elif name.find("xpos")>-1: name = name[0:3]+" mm displacement"
         # else: name = name[name.find('-')+1:name.find('GeV')]+" GeV"
         else: name = str[str.find('-')+1:str.find('GeV')]+' GeV'
         return name
+
+def binaryLegendName(str):
+    if 'fpga' in str: return 'testbeam'
+    if 'GeV' in str: return 'sim'
+    else: return '???'
+
+def LegendName2(str):#returns the legend name based on plot type
+    name =''
+    if 'end0' in str: name+= 'top/left SiPM'
+    if 'end1' in str: name+= 'bottom/right SiPM'
+    if '(pedestal subtraction)' in str: name+= '; pedestals removed'
+    if '(no pedestal subtraction)' in str: name+= '; pedestals kept'
+    return name
+
+def LegendName(str): #returns the legend name based on file name 
+    if 'fpga0_243' in str: return '#mu 45 cm'
+    if 'fpga0_241' in str: return '#mu 60 cm'
+    if 'fpga0_235' in str: return '#mu 30 cm'
+                        
+    if 'fpga0_229' in str: return 'e- 0.3 GeV'
+    if 'fpga0_228' in str: return 'e- 0.4 GeV'
+    if 'fpga0_227' in str: return 'e- 0.5 GeV'
+    if 'fpga0_226' in str: return 'e- 1 GeV'
+    if 'fpga0_225' in str: return 'e- 2 GeV'
+
+    if 'GeV' in str: return 'sim'
+    if 'fpga' in str: return 'testbeam'
+    else: return '???'
 
 def plotResolution(resolutionList,ΔresolutionList,plotName):
     import matplotlib
