@@ -121,7 +121,7 @@ def main():
             hist = createHist(plotDict,plotVar,barIDs)  
             # try: hist = fillHist(hist, plotVar, allData, beamEnergy=beamEnergy,eventOfInterest=eventOfInterest,processName='unpack')     
             # except: hist = fillHist(hist, plotVar, allData, beamEnergy=beamEnergy,eventOfInterest=eventOfInterest)     
-            hist = fillHist(hist, plotVar, allData, beamEnergy=beamEnergy,eventOfInterest=eventOfInterest)     
+            hist = fillHist(hist, plotVar, allData, beamEnergy=beamEnergy,eventOfInterest=eventOfInterest,fileName=fileName)     
             lines.append(copy.deepcopy(hist))          
             #add a line        
             # else:

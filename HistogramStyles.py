@@ -5,7 +5,9 @@ from numpy import *
 # rootColors=[4,6,2]
 # rootColors=[60,64,68,72,74]
 rootColors=[60,70,80,90,99]
-rootColors=[60,65,99,95]
+rootColors=[60,80,90,99]
+rootColors=[60,91,96,99]
+# rootColors=[60,65,99,95]
 
 def styleHistogramEnergyResponse(histogram,legend):
     histogram.SetMarkerSize(0.75)    
@@ -32,34 +34,69 @@ def labelμ(lines,line,fit):
     label.DrawLatex(0.6,  0.5 - 0.05*lines.index(line), "#mu = "+str(round(fit.Parameter(1),6)))
     return label    
 
+def labelSiPMResponseRatio(lines):
+    label = r.TLatex()
+    label.SetTextFont(42)
+    label.SetTextSize(0.048)
+    label.SetTextColor(1)
+    label.SetNDC()    
+    r.gStyle.SetOptStat("")
+    binOfInterest=3
+    if lines[0].GetBinContent(binOfInterest) != 0:
+        ratio = lines[-1].GetBinContent(binOfInterest)/lines[0].GetBinContent(binOfInterest)
+        percentage = str(round(ratio*100,6)) + '%'
+        label.DrawLatex(0.1,  0.84, "Movement effect: "+percentage+" brightness")
+    return label 
+
+def labelLayer(lines):
+    label = r.TLatex()
+    label.SetTextFont(42)
+    label.SetTextSize(0.04)
+    label.SetTextColor(16)
+    label.SetNDC()    
+    r.gStyle.SetOptStat("")
+    binOfInterest=3
+    name=lines[0].GetName()
+    layer=name[name.find('layer')+6:name.find('bar')-2]
+    print(layer)
+    label.DrawLatex(0.3,  0.2,  "Layer: "+str(layer))
+    return label 
+
 def createContext(fileName,plotName,μ=None,σ=None,χ2=None):
     label = r.TLatex()
     label.SetTextFont(42)
     label.SetTextSize(0.05)
     label.SetNDC()      
-    if 'e-' in fileName:    particle="e-"
-    elif 'mu-' in fileName: particle="#mu-"
-    elif 'pi-' in fileName: particle="#pi-"
-    else:                   particle="???"
-    energy = fileName[fileName.find('-')+1:fileName.find('GeV')]
-    sample = fileName[fileName.find('GeV')+3:fileName.find('k')]
-    if 'deg' in fileName: angle = fileName[fileName.find('k')+1:fileName.find('deg')]
-    else: angle = '0'
+    if '225' in fileName:    particle="e-"; energy = '2'
+    if '226' in fileName:    particle="e-"; energy = '1'
+    else: particle="#mu-"; energy = '4'
+    sample='10'
 
-    if plotName == 'energy response vs. energy' and "0.5GeV" in fileName :  energy = '0.5 - 8'
-    if plotName == 'energy response vs. energy' and "0.1GeV" in fileName:  energy = '0.1 - 0.5'
-    if plotName == 'energy response vs. angle':  angle = '0 - 40'
+    # if 'e-' in fileName:    particle="e-"
+    # elif 'mu-' in fileName: particle="#mu-"
+    # elif 'pi-' in fileName: particle="#pi-"
+    # else:                   particle="???"
+    # energy = fileName[fileName.find('-')+1:fileName.find('GeV')]
+    # sample = fileName[fileName.find('GeV')+3:fileName.find('k')]
+    # if 'deg' in fileName: angle = fileName[fileName.find('k')+1:fileName.find('deg')]
+    # else: angle = '0'
+
+    # if plotName == 'energy response vs. energy' and "0.5GeV" in fileName :  energy = '0.5 - 8'
+    # if plotName == 'energy response vs. energy' and "0.1GeV" in fileName:  energy = '0.1 - 0.5'
+    # if plotName == 'energy response vs. angle':  angle = '0 - 40'
 
     if 'end0' in plotName:    top = 'left side SiPMs'
+    # if 'end0' in plotName:    top = 'top SiPMs'
     elif 'end1' in plotName:    top = 'right side SiPMs'
+    # elif 'end1' in plotName:    top = 'bottom SiPMs'
     else: top = 'end0=left;end1=right'
     # if σ != None: top += "#sigma: "+str(round(σ,4))
     # if μ != None: top += ", #mu: "+str(round(μ,4))
     # if μ != None and σ != None: top += "Resolution: "+str(round(σ/μ,4))
     
 
-    # bottom = "Particle: "+particle+", Energy: "+energy+" GeV, Sample: "+sample+"k, Angle: "+angle+" deg"
-    bottom = "Particle: #mu Energy: 4 GeV, Sample: 10k"
+    bottom = "Particle: "+particle+", Energy: "+energy+" GeV, Sample: "+sample+"k"
+    # bottom = "Particle: #mu Energy: 4 GeV, Sample: 10k"
     # if χ2 != None: bottom += ", #chi2: "+str(round(χ2,4))
     contextString='#splitline{'+top+'}{'+bottom+'}'
 
@@ -112,6 +149,7 @@ def LegendName(str): #returns the legend name based on file name
     if 'fpga0_243' in str: return '#mu 45 cm'
     if 'fpga0_241' in str: return '#mu 60 cm'
     if 'fpga0_235' in str: return '#mu 30 cm'
+    if 'fpga0_287' in str: return '#mu 0 cm'
                         
     if 'fpga0_229' in str: return 'e- 0.3 GeV'
     if 'fpga0_228' in str: return 'e- 0.4 GeV'

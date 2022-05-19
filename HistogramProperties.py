@@ -238,6 +238,10 @@ plotDict = {
     'Pulse shape (end1) (no pedestal subtraction)'  :{'xaxis' : 'Time sample', 'yaxis' : 'ADC', 'binning' : {'nBins':8, 'min':0, 'max':8}, 'dimension' : 1,'bars' : hcalBarIDs()},
     'Pulse shape (end0) (pedestal subtraction)'  :{'xaxis' : 'Time sample', 'yaxis' : 'ADC', 'binning' : {'nBins':8, 'min':0, 'max':8}, 'dimension' : 1,'bars' : hcalBarIDs()},
     'Pulse shape (end1) (pedestal subtraction)'  :{'xaxis' : 'Time sample', 'yaxis' : 'ADC', 'binning' : {'nBins':8, 'min':0, 'max':8}, 'dimension' : 1,'bars' : hcalBarIDs()},
+    'Pulses'  :{'xaxis' : 'Time sample', 'yaxis' : 'ADC', 'binning' : {'nBins':8, 'min':0, 'max':8}, 'dimension' : 1},
+    '3D'  :{'xaxis' : 'Layer number', 'yaxis' : 'Bar number', 'dimension' : 2,
+                    'binningX' : {'nBins':39, 'min':0.5, 'max':39.5}, 
+                    'binningY' : {'nBins':12, 'min':-0.5, 'max':11.5}},
     # 'Pulse shape'  :{'xaxis' : 'Time sample', 'yaxis' : 'ADC', 'binning' : {'nBins':8, 'min':0, 'max':8}, 'dimension' : 1},
 
     }    

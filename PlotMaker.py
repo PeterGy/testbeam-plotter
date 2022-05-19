@@ -8,7 +8,7 @@ import libDetDescr as DD
 
 def main():   
     skipUninterestingPlots=False
-    skipUninterestingPlots=True
+    # skipUninterestingPlots=True
     resolutionList=[]
     ΔresolutionList=[]
 
@@ -41,6 +41,7 @@ def main():
             if dimension == 2:
                 c.SetCanvasSize(1800, 800)
                 c.GetPad(0).SetRightMargin(0.121)
+                # hist.GetZaxis().SetRangeUser(0, 400)
                 hist.Draw("COLZ")
                 r.gStyle.SetOptStat("")
                 label2D()   
@@ -56,16 +57,18 @@ def main():
                 legend = r.TLegend(0.0,0.9,0.18,1)
                 for i in range(len(plot)):
                     plotName = plot[i][0]
-                    hist=inFile.Get(plotName+barName(id)+";")
-                    # hist=inFile.Get(plotName+barName(id)+";"+str(i+1))
+                    # hist=inFile.Get(plotName+barName(id)+";")
+                    hist=inFile.Get(plotName+barName(id)+";"+str(i+1))
                     # print(hist)
                     hist.GetYaxis().SetRangeUser(0, 400)
                     hist.SetLineColor(rootColors[i])  
                     lines.append(copy.deepcopy(hist))
-                    # legend.AddEntry(lines[-1],LegendName(plot[i][1]),"f")
-                    legend.AddEntry(lines[-1],LegendName2(plot[i][0]),"f")
+                    legend.AddEntry(lines[-1],LegendName(plot[i][1]),"f")
+                    # legend.AddEntry(lines[-1],LegendName2(plot[i][0]),"f")
                 for line in lines:
-                    line.Draw("same hist e")    
+                    line.Draw("same hist e")  
+                    # print(line.GetBinContent (3)) 
+                    # line.Draw("same hist")    
                     # if len(lines)==1: line.Draw("HIST")  
                     # try:
                     # fit = line.Fit('gaus','Sq')
@@ -82,6 +85,12 @@ def main():
                     # if len(plot) ==1: line.GetFunction("gaus").SetLineColor(2)
                     # labelμ(lines,line,fit)
                     # except: pass
+                
+                # labelSiPMResponseRatio(lines)    
+                # labelLayer(lines)    
+                # r.gStyle.SetOptStat("nerm")
+
+                # print()    
 
                     
                

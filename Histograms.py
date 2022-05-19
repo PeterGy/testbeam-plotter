@@ -1,4 +1,5 @@
 from HistogramProperties import *
+
 #One element for each plot. Each plot is a list of pairs, each element in the list being a line on the plot. 
 #The pair holds the plotvar, then the file it stems from   
 testbeamPlotGroups = [
@@ -87,6 +88,7 @@ plotGroups = [
     # (('total energy deposited FPGA0','mu-4GeV1k'),('total energy deposited FPGA0','fpga0_287'),),
     # (('Mapped distribution of number of hits of each bar','fpga0_287'),),
     # (('Mapped ADC average','fpga0_287'),),    
+ 
     # (('Mapped ADC average','mu-4GeV1k'),),
     # (('Mapped distribution of number of hits of each bar','mu-4GeV1k'),),
     # (('Mapped Distribution of average PEs','fpga0_287'),),
@@ -103,9 +105,30 @@ plotGroups = [
 
 
 
-    # (('Pulse shape','fpga0_287'),),
+    # (('Pulse shape (end0) (pedestal subtraction)','fpga0_287_1k'),),
+    # (('Pulse shape (end0) (pedestal subtraction)','fpga0_287'),),
+    # (('Pulse shape (end1) (pedestal subtraction)','fpga0_287'),),
+    # (('Pulse shape (end0) (pedestal subtraction)','287'),),
+    # (('Pulse shape (end1) (pedestal subtraction)','287'),),
+
     # (('Pulse shape (end0) (no pedestal subtraction)','fpga0_235'),('Pulse shape (end0) (no pedestal subtraction)','fpga0_243'),('Pulse shape (end0) (no pedestal subtraction)','fpga0_241'),),    
-    # (('Pulse shape (end1)','fpga0_235'),('Pulse shape (end1)','fpga0_243'),('Pulse shape (end1)','fpga0_241'),),    
+    # (
+    #     ('Pulse shape (end1) (pedestal subtraction)','fpga0_287'),
+    #     ('Pulse shape (end1) (pedestal subtraction)','fpga0_235'),
+    #     ('Pulse shape (end1) (pedestal subtraction)','fpga0_243'),
+    #     ('Pulse shape (end1) (pedestal subtraction)','fpga0_241'),
+    # ),    
+    # (
+    #     ('Pulse shape (end0) (pedestal subtraction)','fpga0_287'),
+    #     ('Pulse shape (end0) (pedestal subtraction)','fpga0_235'),
+    #     ('Pulse shape (end0) (pedestal subtraction)','fpga0_243'),
+    #     ('Pulse shape (end0) (pedestal subtraction)','fpga0_241'),
+    # ),    
+    # (
+
+    #     ('Pulse shape (end1) (pedestal subtraction)','fpga0_243'),
+
+    # ),
     # (
     # ('Pulse shape (end1) (no pedestal subtraction)','fpga0_225'),
     # ('Pulse shape (end1) (no pedestal subtraction)','fpga0_226'),
@@ -113,20 +136,41 @@ plotGroups = [
     # ('Pulse shape (end1) (no pedestal subtraction)','fpga0_228'),
     # ('Pulse shape (end1) (no pedestal subtraction)','fpga0_229'),
     # ),    
-    # (('Pulse shape (end0) (no pedestal subtraction)','fpga0_287_1k'),
-    # ('Pulse shape (end0) (pedestal subtraction)','fpga0_287_1k'),)
-    (
-    ('Pulse shape (end1) (pedestal subtraction)','fpga0_287'),
-    ('Pulse shape (end0) (pedestal subtraction)','fpga0_287'),
-    ('Pulse shape (end1) (no pedestal subtraction)','fpga0_287'),
-    ('Pulse shape (end0) (no pedestal subtraction)','fpga0_287'),
-    )
-    # (('Pulse shape (end0)','fpga0_287'),('Pulse shape (end1)','fpga0_287'),)
-    # (('Pulse shape (end1)','fpga0_287'),),
+    # (
+    # ('Pulse shape (end0) (no pedestal subtraction)','fpga0_287_1k'),
+    # ('Pulse shape (end0) (pedestal subtraction)','fpga0_287_1k'),
+    # )
+
+    # (
+    # ('Pulse shape (end1) (pedestal subtraction)','fpga0_287'),
+    # ('Pulse shape (end0) (pedestal subtraction)','fpga0_287'),
+    # ('Pulse shape (end1) (no pedestal subtraction)','fpga0_287'),
+    # ('Pulse shape (end0) (no pedestal subtraction)','fpga0_287'),
+    # )
 
 
+    # (('Mapped ADC average','225'),),    
+    # (('Mapped ADC average','226'),),   
 
+    # same phase comparison
+    # (
+    #     ('Pulse shape (end0) (pedestal subtraction)','fpga0_279'),
+    #     ('Pulse shape (end0) (pedestal subtraction)','fpga0_235'),
+    #     ('Pulse shape (end0) (pedestal subtraction)','fpga0_243'),
+    #     ('Pulse shape (end0) (pedestal subtraction)','fpga0_241'),
+    # ),   
+    # (
+    #     ('Pulse shape (end1) (pedestal subtraction)','fpga0_279'),
+    #     ('Pulse shape (end1) (pedestal subtraction)','fpga0_235'),
+    #     ('Pulse shape (end1) (pedestal subtraction)','fpga0_243'),
+    #     ('Pulse shape (end1) (pedestal subtraction)','fpga0_241'),
+    # ),  
+    # (('Mapped ADC average','fpga0_279'),),    
+    # (('Mapped ADC average','287'),),    
 
+    # (('Pulses','fpga0_287'),),    
+    # (('3D','fpga0_287_1k'),),    
+    (('3D','287'),),    
 
 
 

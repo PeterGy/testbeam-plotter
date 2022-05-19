@@ -1,16 +1,15 @@
 #processName is actually protosim on aurora
 from HistogramProperties import *
+import ROOT as r
 from numpy import *
 import platform 
 import libDetDescr as DD
 import csv
+from HCal3Dmodel import *
+# import HCal3Dmodel.py
 
 # def pedestal_subtractor(hist):
-csv_reader = csv.reader(open('pedestals/pedestals_20220424.csv'), delimiter=',')
-pedestals ={}
-for row in csv_reader:
-    try:  pedestals[int(row[0],0)] = float(row[1])
-    except:pass
+
 # print(pedestals)    
     # for digi_ID in pedestals:    
     #     ID=DD.HcalDigiID(digi_ID)
@@ -20,8 +19,31 @@ for row in csv_reader:
 
 
 #hist can actually be a single histogram or a dictionary of 12 or 192 histograms
-def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, maxEDeposit=float('inf'), barID=False, angle=0, beamEnergy=1, eventOfInterest=None): 
-    
+def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, maxEDeposit=float('inf'), barID=False, angle=0, beamEnergy=1, eventOfInterest=None, fileName=''): 
+    # print('doing one', fileName)
+
+    if '279' in fileName:     csv_reader = csv.reader(open('pedestals/pedestals_20220424_07.csv'), delimiter=',')
+    if '287' in fileName:     csv_reader = csv.reader(open('pedestals/pedestals_20220424_22.csv'), delimiter=',')
+    if '235' in fileName or '241' in fileName or '243' in fileName:     csv_reader = csv.reader(open('pedestals/pedestals_20220422_07.csv'), delimiter=',')
+    if '225' in fileName or '226' in fileName:     csv_reader = csv.reader(open('pedestals/pedestals_20220421_07.csv'), delimiter=',')
+    else: csv_reader = csv.reader(open('pedestals/pedestals_20220424_22.csv'), delimiter=',')
+    # csv_reader = csv.reader(open('pedestals/pedestals_20220424.csv'), delimiter=',')
+
+    pedestals ={}
+    if '(pedestal subtraction)' in plotVar:
+        for row in csv_reader:
+            try:  pedestals[int(row[0],0)] = float(row[1])
+            except:pass
+    if '(no pedestal subtraction)' in plotVar:
+        for row in csv_reader:
+            try:  pedestals[int(row[0],0)] = 0.0
+            except:pass        
+    else:     
+        for row in csv_reader:
+            try:  pedestals[int(row[0],0)] = float(row[1])
+            except:pass    
+
+
     if len(hist)==1:
         hist=hist[0]
         
@@ -616,27 +638,31 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
     #         for j in range(12):
     #             hist.Fill(i+1,j,ADCMap[i,j]/countMap[i,j])
 
-    elif plotVar == 'Mapped ADC average': 
-        countMap = zeros((39,12))
-        ADCMap = zeros((39,12))
-        for event in allData: 
-            for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):
-            # for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):   
-                # print("HcalDigis_"+processName)      
-                #for i in 'at', 'id', 'isADC', 'isTOT', 'size', 'soi', 'tot']
-                print(h.at(3).adc_t())      
+    # elif plotVar == 'Mapped ADC average': 
+    #     countMap = zeros((39,12))
+    #     ADCMap = zeros((39,12))
+    #     for event in allData: 
+    #         for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
+    #         # for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):
+    #         # for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):   
+    #             # print("HcalDigis_"+processName)      
+    #             #for i in 'at', 'id', 'isADC', 'isTOT', 'size', 'soi', 'tot']
+    #             # print(h.at(3).adc_t())      
+    #             ID=DD.HcalDigiID(h.id())
+    #             # HCal_ID=DD.HcalID(ID.section(),ID.layer(),ID.strip()).raw()
       
 
-                LayerBarSide = sipmMapLocation(h.id()) 
-                if LayerBarSide[2]==1: LayerBarSide[0] +=20
+    #             # LayerBarSide = sipmMapLocation(h.id()) 
+    #             LayerBarSide = [ID.layer(),ID.strip(),ID.end()] 
+    #             if LayerBarSide[2]==1: LayerBarSide[0] +=20
                 
-                for i in range(h.size()) :
-                    countMap[LayerBarSide[0]-1,LayerBarSide[1]] += 1
-                    ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] += h.at(i).adc_t()
-        countMap[countMap == 0 ] = 1
-        for i in range(39):
-            for j in range(12):
-                hist.Fill(i+1,j,ADCMap[i,j]/countMap[i,j])
+    #             for i in range(h.size()) :
+    #                 countMap[LayerBarSide[0]-1,LayerBarSide[1]] += 1
+    #                 ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] += h.at(i).adc_t()
+    #     countMap[countMap == 0 ] = 1
+    #     for i in range(39):
+    #         for j in range(12):
+    #             hist.Fill(i+1,j,ADCMap[i,j]/countMap[i,j])
 
 
     elif plotVar == 'Mapped Distribution of average PEs': 
@@ -761,33 +787,101 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
         # pedestal_subtractor(hist)    
                        
     #'at', 'id', 'isADC', 'isTOT', 'size', 'soi', 'tot'
-                      
+
+
+    elif plotVar == 'Mapped ADC average': 
+        countMap = zeros((39,12))
+        ADCMap = zeros((39,12))
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
+            # for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):
+            # for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):   
+                # print("HcalDigis_"+processName)      
+                #for i in 'at', 'id', 'isADC', 'isTOT', 'size', 'soi', 'tot']
+                # print(h.at(3).adc_t())      
+                ID=DD.HcalDigiID(h.id())
+                # HCal_ID=DD.HcalID(ID.section(),ID.layer(),ID.strip()).raw()
+      
+
+                # LayerBarSide = sipmMapLocation(h.id()) 
+                LayerBarSide = [ID.layer(),ID.strip(),ID.end()] 
+                if LayerBarSide[0] < 10: LayerBarSide[1] +=2 #visual offset
+                if LayerBarSide[2]==1: LayerBarSide[0] +=20
+                
+                for i in range(h.size()) :
+                    countMap[LayerBarSide[0]-1,LayerBarSide[1]] += 1
+                    try: ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] += h.at(i).adc_t()-pedestals[h.id()]
+                    except: ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] += h.at(i).adc_t()
+                    # print(-pedestals[h.id()])
+        countMap[countMap == 0 ] = 1
+        for i in range(39):
+            for j in range(12):
+                hist.Fill(i+1,j,ADCMap[i,j]/countMap[i,j])
+
     elif 'Pulse shape' in plotVar:
         if '(end0)' in plotVar: end=0
         elif '(end1)' in plotVar: end=1
         else: end=0
-        if '(no pedestal subtraction)' in plotVar: usePedestals=False
-        elif '(pedestal subtraction)' in plotVar: usePedestals=True
-        else: usePedestals=False
-        hitCount={}
-        for event in allData: 
+        if '(no pedestal subtraction)' in plotVar: subtractPedestals=False
+        elif '(pedestal subtraction)' in plotVar: subtractPedestals=True
+        else: subtractPedestals=False
 
-            # opposing_sipm_adc={}
+
+        
+
+        hitCount={}
+
+        for event in allData: 
+            this_sipm_adc={}
+            opposing_sipm_adc={}
+
             for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
                 ID=DD.HcalDigiID(h.id())
                 HCal_ID=DD.HcalID(ID.section(),ID.layer(),ID.strip()).raw()
                 if HCal_ID not in hitCount: hitCount[HCal_ID]=0
-                if ID.end()==end:
-                    ADCs=[h.at(i).adc_t() for i in range(h.size())]
-                    if max(ADCs)>200:
-                        hitCount[HCal_ID]+=1
+                
+
+                if ID.end()!=end:
+                    ADCs = [h.at(i).adc_t() for i in range(h.size())] 
+                    opposing_sipm_adc[HCal_ID] = ADCs
+
+                elif ID.end()==end:
+                    ADCs2 = [h.at(i).adc_t() for i in range(h.size())]
+                    this_sipm_adc[HCal_ID] = ADCs2
+
+
+                if HCal_ID in opposing_sipm_adc and HCal_ID in this_sipm_adc:
+                    if max(opposing_sipm_adc[HCal_ID])>200 and max(this_sipm_adc[HCal_ID])>200:
+                        # print(max(opposing_sipm_adc[HCal_ID]), max(this_sipm_adc[HCal_ID]))
                         for i in range(h.size()):
-                            if usePedestals: 
-                                hist[HCal_ID].Fill(i,h.at(i).adc_t()-pedestals[h.id()]) 
-                            else:   
-                                hist[HCal_ID].Fill(i,h.at(i).adc_t()) 
+                            # print(pedestals)
+                            hist[HCal_ID].Fill(i,this_sipm_adc[HCal_ID][i]-pedestals[h.id()])
+                        hitCount[HCal_ID]+=1
+
+
+
+                            # if HCal_ID in opposing_sipm_adc:
+                            #     if subtractPedestals: 
+                            #         hist[HCal_ID].Fill(i,opposing_sipm_adc[HCal_ID]  ) 
+                            #         hist[HCal_ID].Fill(i,h.at(i).adc_t()-pedestals[h.id()]) 
+                            #         hitCount[HCal_ID]+=2
+
+                            #     else:   
+                            #         hist[HCal_ID].Fill(i,opposing_sipm_adc[HCal_ID]  ) 
+                            #         hist[HCal_ID].Fill(i,h.at(i).adc_t()) 
+                            #         hitCount[HCal_ID]+=2
+                            # else:  
+                            #     if subtractPedestals: 
+                            #         opposing_sipm_adc[HCal_ID]=h.at(i).adc_t()-pedestals[h.id()]) 
+                            #         hitCount[HCal_ID]+=2
+
+                            #     else:   
+                            #         opposing_sipm_adc[HCal_ID]=h.at(i).adc_t()) 
+                            #         hitCount[HCal_ID]+=2      
+
                             # print(pedestals[h.id()])
                     # else: opposing_sipm_adc[HCal_ID] = False       
+                    # else: pass       
        
         for h in hist:
             try:
@@ -795,7 +889,67 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
             except: pass 
 
          
-      
+    elif 'Pulses' == plotVar:  
+        plotsMade=0
+        for event in allData: 
+            
+
+            for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
+                ID=DD.HcalDigiID(h.id())
+
+                if ID.layer()==4 and ID.strip()==4 and ID.end()==0:
+                    ADCs = [h.at(i).adc_t() for i in range(h.size())] 
+                    if max(ADCs)>200:
+                        c=r.TCanvas('t','The canvas of anything', 1100, 900)
+                        pulseHist =  r.TH1F("timeSampleEventDisplay", "Time samples ", 8,0,8) 
+                        pulseHist.SetYTitle('ADC')
+                        pulseHist.SetXTitle('Time sample') 
+                        pulseHist.GetYaxis().SetRangeUser(0, 1024)
+                        for i in range(h.size()):
+                                # print(pedestals)
+                                pulseHist.Fill(i,ADCs[i]-pedestals[h.id()])
+                        
+                        pulseHist.Draw("HIST")
+                        c.SaveAs("plots/"+str(plotsMade)+".png")  
+                        c.Close()
+                        del(pulseHist)
+                        plotsMade+=1
+
+    elif '3D' == plotVar:  
+        #event 10 in gpga0 run 287 works
+        countMap = zeros((39,12))
+        ADCMap = zeros((39,12))
+        eventN=0
+        for event in allData: 
+            eventN+=1
+            if eventN==10010 or eventN==10: #works for 287 except for last alyer
+            # if eventN==10009 or eventN==9:
+                for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
+                    ID=DD.HcalDigiID(h.id())
+                    LayerBarSide = [ID.layer(),ID.strip(),ID.end()] 
+                    if LayerBarSide[0] < 10: LayerBarSide[1] +=2 #visual offset
+                    if LayerBarSide[2]==1: LayerBarSide[0] +=20
+                    
+                    for i in range(h.size()) :
+                        countMap[LayerBarSide[0]-1,LayerBarSide[1]] += 1
+                        try: ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] += h.at(i).adc_t()-pedestals[h.id()]
+                        except: ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] += h.at(i).adc_t()
+                        # print(-pedestals[h.id()])
+
+
+        hits=[]                
+        countMap[countMap == 0 ] = 1
+        for i in range(20):
+            for j in range(12):
+                
+                if ADCMap[i,j] >100 and ADCMap[i+20,j] >100:
+                    hist.Fill(i+1,j,ADCMap[i,j]/countMap[i,j])
+                    hits.append([i+1,j])
+        print(hits)
+        render_event_display(hits)           
+
+
+
 
 
 
