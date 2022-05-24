@@ -908,6 +908,13 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
                         for i in range(h.size()):
                                 # print(pedestals)
                                 pulseHist.Fill(i,ADCs[i]-pedestals[h.id()])
+                                # if h.at(i).tot() >1000:
+                                if True:
+                                    print('Timestamp',i)
+                                    print('adc',h.at(i).adc_t())
+                                    print('toa',h.at(i).toa())
+                                    print('tot',h.at(i).tot())
+                                
                         
                         pulseHist.Draw("HIST")
                         c.SaveAs("plots/"+str(plotsMade)+".png")  
@@ -915,14 +922,42 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
                         del(pulseHist)
                         plotsMade+=1
 
+                        break
+
+    elif 'Hit map' == plotVar:  
+        #event 10 in gpga0 run 287 works
+        
+        ADCMap = zeros((39,12))
+        for event in allData: 
+            countMap = zeros((39,12))
+            for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
+                ID=DD.HcalDigiID(h.id())
+                LayerBarSide = [ID.layer(),ID.strip(),ID.end()] 
+                if LayerBarSide[0] < 10: LayerBarSide[1] +=2 #visual offset
+                if LayerBarSide[2]==1: LayerBarSide[0] +=20
+                
+                try: ADCs = [h.at(i).adc_t()-pedestals[h.id()] for i in range(h.size())] 
+                except:   ADCs = [0 for i in range(h.size())] 
+                if max(ADCs) > 100: countMap[LayerBarSide[0]-1,LayerBarSide[1]] =1
+
+            for i in range(20):
+                for j in range(12):
+                    if countMap[i,j] == 1 and countMap[i+20,j] == 1:
+                        hist.Fill(i+1,j,countMap[i,j])
+                    # hits.append([str(i+1)+','+str(j),ADCMap[i,j]])
+                    # hits[str(i+1)+','+str(j)] =ADCMap[i,j]/countMap[i,j]
+        # print(hits)
+        # render_event_display(hits)  
+
     elif '3D' == plotVar:  
         #event 10 in gpga0 run 287 works
         countMap = zeros((39,12))
         ADCMap = zeros((39,12))
+        event_of_interest=10 #10 works great for 287
         eventN=0
         for event in allData: 
             eventN+=1
-            if eventN==10010 or eventN==10: #works for 287 except for last alyer
+            if eventN == event_of_interest or eventN==event_of_interest+10000:
             # if eventN==10009 or eventN==9:
                 for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
                     ID=DD.HcalDigiID(h.id())
@@ -930,21 +965,31 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
                     if LayerBarSide[0] < 10: LayerBarSide[1] +=2 #visual offset
                     if LayerBarSide[2]==1: LayerBarSide[0] +=20
                     
-                    for i in range(h.size()) :
-                        countMap[LayerBarSide[0]-1,LayerBarSide[1]] += 1
-                        try: ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] += h.at(i).adc_t()-pedestals[h.id()]
-                        except: ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] += h.at(i).adc_t()
+                    try: ADCs = [h.at(i).adc_t()-pedestals[h.id()] for i in range(h.size())] 
+                    except: 
+                        ADCs = [0 for i in range(h.size())] 
+                        print('pedestal missing for',LayerBarSide,h.id(),hex(h.id()))
+                    # if max(ADCs)>1:
+                    ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] =max(ADCs)
+
+                    # for i in range(h.size()) :
+                    #     countMap[LayerBarSide[0]-1,LayerBarSide[1]] += 1
+                    #     try: ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] += h.at(i).adc_t()-pedestals[h.id()]
+                    #     except: ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] += h.at(i).adc_t()
                         # print(-pedestals[h.id()])
 
 
-        hits=[]                
+        # hits=[]                
+        hits={}                
         countMap[countMap == 0 ] = 1
+        threshold=50
         for i in range(20):
             for j in range(12):
                 
-                if ADCMap[i,j] >100 and ADCMap[i+20,j] >100:
+                if ADCMap[i,j] >threshold and ADCMap[i+20,j] >threshold:
                     hist.Fill(i+1,j,ADCMap[i,j]/countMap[i,j])
-                    hits.append([i+1,j])
+                    # hits.append([str(i+1)+','+str(j),ADCMap[i,j]])
+                    hits[str(i+1)+','+str(j)] =ADCMap[i,j]/countMap[i,j]
         print(hits)
         render_event_display(hits)           
 

@@ -10,13 +10,21 @@ def render_event_display(hits=[]):
     bar_width=50
     bar_height=2000
     layer_thickness=45
-    layer_thickness=95
+    # layer_thickness=90
 
     def add_bar(x,y,z,layer,bar,hits,color='C0'):
-        if [layer,bar] in hits:  color='red'
+        # rendered_layers=[4,7,12]
+
+        rendered_layers=range(0,20)
         vertices = [list(zip(x,y,z))]
-        poly = Poly3DCollection(vertices, alpha=0.2,facecolor=color)
-        ax.add_collection3d(poly)
+        # if [layer,bar,'.+'] in hits: poly = Poly3DCollection(vertices, alpha=0.2,facecolor='red',edgecolor='red')
+        if str(layer)+','+str(bar) in hits: 
+            yellowness = 1 - hits[str(layer)+','+str(bar)] / 1024
+            poly = Poly3DCollection(vertices, alpha=0.2,facecolor=(1,yellowness,0),edgecolor=(1,yellowness,0))
+        else:   
+            # poly = Poly3DCollection(vertices,facecolor='#FF000000',edgecolor='#1f77b420')
+            poly = Poly3DCollection(vertices,facecolor='#FF000000',edgecolor='#FF000000')
+        if layer in rendered_layers: ax.add_collection3d(poly)
 
 
     for layer in range (1,20):
@@ -43,21 +51,59 @@ def render_event_display(hits=[]):
                 z = [(0+bar-6)*bar_width, (1+bar-6)*bar_width, (1+bar-6)*bar_width, (0+bar-6)*bar_width]
                 add_bar(x,y,z,layer,bar,hits)
 
+    # def get_x_entryhits(hits):
+    first_layer_max=0
+    entry_bar=99
+    for i in hits:
+        if i[0:2]=='1,':
+            if hits[i]>first_layer_max:
+                entry_bar=int(i[2])
+                first_layer_max=hits[i]
+    first_vertical_bar = entry_bar        
+
+    first_layer_max=0
+    entry_bar=99
+    for i in hits:
+        if i[0:2]=='2,':
+            if hits[i]>first_layer_max:
+                entry_bar=int(i[2])
+                first_layer_max=hits[i]
+    first_horizontal_bar = entry_bar     
+
 
 
     import numpy as np
-    first_vertical_bar = hits[0][1]
-    first_horizontal_bar = hits[1][1]
+    # first_vertical_bar = 4#hits[0][1]
+    # first_horizontal_bar = 5#hits[1][1]
     x_start =  (0+first_vertical_bar-6)*bar_width + bar_width/2
     z_start =  (0+first_horizontal_bar-6)*bar_width + bar_width/2
 
     x = [x_start,x_start]
     z = [z_start,z_start]
-    y = [-1000,3000]
+    y = [-1000,1000]
     ax.plot(x, y, z, label='parametric curve',color='green')
     ax.set_xlim(-1000,1000)
-    ax.set_ylim(-1000,1000)
+    ax.set_ylim(000,1000)
     ax.set_zlim(-1000,1000)
+
+    from matplotlib.lines import Line2D
+    from matplotlib.patches import Patch
+    custom_lines = [
+                    # Patch(facecolor='#FF000000',edgecolor='#1f77b488' ),
+                    Patch(facecolor='yellow',edgecolor='yellow' ),
+                    Patch(facecolor='red', ),
+                    Line2D([0], [0], color='green', lw=4),]
+
+
+    ax.legend(custom_lines, ['HCal bar (weak hit)', 'HCal bar (strong hit)', 'Muon path'])
+    # ax.legend(custom_lines, ['HCal bar (not hit)', 'HCal bar (hit)', 'presumed pion entry'])
+    # ax.legend(custom_lines, ['HCal bar (weak hit)', 'HCal bar (strong hit)', 'presumed electron entry'])
+
+    ax.set_xlabel("Horizontal axis [mm]")
+    ax.set_ylabel("Beam axis [mm]")
+    ax.set_zlabel("Vertical axis [mm]")
+
+
     plt.show()
 
  

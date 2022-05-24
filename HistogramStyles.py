@@ -21,7 +21,8 @@ def label2D():
     label.SetTextFont(42)
     label.SetTextSize(0.025)
     label.SetNDC()    
-    label.DrawLatex(0,  0.92, "Odd layers: horizontal bars; Even layers: vertical bars")
+    # label.DrawLatex(0,  0.92, "Odd layers: horizontal bars; Even layers: vertical bars")
+    label.DrawLatex(0,  0.92, "Odd layers: vertical bars; Even layers: horizontal bars")
     return label
 
 def labelμ(lines,line,fit):
@@ -67,8 +68,11 @@ def createContext(fileName,plotName,μ=None,σ=None,χ2=None):
     label.SetTextFont(42)
     label.SetTextSize(0.05)
     label.SetNDC()      
+    print(fileName)
     if '225' in fileName:    particle="e-"; energy = '2'
-    if '226' in fileName:    particle="e-"; energy = '1'
+    elif '226' in fileName:    particle="e-"; energy = '1'
+    elif '288' in fileName:    particle="#pi-"; energy = '4'
+    # if '226' in fileName:    particle="e-"; energy = '1'
     else: particle="#mu-"; energy = '4'
     sample='10'
 
@@ -89,7 +93,8 @@ def createContext(fileName,plotName,μ=None,σ=None,χ2=None):
     # if 'end0' in plotName:    top = 'top SiPMs'
     elif 'end1' in plotName:    top = 'right side SiPMs'
     # elif 'end1' in plotName:    top = 'bottom SiPMs'
-    else: top = 'end0=left;end1=right'
+    # else: top = 'end0=left;end1=right'
+    else: top = ''
     # if σ != None: top += "#sigma: "+str(round(σ,4))
     # if μ != None: top += ", #mu: "+str(round(μ,4))
     # if μ != None and σ != None: top += "Resolution: "+str(round(σ/μ,4))

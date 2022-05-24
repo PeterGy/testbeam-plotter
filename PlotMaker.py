@@ -39,9 +39,9 @@ def main():
             'Pulse shape (end0) (pedestal subtraction)','Pulse shape (end1) (pedestal subtraction)'
             ]
             if dimension == 2:
-                c.SetCanvasSize(1800, 800)
+                c.SetCanvasSize(900, 800)
                 c.GetPad(0).SetRightMargin(0.121)
-                # hist.GetZaxis().SetRangeUser(0, 400)
+                hist.GetZaxis().SetRangeUser(0, 8000)
                 hist.Draw("COLZ")
                 r.gStyle.SetOptStat("")
                 label2D()   
