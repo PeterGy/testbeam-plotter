@@ -1,12 +1,13 @@
 import ROOT as r
 from numpy import *
-# rootColors=[4,2,3,1,6,7,8,9]
+rootColors=[4,2,3,1,6,7,8,9]
 # rootColors=[90,95,99]
 # rootColors=[4,6,2]
 # rootColors=[60,64,68,72,74]
-rootColors=[60,70,80,90,99]
-rootColors=[60,80,90,99]
-rootColors=[60,91,96,99]
+# rootColors=[60,70,80,90,99]
+# rootColors=[60,80,90,99]
+# rootColors=[60,91,96,99]
+# rootColors=[60,99]
 # rootColors=[60,65,99,95]
 
 def styleHistogramEnergyResponse(histogram,legend):
@@ -14,7 +15,7 @@ def styleHistogramEnergyResponse(histogram,legend):
     legend.SetX1(0.7)               
     legend.SetX2(1)  
     legend.SetY1(0.6)               
-    legend.SetY2(0.8)   
+    legend.SetY2(0.9)   
 
 def label2D():
     label = r.TLatex()
@@ -63,22 +64,81 @@ def labelLayer(lines):
     label.DrawLatex(0.3,  0.2,  "Layer: "+str(layer))
     return label 
 
+def labelTSbar(lines):
+    label = r.TLatex()
+    label.SetTextFont(42)
+    label.SetTextSize(0.04)
+    label.SetTextColor(16)
+    label.SetNDC()    
+    r.gStyle.SetOptStat("")
+    binOfInterest=3
+    name=lines[0].GetName()
+    # layer=name[name.find('layer')+6:name.find('bar')-2]
+    # print(layer)
+    bar=int(name[name.find(', bar')+6:])
+    label.DrawLatex(0.25,  0.8,  "Bar: "+str(bar))
+    return label     
+
+def labelNone():
+    label = r.TLatex()
+    label.SetTextFont(42)
+    label.SetTextSize(0.04)
+    label.SetTextColor(16)
+    label.SetNDC()    
+    r.gStyle.SetOptStat("")
+    label.DrawLatex(0.3,  0.2,  "")
+    return label
+
+def labelELink(lines,IDcounter):
+    label = r.TLatex()
+    label.SetTextFont(42)
+    label.SetTextSize(0.06)
+    label.SetTextColor(16)
+    label.SetNDC()    
+    r.gStyle.SetOptStat("")
+    binOfInterest=3
+    name=lines[0].GetName()
+    # print(name)
+    layer=int(name[name.find('layer')+6:name.find(', bar')])
+    # print(name.find('layer')) 
+    # print(name.find('bar')) 
+    bar=int(name[name.find(', bar')+6:])
+    # if int(layer) <= 9 : link= int((layer-1)/2)
+
+    # else: link= int(((layer-10)*12+bar)/16)+5
+    # print(link)
+    # IDcounter
+    # print(layer,bar)
+    link=int(IDcounter/16)
+    # label.DrawLatex(0.3,  0.2, "Link: "+str(link)+"; Layer: "+str(layer)+", Bar: "+str(bar))
+    label.DrawLatex(0.2,  0.8, "Link: "+str(link)+"; Layer: "+str(layer)+", Bar: "+str(bar))
+    # print(layer,bar)
+    # print(IDcounter,link)
+    if layer == 9 and bar in [0,1,10,11]:IDcounter+=0
+    else: IDcounter+=1
+
+    return IDcounter
+
 def createContext(fileName,plotName,μ=None,σ=None,χ2=None):
     label = r.TLatex()
     label.SetTextFont(42)
     label.SetTextSize(0.05)
     label.SetNDC()      
-    print(fileName)
+    # print(fileName)
+    sample='2'
     if '225' in fileName:    particle="e-"; energy = '2'
     elif '226' in fileName:    particle="e-"; energy = '1'
     elif '288' in fileName:    particle="#pi-"; energy = '4'
+    elif 'e-1GeV' in fileName:    particle="e-"; energy = '1'
+    elif 'TS' in fileName:    particle="e-"; energy = '4'; sample='56'
+
     # if '226' in fileName:    particle="e-"; energy = '1'
     else: particle="#mu-"; energy = '4'
-    sample='10'
+    
 
-    # if 'e-' in fileName:    particle="e-"
-    # elif 'mu-' in fileName: particle="#mu-"
-    # elif 'pi-' in fileName: particle="#pi-"
+    if 'e-' in fileName:    particle="e-"
+    elif 'mu-' in fileName: particle="#mu-"
+    elif 'pi-' in fileName: particle="#pi-"
     # else:                   particle="???"
     # energy = fileName[fileName.find('-')+1:fileName.find('GeV')]
     # sample = fileName[fileName.find('GeV')+3:fileName.find('k')]
@@ -86,7 +146,7 @@ def createContext(fileName,plotName,μ=None,σ=None,χ2=None):
     # else: angle = '0'
 
     # if plotName == 'energy response vs. energy' and "0.5GeV" in fileName :  energy = '0.5 - 8'
-    # if plotName == 'energy response vs. energy' and "0.1GeV" in fileName:  energy = '0.1 - 0.5'
+    if plotName == 'energy response vs. energy' and "0.1GeV" in fileName:  energy = '0.1 - 0.5'
     # if plotName == 'energy response vs. angle':  angle = '0 - 40'
 
     if 'end0' in plotName:    top = 'left side SiPMs'
@@ -139,6 +199,7 @@ def prettyLegendName(str):
 
 def binaryLegendName(str):
     if 'fpga' in str: return 'testbeam'
+    if 'TS' in str: return 'testbeam'
     if 'GeV' in str: return 'sim'
     else: return '???'
 
@@ -163,7 +224,9 @@ def LegendName(str): #returns the legend name based on file name
     if 'fpga0_225' in str: return 'e- 2 GeV'
 
     if 'GeV' in str: return 'sim'
+    if 'TS' in str: return 'testbeam'
     if 'fpga' in str: return 'testbeam'
+    if len(str)==3: return 'testbeam'
     else: return '???'
 
 def plotResolution(resolutionList,ΔresolutionList,plotName):
@@ -195,8 +258,8 @@ def plotResolution(resolutionList,ΔresolutionList,plotName):
     elif len(resolutionList)==10:
         def expected(E,s,p): return p+s*1/sqrt(E)
         plt.figure("Energies")
-        energies = (8,4,2,1,0.5)
-        # energies = (0.5,0.4,0.3,0.2,0.1)
+        # energies = (8,4,2,1,0.5)
+        energies = (0.5,0.4,0.3,0.2,0.1)
 
         xfit=linspace(min(energies),max(energies),50)
         
@@ -215,7 +278,7 @@ def plotResolution(resolutionList,ΔresolutionList,plotName):
         # plt.title('Fit quality')
         plt.legend()
         plt.grid(visible=True)
-        plt.savefig('plots/resolutionEnergies.png')
+        plt.savefig('plots/resolutionEnergiesLOW.png')
 
         return [[],[]]
 
@@ -232,3 +295,32 @@ def plotResolution(resolutionList,ΔresolutionList,plotName):
         plt.savefig('plots/resEnergies.png')
         return [[],[]]
     return[resolutionList,ΔresolutionList]    
+
+def plotEresponse(EresponseList,ΔEresponseList,plotName):
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    from scipy import optimize
+
+    if len(EresponseList)==5:
+        def expected(E,s,p): return p+s*1/sqrt(E)
+        plt.figure("Ereps")
+        x=(0,100,200,300,400)
+
+
+        xfit=linspace(min(x),max(x),50)
+        
+        plt.errorbar(x,EresponseList[0:5],xerr=0,yerr=ΔEresponseList[0:5],label='Electrons',color='b',marker="_",linestyle='')
+        # plt.errorbar(energies,EresponseList[5:10],xerr=0,yerr=ΔEresponseList[5:10],label='Electrons',color='b',marker="_",linestyle='')
+        textSize=12  
+        plt.title("Energy response for various detector displacements", fontsize=textSize)            
+        plt.ylabel("Energy response [Edep/Ebeam]", fontsize=textSize    )        
+        plt.xlabel("X displacement [mm]", fontsize=textSize)
+        plt.tick_params(axis='both', which='major', labelsize=textSize)         
+        # plt.ylim(0.05,0.1)   
+        # plt.title('Fit quality')
+        plt.legend()
+        plt.grid(visible=True)
+        plt.savefig('plots/EresponseDisplacement.png')
+
+        return [[],[]]     

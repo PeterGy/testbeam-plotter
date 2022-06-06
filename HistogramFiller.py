@@ -351,12 +351,12 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
         for run in runs:
             hist.Fill(runs[run]) 
         
-    elif plotVar == 'Sum of pulse height per event': 
-        for event in allData: 
-            totalAmplitude=0
-            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
-                totalAmplitude+=h.getAmplitude()
-            hist.Fill(totalAmplitude) 
+    # elif plotVar == 'Sum of pulse height per event': 
+    #     for event in allData: 
+    #         totalAmplitude=0
+    #         for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+    #             totalAmplitude+=h.getAmplitude()
+    #         hist.Fill(totalAmplitude) 
         
     elif plotVar == 'Sum of pulse height per run': 
         runs={}
@@ -369,21 +369,33 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
             hist.Fill(runs[run]) 
         
     #1.4
-    elif plotVar == 'Distribution of number of hits for TS bars': 
-        for event in allData: 
-            for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
-                hist.Fill(h.getBarID())
+    # elif plotVar == 'Distribution of number of hits for TS bars': 
+    #     for event in allData: 
+    #         for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
+    #             hist.Fill(h.getBarID())
 
     elif plotVar == 'Distribution of signal amplitude for TS bars': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
                 hist.Fill(h.getBarID(),h.getAmplitude())
 
+    #  elif plotVar == 'Distribution of signal amplitude for TS bars (individual bars)': 
+    #     for event in allData: 
+    #         for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
+    #             hist[h.getBarID()].Fill(h.getAmplitude()/1000.)       #WARNING: this makes them go from fC to pC
+    #             if h.getBarID() not in range(0,13): print (h.getBarID())
+
     elif plotVar == 'Distribution of signal amplitude for TS bars (individual bars)': 
+        if len(fileName)==5: eventDataFormat = "testBeamHitsUp_hits"
+        else:    eventDataFormat = "trigScintRecHitsUp_protosim"
+        eventCount=0
         for event in allData: 
-            for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
-                hist[h.getBarID()].Fill(h.getAmplitude()/1000.)       #WARNING: this makes them go from fC to pC
-                if h.getBarID() not in range(0,13): print (h.getBarID())
+            for ih,h in enumerate(getattr(event, eventDataFormat)):
+                if h.getPE() >50:
+                    hist[h.getBarID()].Fill(h.getAmplitude()/1000)    
+            eventCount+=1
+            if eventCount>4000 and   eventDataFormat == "trigScintRecHitsUp_protosim": break      
+
 
 
     #1.5
@@ -558,14 +570,14 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
                 hist[h.getID()].Fill(h.getEnergy()*energyErrorCorrection) 
 
 
-    elif plotVar == 'Mapped distribution of number of hits of each bar': 
-        for event in allData: 
-            for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
-                print(dir(h))
-                # print(h.id())
-                # print(h.isTOT())
+    # elif plotVar == 'Mapped distribution of number of hits of each bar': 
+    #     for event in allData: 
+    #         for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
+    #             print(dir(h))
+    #             # print(h.id())
+    #             # print(h.isTOT())
          
-            break    
+    #         break    
 
     # elif plotVar == 'Mapped distribution of number of hits of each bar': 
     #     for event in allData: 
@@ -851,7 +863,7 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
 
 
                 if HCal_ID in opposing_sipm_adc and HCal_ID in this_sipm_adc:
-                    if max(opposing_sipm_adc[HCal_ID])>200 and max(this_sipm_adc[HCal_ID])>200:
+                    if max(opposing_sipm_adc[HCal_ID])>200 and max(this_sipm_adc[HCal_ID])>200 and max(opposing_sipm_adc[HCal_ID])<1000 and max(this_sipm_adc[HCal_ID])<1000:
                         # print(max(opposing_sipm_adc[HCal_ID]), max(this_sipm_adc[HCal_ID]))
                         for i in range(h.size()):
                             # print(pedestals)
@@ -909,45 +921,23 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
                                 # print(pedestals)
                                 pulseHist.Fill(i,ADCs[i]-pedestals[h.id()])
                                 # if h.at(i).tot() >1000:
-                                if True:
-                                    print('Timestamp',i)
-                                    print('adc',h.at(i).adc_t())
-                                    print('toa',h.at(i).toa())
-                                    print('tot',h.at(i).tot())
+                                # if True:
+                                #     print('Timestamp',i)
+                                #     print('adc',h.at(i).adc_t())
+                                #     print('toa',h.at(i).toa())
+                                #     print('tot',h.at(i).tot())
                                 
                         
                         pulseHist.Draw("HIST")
-                        c.SaveAs("plots/"+str(plotsMade)+".png")  
+                        c.SaveAs("plots/pulses/"+str(plotsMade)+".png")  
                         c.Close()
                         del(pulseHist)
                         plotsMade+=1
 
                         break
 
-    elif 'Hit map' == plotVar:  
-        #event 10 in gpga0 run 287 works
-        
-        ADCMap = zeros((39,12))
-        for event in allData: 
-            countMap = zeros((39,12))
-            for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
-                ID=DD.HcalDigiID(h.id())
-                LayerBarSide = [ID.layer(),ID.strip(),ID.end()] 
-                if LayerBarSide[0] < 10: LayerBarSide[1] +=2 #visual offset
-                if LayerBarSide[2]==1: LayerBarSide[0] +=20
-                
-                try: ADCs = [h.at(i).adc_t()-pedestals[h.id()] for i in range(h.size())] 
-                except:   ADCs = [0 for i in range(h.size())] 
-                if max(ADCs) > 100: countMap[LayerBarSide[0]-1,LayerBarSide[1]] =1
 
-            for i in range(20):
-                for j in range(12):
-                    if countMap[i,j] == 1 and countMap[i+20,j] == 1:
-                        hist.Fill(i+1,j,countMap[i,j])
-                    # hits.append([str(i+1)+','+str(j),ADCMap[i,j]])
-                    # hits[str(i+1)+','+str(j)] =ADCMap[i,j]/countMap[i,j]
-        # print(hits)
-        # render_event_display(hits)  
+
 
     elif '3D' == plotVar:  
         #event 10 in gpga0 run 287 works
@@ -982,7 +972,7 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
         # hits=[]                
         hits={}                
         countMap[countMap == 0 ] = 1
-        threshold=50
+        threshold=15
         for i in range(20):
             for j in range(12):
                 
@@ -993,14 +983,300 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
         print(hits)
         render_event_display(hits)           
 
+    elif 'Hit map' == plotVar:  
+        # for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+        if len(fileName)==3: eventDataFormat = "ChipSettingsTestDigis_unpack"
+        else:    eventDataFormat = "HcalDigis_protosim"
+            # print('aaah agh agh')
+            
+
+        ADCMap = zeros((39,12))
+        for event in allData: 
+            countMap = zeros((39,12))
+            for ih,h in enumerate(getattr(event, eventDataFormat)):
+                ID=DD.HcalDigiID(h.id())
+                LayerBarSide = [ID.layer(),ID.strip(),ID.end()] 
+                if LayerBarSide[0] < 10: LayerBarSide[1] +=2 #visual offset
+                if LayerBarSide[2]==1: LayerBarSide[0] +=20           
+                try: 
+                    if eventDataFormat == "ChipSettingsTestDigis_unpack": 
+                        ADCs = [h.at(i).adc_t()-pedestals[h.id()] for i in range(h.size())] 
+                    elif eventDataFormat == "HcalDigis_protosim": 
+                        ADCs = [h.at(i).adc_t() for i in range(h.size())]                     
+                except:   ADCs = [0 for i in range(h.size())] 
+                if max(ADCs) > 100: countMap[LayerBarSide[0]-1,LayerBarSide[1]] =1
+
+            for i in range(20):
+                for j in range(12):
+                    if countMap[i,j] == 1 and countMap[i+20,j] == 1:
+                        hist.Fill(i+1,j,countMap[i,j])
 
 
 
 
+    elif plotVar in ['Sum of pulse height per event','Sum of pulse height per event end0','Sum of pulse height per event end1', 'Sum of pulse height per event (no pedestal)']: 
+        if len(fileName)==3: eventDataFormat = "ChipSettingsTestDigis_unpack"
+        else:    eventDataFormat = "HcalDigis_protosim"
+        if 'end0' in plotVar: endOfInterest=0
+        elif 'end1' in plotVar: endOfInterest=1
+        else: endOfInterest='both'
+        print(endOfInterest)
+        for event in allData: 
+            
+            totalAmplitude=0
+            for ih,h in enumerate(getattr(event, eventDataFormat)):
+                ID=DD.HcalDigiID(h.id())
 
 
+                if ID.end()==endOfInterest or endOfInterest=='both':
+                # if True:
+                    HCal_ID=DD.HcalID(ID.section(),ID.layer(),ID.strip()).raw()
+                    if plotVar =='Sum of pulse height per event (no pedestal)': 
+                        amplitude = max([h.at(i).adc_t() for i in range(h.size())])
+                    elif 'Sum of pulse height per event' in plotVar:
+                        try: 
+                            if eventDataFormat == "ChipSettingsTestDigis_unpack": 
+                                amplitude = max([h.at(i).adc_t()-pedestals[h.id()] for i in range(h.size())]) 
+                            elif eventDataFormat == "HcalDigis_protosim": 
+                                amplitude = max([h.at(i).adc_t() for i in range(h.size())])                      
+                        except: amplitude = -10000
+                        
+                    totalAmplitude += amplitude 
+
+            hist.Fill(totalAmplitude)       
+        #   
+        # if len(fileName)==3: eventDataFormat = "ChipSettingsTestDigis_unpack"
+        # else:    eventDataFormat = "HcalDigis_protosim"
+
+        # for event in allData: 
+        #     amplitudeMap = zeros((40,12))
+        #     for ih,h in enumerate(getattr(event, eventDataFormat)):
+        #         ID=DD.HcalDigiID(h.id())
+        #         LayerBarSide = [ID.layer(),ID.strip(),ID.end()] 
+        #         if LayerBarSide[0] < 10: LayerBarSide[1] +=2 #visual offset
+        #         if LayerBarSide[2]==1: LayerBarSide[0] +=20
+        #         # HCal_ID=DD.HcalID(ID.section(),ID.layer(),ID.strip()).raw()
+        #         # amplitude = max([h.at(i).adc_t() for i in range(h.size())])
+        #         try: 
+        #             if eventDataFormat == "ChipSettingsTestDigis_unpack": 
+        #                 # amplitude = max([h.at(i).adc_t()-pedestals[h.id()] for i in range(h.size())]) 
+        #                 amplitude = max([h.at(i).adc_t()-pedestals[h.id()] for i in range(h.size())]) 
+        #                 # if LayerBarSide[0]==1 and LayerBarSide[1] ==4: print(amplitude)
+
+        #             elif eventDataFormat == "HcalDigis_protosim": 
+        #                 amplitude = max([h.at(i).adc_t() for i in range(h.size())])                      
+        #         except: amplitude =-10000
+        #         amplitudeMap[LayerBarSide[0],LayerBarSide[1]] = amplitude
+        #     threshold=00
+        #     for i in range(1,20):
+        #         for j in range(12):
+        #             if amplitudeMap[i,j] >threshold and amplitudeMap[i+20,j] >threshold:
+        #                 # print('threshold passe')
+                        
+        #                 try:
+        #                     # barID=DD.HcalID(1,i,j).raw()
+        #                     barID=i*100+j
+        #                     # print(barID)
+        #                     hist[barID].Fill( (amplitudeMap[i,j]+amplitudeMap[i+20,j])/2 )
+        #                 except: pass#print(barID)
+
+    elif plotVar == 'SiPM hits per event': 
+        if len(fileName)==3: eventDataFormat = "ChipSettingsTestDigis_unpack"
+        else:    eventDataFormat = "HcalDigis_protosim"
+
+        for event in allData: 
+            
+            totalHits=0
+            for ih,h in enumerate(getattr(event, eventDataFormat)):
+                ID=DD.HcalDigiID(h.id())
+                HCal_ID=DD.HcalID(ID.section(),ID.layer(),ID.strip()).raw()
+                try: 
+                    if eventDataFormat == "ChipSettingsTestDigis_unpack": 
+                        amplitude = max([h.at(i).adc_t()-pedestals[h.id()] for i in range(h.size())]) 
+                    elif eventDataFormat == "HcalDigis_protosim": 
+                        amplitude = max([h.at(i).adc_t() for i in range(h.size())])                      
+                except: amplitude = max([h.at(i).adc_t()-100 for i in range(h.size())])
+                if amplitude >100: totalHits += 1 
+
+            hist.Fill(totalHits) 
+
+
+        # for event in allData: 
+        #     totalCount=0
+        #     for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
+        #         totalCount+=1
+        #     hist.Fill(totalCount) 
+
+    if plotVar == 'Pulse height of an individual bar': 
+        if len(fileName)==3: eventDataFormat = "ChipSettingsTestDigis_unpack"
+        else:    eventDataFormat = "HcalDigis_protosim"
+
+        for event in allData: 
+            amplitudeMap = zeros((40,12))
+            for ih,h in enumerate(getattr(event, eventDataFormat)):
+                ID=DD.HcalDigiID(h.id())
+                LayerBarSide = [ID.layer(),ID.strip(),ID.end()] 
+                if LayerBarSide[0] < 10: LayerBarSide[1] +=2 #visual offset
+                if LayerBarSide[2]==1: LayerBarSide[0] +=20
+                # HCal_ID=DD.HcalID(ID.section(),ID.layer(),ID.strip()).raw()
+                # amplitude = max([h.at(i).adc_t() for i in range(h.size())])
+                try: 
+                    if eventDataFormat == "ChipSettingsTestDigis_unpack": 
+                        # amplitude = max([h.at(i).adc_t()-pedestals[h.id()] for i in range(h.size())]) 
+                        amplitude = max([h.at(i).adc_t()-pedestals[h.id()] for i in range(h.size())]) 
+                        # if LayerBarSide[0]==1 and LayerBarSide[1] ==4: print(amplitude)
+
+                    elif eventDataFormat == "HcalDigis_protosim": 
+                        amplitude = max([h.at(i).adc_t() for i in range(h.size())])                      
+                except: amplitude =-10000
+                amplitudeMap[LayerBarSide[0],LayerBarSide[1]] = amplitude
+            threshold=00
+            for i in range(1,20):
+                for j in range(12):
+                    if amplitudeMap[i,j] >threshold and amplitudeMap[i+20,j] >threshold:
+                        # print('threshold passe')
+                        
+                        try:
+                            # barID=DD.HcalID(1,i,j).raw()
+                            barID=i*100+j
+                            # print(barID)
+                            hist[barID].Fill( (amplitudeMap[i,j]+amplitudeMap[i+20,j])/2 )
+                        except: pass#print(barID)
+            # break            
+        
+    if plotVar == 'pulse height of each SiPM': 
+        if len(fileName)==3: eventDataFormat = "ChipSettingsTestDigis_unpack"
+        else:    eventDataFormat = "HcalDigis_protosim"
+        for event in allData: 
+            amplitudes = {}
+            for ih,h in enumerate(getattr(event, eventDataFormat)):
+                ID=DD.HcalDigiID(h.id())
+                HCal_ID=DD.HcalID(ID.section(),ID.layer(),ID.strip()).raw()
+                LayerBarSide = [ID.layer(),ID.strip(),ID.end()] 
+                if LayerBarSide[0] < 10: LayerBarSide[1] +=2 #visual offset
+                if LayerBarSide[2]==1: LayerBarSide[0] +=20
+                try: 
+                    if eventDataFormat == "ChipSettingsTestDigis_unpack": 
+                        amplitude = max([h.at(i).adc_t()-pedestals[h.id()] for i in range(h.size())]) 
+                        # if LayerBarSide[0]==1 and LayerBarSide[1] ==4: print(amplitude)
+
+                    elif eventDataFormat == "HcalDigis_protosim": 
+                        amplitude = max([h.at(i).adc_t() for i in range(h.size())])                      
+                except: amplitude =-10000
+                # if HCal_ID in amplitudes:
+                #     amplitudes[HCal_ID] += amplitude 
+                # else:
+                #     amplitudes[HCal_ID] = amplitude    
+                amplitudes[HCal_ID] = amplitude    
+            for barID in amplitudes:    
+                hist[barID].Fill(amplitudes[barID]) 
+            # break    
+
+        # amplitudeMap = zeros((39,12))
+
+        # ADCMap = zeros((39,12))
+        # event_of_interest=10 #10 works great for 287
+        # eventN=0
+        # for event in allData: 
+        #     eventN+=1
+        #     if eventN == event_of_interest or eventN==event_of_interest+10000:
+        #     # if eventN==10009 or eventN==9:
+        #         for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
+        #             ID=DD.HcalDigiID(h.id())
+        #             LayerBarSide = [ID.layer(),ID.strip(),ID.end()] 
+        #             if LayerBarSide[0] < 10: LayerBarSide[1] +=2 #visual offset
+        #             if LayerBarSide[2]==1: LayerBarSide[0] +=20
+                    
+        #             try: ADCs = [h.at(i).adc_t()-pedestals[h.id()] for i in range(h.size())] 
+        #             except: 
+        #                 ADCs = [0 for i in range(h.size())] 
+        #                 print('pedestal missing for',LayerBarSide,h.id(),hex(h.id()))
+        #             # if max(ADCs)>1:
+        #             ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] =max(ADCs)
+
+                    # for i in range(h.size()) :
+                    #     countMap[LayerBarSide[0]-1,LayerBarSide[1]] += 1
+                    #     try: ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] += h.at(i).adc_t()-pedestals[h.id()]
+                    #     except: ADCMap[LayerBarSide[0]-1,LayerBarSide[1]] += h.at(i).adc_t()
+                        # print(-pedestals[h.id()])
+
+
+        # hits=[]                
+        # hits={}                
+        # countMap[countMap == 0 ] = 1
+        # threshold=50
+        # for i in range(20):
+        #     for j in range(12):
+                
+        #         if ADCMap[i,j] >threshold and ADCMap[i+20,j] >threshold:
+        #             hist.Fill(i+1,j,ADCMap[i,j]/countMap[i,j])
+        #             # hits.append([str(i+1)+','+str(j),ADCMap[i,j]])
+        #             hits[str(i+1)+','+str(j)] =ADCMap[i,j]/countMap[i,j]
+        # print(hits)
+        # render_event_display(hits)
+
+    elif plotVar == 'TB hits for TS bars' or plotVar == 'Distribution of number of hits for TS bars': 
+        if len(fileName)==5: eventDataFormat = "testBeamHitsUp_hits"
+        else:    eventDataFormat = "trigScintRecHitsUp_protosim"
+        eventCount=0
+        for event in allData: 
+            eventCount+=1
+            for ih,h in enumerate(getattr(event, eventDataFormat)):
+                # print(dir(h))
+                # if h.getEnergy()>0.01:
+                # if h.getHitQuality()>0.01:
+                if h.getPE() >50:
+                    hist.Fill(h.getBarID())
+                # print(ih)
+                # print(h.getSampAboveThr())
+                # if h.getHitQuality() !=0:
+                #  print(h.getHitQuality())
+                # print(dir(h))
+            if eventCount> 4000 and eventDataFormat == "trigScintRecHitsUp_protosim": break   
+        # print(eventCount)
+
+    elif plotVar == 'TS above threshold': 
+        for event in allData: 
+            # for ih,h in enumerate(getattr(event, "trigScintRecHitsUp_"+processName)):
+            for ih,h in enumerate(getattr(event, "testBeamHitsUp_hits")):
+                if h.getSampAboveThr() != 0:
+                    hist.Fill(h.getBarID())
+
+    elif plotVar == 'TS above threshold (individual bars)': 
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "testBeamHitsUp_hits")):
+                # if h.getSampAboveThr() != 0:
+                    # hist[h.getBarID()].Fill(h.getSampAboveThr())     
+                    hist[h.getBarID()].Fill(1)     
+                # if h.getBarID() not in range(0,13): print (h.getBarID())                    
+
+    elif plotVar == 'TS ADCs (individual bars)': 
+        eventCount=0
+        for event in allData: 
+            for ih,h in enumerate(getattr(event, "decodedQIEUp_unpack")):
+                # getChanID
+                # print(dir(h))
+                if h.getChanID() in range(0,12):#what are the other 4 channels???
+                # print(h.getChanID())
+                # pass
+                # if h.getSampAboveThr() != 0:
+                    # hist[h.getBarID()].Fill(h.getSampAboveThr())     
+                    # hist[h.getBarID()].Fill(max(h.getADC()))     
+                    hist[h.getChanID()].Fill(max(h.getADC()))     
+
+                # if h.getBarID() not in range(0,13): print (h.getBarID())    
+            eventCount+=1
+        print (eventCount)
 
     if type(hist) != type({}): return {False:hist}
     return hist    
 
 
+
+
+'''
+
+'getAmplitude', 'getBarID', 'getBeamEfrac', 'getEarlyPedestal', 'getEnergy', 'getHitQuality', 'getID', 'getMinPE', 'getModuleID', 
+'getPE', 'getPedestal', 'getPulseWidth', 'getQ', 'getQualityFlag', 'getSampAbovePed', 'getSampAboveThr', 'getStartSample', 'getTime', 
+'getXPos', 'getYPos', 'getZPos', 'isNoise', 
+'''

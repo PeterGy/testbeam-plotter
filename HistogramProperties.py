@@ -1,3 +1,6 @@
+import libDetDescr as DD
+
+
 def hcalBinning():
     num_layers=9+10
     layer_thickness=45
@@ -25,6 +28,30 @@ def hcalBarIDs():
                 barIDs.append(startID + layer*1024 + bar)
     return barIDs  
 
+def hcalBarIDs_simple():
+    barIDs=[]
+    for layer in range(1,20):
+        if layer <=8:
+            for bar in range(2,10):
+                barIDs.append(layer*100+ bar)
+        else:    
+            for bar in range(0,12):
+                barIDs.append(layer*100 + bar)
+    return barIDs  
+
+# def hcalDigiBarIDs():
+#     barIDs=hcalBarIDs()
+#     for id in barIDs:
+#         ID = DD.HcalID(id)
+
+#             #     ID=DD.HcalDigiID(digi_ID)
+#     #     HCal_ID=DD.HcalID(ID.section(),ID.layer(),ID.strip()).raw()
+#         digiID = DD.HcalDigiID(ID.section(),ID.layer(),ID.strip(),0).raw()
+#     return barIDs  
+
+
+
+
 def trigScintBarIDs():
     return range(0,12) 
 
@@ -42,7 +69,12 @@ def getLayer(id):
 
 def barName(id):
     if id is False: return ''#"Machine"
-    if id <20: return " bar "+str(id) #it means it is TS
+    # if id <20: return " bar "+str(id) #it means it is TS
+    if id < 20000:
+        layer = int(id/100)
+        bar = id-layer*100
+        return " layer "+str(layer)+", bar "+str(bar) 
+        # return str(id)
     shortID = id-402654208
     [layer,bar] = barMapLocation(id) 
     return " layer "+str(layer)+", bar "+str(bar)    
@@ -65,7 +97,7 @@ barBinsZ = hcalBinning()
 plotDict = {
     'Total number of hits per event'   :{'xaxis' : 'Hits', 'yaxis' : 'Event count', 'binning' : {'nBins':60, 'min':0, 'max':60}, 'dimension' : 1 }, #0,0 min-max makes the xrange automatic. nbins must be 10 so my program can manually set nbins to be the value it should really be automatically
     'Total number of hits per run'   :{'xaxis' : 'Hits', 'yaxis' : 'Run count', 'binning' : {'nBins':100, 'min':0, 'max':0}, 'dimension' : 1 }, #0,0 min-max makes the xrange automatic. nbins must be 10 so my program can manually set nbins to be the value it should really be automatically
-    'Sum of pulse height per event' :{'xaxis' : 'Pulse height [mV]', 'yaxis' : 'Event count', 'binning' : {'nBins':1000, 'min':0, 'max':0}, 'dimension' : 1 },
+    # 'Sum of pulse height per event' :{'xaxis' : 'Pulse height [mV]', 'yaxis' : 'Event count', 'binning' : {'nBins':1000, 'min':0, 'max':0}, 'dimension' : 1 },
     'Sum of pulse height per run' :{'xaxis' : 'Pulse height [mV]', 'yaxis' : 'Run count', 'binning' : {'nBins':1000, 'min':0, 'max':0}, 'dimension' : 1 },
 
 
@@ -187,6 +219,7 @@ plotDict = {
 
     'Distribution of number of hits for TS bars':{'xaxis' : 'Bar ID', 'yaxis' : 'Counts', 'binning' : {'nBins':12, 'min':-0.5, 'max':11.5}, 'dimension' : 1,},
     'Distribution of signal amplitude for TS bars':{'xaxis' : 'Bar ID', 'yaxis' : 'Signal Amplitude [fC]', 'binning' : {'nBins':12, 'min':-0.5, 'max':11.5}, 'dimension' : 1,},
+    # 'Distribution of signal amplitude for TS bars (individual bars)':{'xaxis' : 'Amplitude [pC]', 'yaxis' : 'Counts', 'binning' : {'nBins':40, 'min':0, 'max':40}, 'dimension' : 1, 'bars' : trigScintBarIDs()},
     'Distribution of signal amplitude for TS bars (individual bars)':{'xaxis' : 'Amplitude [pC]', 'yaxis' : 'Counts', 'binning' : {'nBins':40, 'min':0, 'max':40}, 'dimension' : 1, 'bars' : trigScintBarIDs()},
     'Time difference between TS and HCal':{'xaxis' : 'Time difference [ns]', 'yaxis' : 'Counts', 'binning' : {'nBins':50, 'min':0, 'max':50}, 'dimension' : 1},
     'barTest' :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Counts', 'binning' : {'nBins':40, 'min':0, 'max':40} , 'dimension' : 1},
@@ -246,5 +279,23 @@ plotDict = {
     'Hit map':{'xaxis' : 'Layer number', 'yaxis' : 'Bar number', 'dimension' : 2,
                     'binningX' : {'nBins':19, 'min':0.5, 'max':19.5}, 
                     'binningY' : {'nBins':12, 'min':-0.5, 'max':11.5}}, 
+
+    'Sum of pulse height per event' :{'xaxis' : 'ADC sum of SiPMs', 'yaxis' : 'Event count', 'binning' : {'nBins':100, 'min':0, 'max':20000}, 'dimension' : 1 },
+    'Sum of pulse height per event end0' :{'xaxis' : 'ADC sum of SiPMs', 'yaxis' : 'Event count', 'binning' : {'nBins':100, 'min':0, 'max':20000}, 'dimension' : 1 },
+    'Sum of pulse height per event end1' :{'xaxis' : 'ADC sum of SiPMs', 'yaxis' : 'Event count', 'binning' : {'nBins':100, 'min':0, 'max':20000}, 'dimension' : 1 },
+    'Sum of pulse height per event (no pedestal)' :{'xaxis' : 'ADC sum of SiPMs', 'yaxis' : 'Event count', 'binning' : {'nBins':200, 'min':0, 'max':40000}, 'dimension' : 1 },
+    'SiPM hits per event'   :{'xaxis' : 'Hits', 'yaxis' : 'Event count', 'binning' : {'nBins':40, 'min':-0.5, 'max':39.5}, 'dimension' : 1 },
+    
+    'Pulse height of an individual bar':{'xaxis' : 'ADC', 'yaxis' : 'Number of events', 'binning' : {'nBins':113, 'min':-100, 'max':1030}, 'dimension' : 1, 'bars' : hcalBarIDs_simple()},
+    'pulse height of each SiPM':{'xaxis' : 'ADC', 'yaxis' : 'Number of events', 'binning' : {'nBins':113, 'min':-100, 'max':2060}, 'dimension' : 1, 'bars' : hcalBarIDs()},
+
+
+    'TB hits for TS bars':{'xaxis' : 'Bar ID', 'yaxis' : 'Counts', 'binning' : {'nBins':12, 'min':-0.5, 'max':11.5}, 'dimension' : 1,},
+    'TS above threshold':{'xaxis' : 'Bar ID', 'yaxis' : 'Counts', 'binning' : {'nBins':12, 'min':-0.5, 'max':11.5}, 'dimension' : 1,},
+    # 'TB hits for TS bars':{'xaxis' : 'Bar ID', 'yaxis' : 'Counts', 'binning' : {'nBins':12, 'min':-0.5, 'max':11.5}, 'dimension' : 1,},
+    'TS above threshold (individual bars)':{'xaxis' : 'Time sample passing threshold', 'yaxis' : 'Counts', 'binning' : {'nBins':18, 'min':-0.5, 'max':17.5}, 'dimension' : 1, 'bars' : trigScintBarIDs()},
+    'TS ADCs (individual bars)':{'xaxis' : 'ADC', 'yaxis' : 'Counts', 'binning' : {'nBins':1024, 'min':-0.5, 'max':1023.5}, 'dimension' : 1, 'bars' : trigScintBarIDs()},
+    # 'Distribution of signal amplitude for TS bars (individual bars)':{'xaxis' : 'Amplitude [pC]', 'yaxis' : 'Counts', 'binning' : {'nBins':40, 'min':0, 'max':40}, 'dimension' : 1, 'bars' : trigScintBarIDs()},
+
 
     }    

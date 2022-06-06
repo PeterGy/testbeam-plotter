@@ -108,7 +108,6 @@ plotGroups = [
     # (('Pulse shape (end0) (pedestal subtraction)','fpga0_287_1k'),),
     # (('Pulse shape (end0) (pedestal subtraction)','fpga0_287'),),
     # (('Pulse shape (end1) (pedestal subtraction)','fpga0_287'),),
-    # (('Pulse shape (end0) (pedestal subtraction)','287'),),
     # (('Pulse shape (end1) (pedestal subtraction)','287'),),
 
     # (('Pulse shape (end0) (no pedestal subtraction)','fpga0_235'),('Pulse shape (end0) (no pedestal subtraction)','fpga0_243'),('Pulse shape (end0) (no pedestal subtraction)','fpga0_241'),),    
@@ -167,6 +166,7 @@ plotGroups = [
     # ),  
     # (('Mapped ADC average','fpga0_279'),),    
     # (('Mapped ADC average','287'),),    
+    # (('Pulses','287'),),    
 
     # (('Pulses','fpga0_287'),),    
     # (('Pulses','288'),),    
@@ -181,8 +181,82 @@ plotGroups = [
     # (('3D','225'),),    
     # (('3D','288'),),    
 
-    # (('Hit map','225'),),   
+    # (('Hit map','226'),),   
+    # (('Hit map','e-1GeV1k'),),   
+    # (('Hit map','e-1GeV10k000xpos'),),   
+    # (('Hit map','e-1GeV10k40smear'),),   
+    # (('Hit map','e-1GeV10k80smear'),),   
+    # (('Hit map','e-1GeV10k100smear'),),   
+    # (('Hit map','e-1GeV10k120smear'),),   
+    # (('Hit map','e-1GeV10k150smear'),),   
+    # (('Hit map','e-1GeV10k200smear'),),   
 
+    # (('Hit map','226'),),   
+    # (('Hit map','e-1GeV10k120smear'),),   
+    # (('Distribution of pulse height of each bar','e-1GeV10k120smear'),), #192
+
+    # (('Pulse height of an individual bar','e-1GeV10k120smear'),),    
+    # (('Pulse height of an individual bar','226'),),
+    # (('Pulse height of an individual bar','e-1GeV10k120smear'),('Pulse height of an individual bar','226'),),
+    # (('pulse height of each SiPM','226'),('pulse height of each SiPM','e-1GeV10k120smear'),),
+    # (('Pulse height of an individual bar','226'),),
+    # (('Pulse height of an individual bar','e-1GeV0k'),),
+    # (('Sum of pulse height per event','e-1GeV10k120smear'),),    
+    # (('Sum of pulse height per event','226'),('Sum of pulse height per event','e-1GeV10k120smear'),),    
+    # (('Sum of pulse height per event end0','226'),('Sum of pulse height per event end0','e-1GeV10k120smear'),),    
+    # (('Sum of pulse height per event end1','226'),('Sum of pulse height per event end1','e-1GeV10k120smear'),),    
+    # (('Sum of pulse height per event','226'),('Sum of pulse height per event','e-1GeV10k120smear'),),    
+
+
+
+    # (('Pulse height of an individual bar','e-1GeV10k120smear'),('Pulse height of an individual bar','226'),),
+
+
+
+    # (('Sum of pulse height per event','e-1GeV10k120smear'),('Sum of pulse height per event','226'),),    
+    # (('Pulse height of an individual bar','e-1GeV10k120smear'),('Pulse height of an individual bar','226'),),
+
+
+    # (('Sum of pulse height per event (no pedestal)','e-1GeV10k120smear'),('Sum of pulse height per event (no pedestal)','226'),),    
+    # (('SiPM hits per event','e-1GeV10k120smear'),('SiPM hits per event','226'),),    
+    # (('Pulse height of an individual bar','226'),),   
+    
+    # (('Pulse height of an individual bar','mu-4GeV10k120smear'),('Pulse height of an individual bar','287'),),
+    # (('Pulse height of an individual bar','mu-4GeV1k'),('Pulse height of an individual bar','287'),),
+
+    # (('3D','287'),),  
+    # (('TB hits for TS bars','183TS'),),  
+    # (('TB hits for TS bars','183TS'),('TB hits for TS bars','e-4GeV56k30smearTSonly'),),  
+    # (('Distribution of number of hits for TS bars','183TS'),('Distribution of number of hits for TS bars','e-4GeV56k30smearTSonly'),),  
+    # (('Distribution of number of hits for TS bars','e-4GeV5k90smearTSonly'),), 
+
+    # (('TS above threshold','183TS'),),  
+    # (('TB hits for TS bars','183TS'),('TB hits for TS bars','e-4GeV500k30smearTSonly'),),  
+
+    # (('TS above threshold (individual bars)','183TS'),),  
+    # (('Distribution of signal amplitude for TS bars (individual bars)','183TS'),),        
+    # (('TS ADCs (individual bars)','183TS'),),        
+    # (('Distribution of signal amplitude for TS bars (individual bars)','183TS'),('Distribution of signal amplitude for TS bars (individual bars)','e-4GeV56k30smearTSonly'),),        
+    # (('Distribution of signal amplitude for TS bars (individual bars)','183TS'),('Distribution of signal amplitude for TS bars (individual bars)','e-4GeV5k30smearTSonly'),),        
+
+    # (('Pulse shape (end0) (pedestal subtraction)','287'),),
+    # (('Pulses','287'),),    
+
+    # (('Distribution of number of hits for TS ars','e-4GeV56k30smearTSonly'),('Distribution of number of hits for TS bars','183TS'),),  
+
+    # (('Distribution of signal amplitude for TS bars (individual bars)','e-4GeV5k30smearTSonly'),('Distribution of signal amplitude for TS bars (individual bars)','183TS'),),        
+
+    # (('Mapped distribution of number of hits of each bar','e-1GeV1k'),),
+
+    # (('Pulse height of an individual bar','e-1GeV10k120smear'),('Pulse height of an individual bar','226'),),
+    # (('Pulse height of an individual bar','mu-4GeV10k120smear'),('Pulse height of an individual bar','287'),),
+
+    # (('energy response vs. position','e-1GeV10k000xpos'),('energy response vs. position','e-1GeV10k100xpos'),('energy response vs. position','e-1GeV10k200xpos'),('energy response vs. position','e-1GeV10k300xpos'),('energy response vs. position','e-1GeV10k400xpos'),),
+
+# (('Sum of pulse height per run','e-1GeV1k'),),
+
+   (('energy response vs. energy','pi-0.5GeV2k'),('energy response vs. energy','pi-0.4GeV2k'),('energy response vs. energy','pi-0.3GeV2k'),('energy response vs. energy','pi-0.2GeV2k'),('energy response vs. energy','pi-0.1GeV2k'),), #1
+    (('energy response vs. energy','e-0.5GeV2k'),('energy response vs. energy','e-0.4GeV2k'),('energy response vs. energy','e-0.3GeV2k'),('energy response vs. energy','e-0.2GeV2k'),('energy response vs. energy','e-0.1GeV2k'),), #1
 
 
     ]     

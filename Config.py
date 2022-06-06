@@ -19,16 +19,17 @@ options = parser.parse_args()[0]
 # incidentAngleDegrees = float(options.angle)
 
 
-max_events = 1
-energy=1 # GeV, certified
+max_events = 20000
+energy=4 # GeV, certified
 particle_id='e-'
 incidentAngleDegrees=0
 runNumber=int(options.seed)
 xOffset=000 #mm, absorber is 665 mm wide
-beamSmear=[40.,40.,0.]
-beamSmear=[0.,0.,0.]
+smear=30.
+beamSmear=[smear,smear,0.]
+# beamSmear=[0.,0.,0.]
 
-simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"
+simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"+str(int(smear))+'smearTSonly'
 # simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k_barsslide000mm_"+str(options.seed)
 # simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"kLYSO"
 # simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"kBad"
@@ -61,7 +62,7 @@ position=[-xVector*beamDistance+xOffset, 0., -zVector*beamDistance+hcal_edge_off
 
 direction=[xVector, 0.,zVector]
 
-output_filename=simulation_name + '.root'
+output_filename='reconstructions/'+simulation_name + '.root'
 
 
 
@@ -121,4 +122,7 @@ TrigScintQIEDigiProducer.verbosity=0
 TrigScintRecHitProducer.verbosity=0
 
 process.sequence = [ simulation, digi.HcalDigiProducer(), digi.HcalRecProducer(), hcal.HcalVetoProcessor(),tsDigis,tsRecHits]
+# process.sequence = [ simulation, tsDigis,tsRecHits]
+# process.sequence = [ tsDigis,tsRecHits]
+# process.sequence = [ simulation, digi.HcalDigiProducer(), digi.HcalRecProducer(),]
 process.outputFiles = [output_filename]
