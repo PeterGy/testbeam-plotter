@@ -19,7 +19,7 @@ from ROOT import gSystem
 from optparse import OptionParser
 gSystem.Load("libFramework.so") #this library is vital for it to run. It might be old though?
 r.gROOT.SetBatch(1); #makes root not try to display plots in a new window
-import libDetDescr as DD
+# import libDetDescr as DD
 
 
 

@@ -1,4 +1,4 @@
-import libDetDescr as DD
+# import libDetDescr as DD
 
 
 def hcalBinning():

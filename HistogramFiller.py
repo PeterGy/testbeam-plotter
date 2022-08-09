@@ -3,7 +3,7 @@ from HistogramProperties import *
 import ROOT as r
 from numpy import *
 import platform 
-import libDetDescr as DD
+# import libDetDescr as DD
 import csv
 from HCal3Dmodel import *
 # import HCal3Dmodel.py
@@ -49,7 +49,45 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
         
     energyErrorCorrection = 0.5 #they did an oopsie in the coding and now I got to correct for it
     allowNoise= False
-    if   plotVar == 'simX': 
+
+    if 'Pulses' == plotVar:  
+        plotsMade=0
+        for event in allData: 
+            
+
+            for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
+            # for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):
+                
+                # ID=DD.HcalDigiID(h.id())
+
+                # if ID.layer()==4 and ID.strip()==4 and ID.end()==0:
+                    ADCs = [h.at(i).adc_t() for i in range(h.size())] 
+                    if max(ADCs)>200:
+                        c=r.TCanvas('t','The canvas of anything', 1100, 900)
+                        pulseHist =  r.TH1F("timeSampleEventDisplay", "Time samples ", 8,0,8) 
+                        pulseHist.SetYTitle('ADC')
+                        pulseHist.SetXTitle('Time sample') 
+                        pulseHist.GetYaxis().SetRangeUser(0, 1024)
+                        for i in range(h.size()):
+                                # print(pedestals)
+                                pulseHist.Fill(i,ADCs[i]-pedestals[h.id()])
+                                # if h.at(i).tot() >1000:
+                                # if True:
+                                #     print('Timestamp',i)
+                                #     print('adc',h.at(i).adc_t())
+                                #     print('toa',h.at(i).toa())
+                                #     print('tot',h.at(i).tot())
+                                
+                        
+                        pulseHist.Draw("HIST")
+                        c.SaveAs("plots/pulses/"+str(plotsMade)+".png")  
+                        c.Close()
+                        del(pulseHist)
+                        plotsMade+=1
+                        print(h.id())
+                        break
+
+    elif   plotVar == 'simX': 
         for event in allData: 
             for ih,h in enumerate(getattr(event, "HcalSimHits_"+processName)):
                 if h.getEdep() > minEDeposit and h.getEdep() < maxEDeposit:
@@ -901,40 +939,7 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
             except: pass 
 
          
-    elif 'Pulses' == plotVar:  
-        plotsMade=0
-        for event in allData: 
-            
 
-            for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
-                ID=DD.HcalDigiID(h.id())
-
-                if ID.layer()==4 and ID.strip()==4 and ID.end()==0:
-                    ADCs = [h.at(i).adc_t() for i in range(h.size())] 
-                    if max(ADCs)>200:
-                        c=r.TCanvas('t','The canvas of anything', 1100, 900)
-                        pulseHist =  r.TH1F("timeSampleEventDisplay", "Time samples ", 8,0,8) 
-                        pulseHist.SetYTitle('ADC')
-                        pulseHist.SetXTitle('Time sample') 
-                        pulseHist.GetYaxis().SetRangeUser(0, 1024)
-                        for i in range(h.size()):
-                                # print(pedestals)
-                                pulseHist.Fill(i,ADCs[i]-pedestals[h.id()])
-                                # if h.at(i).tot() >1000:
-                                # if True:
-                                #     print('Timestamp',i)
-                                #     print('adc',h.at(i).adc_t())
-                                #     print('toa',h.at(i).toa())
-                                #     print('tot',h.at(i).tot())
-                                
-                        
-                        pulseHist.Draw("HIST")
-                        c.SaveAs("plots/pulses/"+str(plotsMade)+".png")  
-                        c.Close()
-                        del(pulseHist)
-                        plotsMade+=1
-
-                        break
 
 
 

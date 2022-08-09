@@ -19,21 +19,22 @@ options = parser.parse_args()[0]
 # incidentAngleDegrees = float(options.angle)
 
 
-max_events = 20000
-energy=4 # GeV, certified
-particle_id='e-'
+max_events = 1000
+energy= 4 # GeV, certified
+particle_id='mu-'
 incidentAngleDegrees=0
 runNumber=int(options.seed)
 xOffset=000 #mm, absorber is 665 mm wide
-smear=30.
+# smear=30.
+smear=0.
 beamSmear=[smear,smear,0.]
 # beamSmear=[0.,0.,0.]
 
-simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"+str(int(smear))+'smearTSonly'
+# simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"+str(int(smear))+'smearTSonly'
 # simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k_barsslide000mm_"+str(options.seed)
 # simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"kLYSO"
 # simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"kBad"
-# simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"+str(incidentAngleDegrees)+"deg"
+simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"
 # simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"+str(xOffset)+"xpos"
 
 
@@ -77,7 +78,7 @@ process = ldmxcfg.Process("protosim")
 # simulator = simulator.simulator(simulation_name)
 simulation = simulator.simulator("prototype")
 # simulation.runNumber = int(seed)
-simulation.setDetector('ldmx-hcal-prototype-v1.0')
+simulation.setDetector('ldmx-hcal-prototype-v2.0')
 
 gun = generators.gun('particle_gun')
 

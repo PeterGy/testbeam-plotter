@@ -4,7 +4,7 @@ from Histograms import *
 from HistogramStyles import *
 r.gROOT.SetBatch(1); #makes root not try to display plots in a new window
 import copy
-import libDetDescr as DD
+#import libDetDescr as DD
 
 def main():   
     skipUninterestingPlots=False
@@ -32,16 +32,7 @@ def main():
             c=r.TCanvas('t','The canvas of anything', 1100, 900)
             c.cd()
             dualPlotMode=False  
-            fittyPlots=['energy response vs. energy','energy response vs. angle','energy response vs. position',
-            'energy response vs. bar displacement',
-            'Reconstructed energy for tags (absolute energy)','simETot','Reconstructed energy for tags'
-            ,'Distribution of signal amplitude for TS bars (individual bars)',
-            'total energy deposited FPGA0',
-            'total energy deposited FPGA0 horizontal bars',
-            'Pulse shape (end0) (no pedestal subtraction)','Pulse shape (end1) (no pedestal subtraction)',
-            'Pulse shape (end0) (pedestal subtraction)','Pulse shape (end1) (pedestal subtraction)',
-            'Pulse height of an individual bar','Sum of SiPM pulse height per event','SiPM hits per event',
-            ]
+
             # if id != False: hist.SetName(barName(id)) 
             # hist.SetName(barName(id)) 
             # hist.SetName('come on') 
@@ -99,7 +90,7 @@ def main():
                     # hist.GetYaxis().SetRangeUser(0, 1100)
                     # hist.GetXaxis().SetRangeUser(100, 1030)
                     # hist.GetXaxis().SetRangeUser(0, 1030)
-                    hist.GetXaxis().SetRangeUser(0, 0.25)
+                    # hist.GetXaxis().SetRangeUser(0, 0.25)
                     # hist.GetYaxis().SetRangeUser(0, 1000)
 
                     # hist.GetXaxis().SetRangeUser(0, 40)
@@ -155,21 +146,22 @@ def main():
 
 
 
-                    fit = line.Fit('gaus','Sq')
-                    μ = fit.Parameter(1)
-                    Δμ = fit.ParError(1)
-                    σ = fit.Parameter(2)
-                    Δσ = fit.ParError(2)
-                    resolution=σ/μ
-                    Δresolution=resolution*(Δμ/μ+Δσ/σ)
-                    resolutionList.append(resolution)     
-                    ΔresolutionList.append(Δresolution)     
-                    EresponseList.append(μ)     
-                    ΔEresponseList.append(σ)   
-                    χ2=fit.Chi2()
-                    line.GetFunction("gaus").SetLineColor(rootColors[lines.index(line)])
+                    # fit = line.Fit('gaus','Sq')
+                    # μ = fit.Parameter(1)
+                    # Δμ = fit.ParError(1)
+                    # σ = fit.Parameter(2)
+                    # Δσ = fit.ParError(2)
+                    # resolution=σ/μ
+                    # Δresolution=resolution*(Δμ/μ+Δσ/σ)
+                    # resolutionList.append(resolution)     
+                    # ΔresolutionList.append(Δresolution)     
+                    # EresponseList.append(μ)     
+                    # ΔEresponseList.append(σ)   
+                    # χ2=fit.Chi2()
+                    # line.GetFunction("gaus").SetLineColor(rootColors[lines.index(line)])
+
                     # if len(plot) ==1: line.GetFunction("gaus").SetLineColor(2)
-                    labelμ(lines,line,fit)
+                    # labelμ(lines,line,fit)
                     # except: pass
                 
                 # labelSiPMResponseRatio(lines)    
@@ -259,7 +251,7 @@ def main():
 
         # print(resolutionList)
         [resolutionList,ΔresolutionList] = plotResolution(resolutionList,ΔresolutionList,plotName)
-        [EresponseList,ΔEresponseList] = plotEresponse(EresponseList,ΔEresponseList,plotName)
+        # [EresponseList,ΔEresponseList] = plotEresponse(EresponseList,ΔEresponseList,plotName)
 
 
 
