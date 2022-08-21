@@ -3,9 +3,14 @@ from HistogramProperties import *
 import ROOT as r
 from numpy import *
 import platform 
-# import libDetDescr as DD
+import libDetDescr as DD
 import csv
 from HCal3Dmodel import *
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.optimize
+import matplotlib
+matplotlib.use('Agg')
 # import HCal3Dmodel.py
 
 # def pedestal_subtractor(hist):
@@ -50,42 +55,107 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
     energyErrorCorrection = 0.5 #they did an oopsie in the coding and now I got to correct for it
     allowNoise= False
 
-    if 'Pulses' == plotVar:  
-        plotsMade=0
-        for event in allData: 
-            
+    def landau(x,a,b,c,d):
+        x=x*c-d
+        p = 1/sqrt(2*pi)*np.exp(-(x+np.exp(-x)/2))*a +b
+        # if p > 900: return 900
+        return p
 
+    if False: pass
+
+    elif 'Pulses' == plotVar:  
+        plotsMade=0
+        targetStrip=6
+        MIPequivalents=[]
+        for event in allData: 
+            muonComesIn=False
+            muonComesOut=False
             for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
             # for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):
                 
-                # ID=DD.HcalDigiID(h.id())
+                ID=DD.HcalDigiID(h.id())
 
-                # if ID.layer()==4 and ID.strip()==4 and ID.end()==0:
+
+                if ID.layer()==7 and ID.strip()==targetStrip and ID.end()==0:
                     ADCs = [h.at(i).adc_t() for i in range(h.size())] 
-                    if max(ADCs)>200:
-                        c=r.TCanvas('t','The canvas of anything', 1100, 900)
-                        pulseHist =  r.TH1F("timeSampleEventDisplay", "Time samples ", 8,0,8) 
-                        pulseHist.SetYTitle('ADC')
-                        pulseHist.SetXTitle('Time sample') 
-                        pulseHist.GetYaxis().SetRangeUser(0, 1024)
+                    if max(ADCs)>200 and max(ADCs)<900:
+                        plotsMade+=1
+                        plt.figure(plotsMade)
+                        x=[]
+                        y=[]
                         for i in range(h.size()):
-                                # print(pedestals)
-                                pulseHist.Fill(i,ADCs[i]-pedestals[h.id()])
-                                # if h.at(i).tot() >1000:
-                                # if True:
-                                #     print('Timestamp',i)
-                                #     print('adc',h.at(i).adc_t())
-                                #     print('toa',h.at(i).toa())
-                                #     print('tot',h.at(i).tot())
+                            x.append(i)
+                            y.append(ADCs[i]-pedestals[h.id()])
+                        params,_ = scipy.optimize.curve_fit(landau, x, y, p0=(400,100,1,3), bounds=((200,0,0.1,0),(1000,500,4,4)) , maxfev=5000 )
+                        print(params)                      
+                        x_new = np.linspace(x[0], x[-1], 50)
+                        y_new = landau(x_new,*params)
+                        plt.plot(x,y,'o')
+                        plt.plot(x_new, y_new)
+                        plt.xlim([x[0]-1, x[-1] + 1 ])
+                        text= str(round(params[0],4))+'; '+str(round(params[1],4))+'; '+str(round(params[2],4))+'; '+str(round(params[3],4))+'; '
+                        plt.title(text)
+                        MIPeqqivalent = max(y_new)/410
+                        MIPequivalents.append(MIPeqqivalent)
+
+                        plt.xlabel('Time sample')
+                        plt.ylabel('ADC')
+                        plt.savefig("plots/pulses/"+str(plotsMade)+".png")
+                        plt.close()
+                elif ID.layer()==1 and ID.strip()==targetStrip and ID.end()==0: muonComesIn=True
+                elif ID.layer()==19 and ID.strip()==targetStrip and ID.end()==0: muonComesOut=True
+                    
+
+            
+            if muonComesIn and muonComesOut:  
+                plt.savefig("plots/pulses/"+str(plotsMade)+".png")
+            # else:
+            #     print(muonComesIn,muonComesOut)    
+            plt.close()
+            if plotsMade>35:
+                plt.hist(MIPequivalents)
+                plt.savefig("plots/MIP.png")
+
+                
+                break        
+
+
+    # elif 'Pulses' == plotVar:  
+    #     plotsMade=0
+    #     for event in allData: 
+            
+
+    #         for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
+    #         # for ih,h in enumerate(getattr(event, "HcalDigis_"+processName)):
+                
+    #             # ID=DD.HcalDigiID(h.id())
+
+    #             # if ID.layer()==4 and ID.strip()==4 and ID.end()==0:
+    #                 ADCs = [h.at(i).adc_t() for i in range(h.size())] 
+    #                 if max(ADCs)>200:
+    #                     c=r.TCanvas('t','The canvas of anything', 1100, 900)
+    #                     pulseHist =  r.TH1F("timeSampleEventDisplay", "Time samples ", 8,0,8) 
+    #                     pulseHist.SetYTitle('ADC')
+    #                     pulseHist.SetXTitle('Time sample') 
+    #                     pulseHist.GetYaxis().SetRangeUser(0, 1024)
+    #                     for i in range(h.size()):
+    #                             # print(pedestals)
+    #                             pulseHist.Fill(i,ADCs[i]-pedestals[h.id()])
+    #                             # if h.at(i).tot() >1000:
+    #                             # if True:
+    #                             #     print('Timestamp',i)
+    #                             #     print('adc',h.at(i).adc_t())
+    #                             #     print('toa',h.at(i).toa())
+    #                             #     print('tot',h.at(i).tot())
                                 
                         
-                        pulseHist.Draw("HIST")
-                        c.SaveAs("plots/pulses/"+str(plotsMade)+".png")  
-                        c.Close()
-                        del(pulseHist)
-                        plotsMade+=1
-                        print(h.id())
-                        break
+    #                     pulseHist.Draw("HIST")
+    #                     c.SaveAs("plots/pulses/"+str(plotsMade)+".png")  
+    #                     c.Close()
+    #                     del(pulseHist)
+    #                     plotsMade+=1
+    #                     print(h.id())
+    #                     break
 
     elif   plotVar == 'simX': 
         for event in allData: 

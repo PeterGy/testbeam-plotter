@@ -34,20 +34,14 @@ def main():
             dualPlotMode=False  
 
             # if id != False: hist.SetName(barName(id)) 
-            # hist.SetName(barName(id)) 
-            # hist.SetName('come on') 
             if dimension == 2:
                 c.SetCanvasSize(1600, 800)
-                # c.SetCanvasSize(900, 800)
-                # c.GetPad(0).SetRightMargin(0.121)
                 c.GetPad(0).SetLeftMargin(0.16)
                 c.GetPad(0).SetBottomMargin(0.25)
                 # hist.GetZaxis().SetRangeUser(0, 8000)
                 hist.GetYaxis().SetTitleOffset(0.6)
                 hist.Draw("COLZ")
                 c.cd(1)
-                # axis = r.TGaxis(c.GetPad(0).GetUxmin(),c.GetPad(0).GetUymax(),c.GetPad(0).GetUxmax(),c.GetPad(0).GetUymax(),1,120,510,"+L")
-                # axis = r.TGaxis(0,0,0,12,0,12,80506,"+L")
                 axis = r.TGaxis(0.5,-2,19.5,-2,0,19*45,21,'')
                 axis.SetTitle("Distance along beamline [mm]")
                 axis.Draw()
@@ -55,17 +49,9 @@ def main():
                 axis2.SetTitle("Distance from beam in x or y axis [mm]")
                 axis2.SetTitleOffset(0.8)
                 axis2.Draw()
-
-                
-                
-                # 0,12,0,12,80506,"+L")
                 r.gStyle.SetOptStat("")
                 label2D()   
 
-
-            
-            # == 'energy response vs. energy' or plotName == 'energy response vs. angle' or plotName == 'energy response vs. position'
-            # elif plotName in fittyPlots:
             elif True:
                 dualPlotMode=False
                 prepareDualPlots(dualPlotMode,c)   
@@ -81,20 +67,8 @@ def main():
                     hist=inFile.Get(plotName+barName(id)+";"+str(i+1))
                     # if id != False: hist.SetName(barName(id)) 
 
-                    # print(hist)
                     # hist.GetYaxis().SetRangeUser(0, 800)
 
-                    # hist.GetYaxis().SetRangeUser(0, 70000)
-                    # hist.GetYaxis().SetRangeUser(0, 6000)
-                    # hist.GetYaxis().SetRangeUser(0, 600)
-                    # hist.GetYaxis().SetRangeUser(0, 1100)
-                    # hist.GetXaxis().SetRangeUser(100, 1030)
-                    # hist.GetXaxis().SetRangeUser(0, 1030)
-                    # hist.GetXaxis().SetRangeUser(0, 0.25)
-                    # hist.GetYaxis().SetRangeUser(0, 1000)
-
-                    # hist.GetXaxis().SetRangeUser(0, 40)
-                    # hist.GetXaxis().SetRangeUser(0, 10000)
                     hist.SetLineColor(rootColors[i])  
                     # if id != False: hist.SetName(barName(id)) 
                     lines.append(copy.deepcopy(hist))
@@ -109,41 +83,6 @@ def main():
                     # print(line.GetBinContent (3)) 
                     # line.Draw("same hist")    
                     # if len(lines)==1: line.Draw("HIST")  
-                    # try:
-
-                    # par=[0,1,2,3,4,5]
-
-                    # g1 = r.TF1("g1", "gaus", 0, 0.14);
-                    # g2 = r.TF1("g2", "gaus", 0, 0.14);
-                    # # g1 = r.TF1("g1", "gaus", 85, 95);
-
-                    # # g2 = r.TF1("g2", "gaus", 98, 108);
-                    # # g1 = r.TF1('gaus','Sq');
-                    # # g2 = r.TF1('gaus','Sq');
-                    
-
-                    # total = r.TF1("total", "gaus(0)+gaus(3)", 85, 125);
-                    # total.SetLineColor(2);
-                    
-
-                    # fit1=line.Fit(g1, "R");
-                    # fit2=line.Fit(g2, "R+");
-                    
-                    # par[0]=fit1.Parameter(0)
-                    # par[1]=fit1.Parameter(1)
-                    # par[2]=fit1.Parameter(2)
-                    # par[3]=fit2.Parameter(0)
-                    # par[4]=fit2.Parameter(1)
-                    # par[5]=fit2.Parameter(2)
-                    # # g1.GetParameters(par[0]);
-                    # # g2.GetParameters(par[3]);
-                    
-                    # // Use the parameters on the sum.
-                    # total.SetParameters(par);
-                    # fit=line.Fit(total, "R+");
-
-
-
 
 
                     # fit = line.Fit('gaus','Sq')
