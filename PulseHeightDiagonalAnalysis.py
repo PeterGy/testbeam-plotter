@@ -20,7 +20,7 @@ def landau(x,a,b,c,d):
     # if p > 900: return 900
     return p
 
-def labelLayer(text):
+def labelLayer(text,diagonal):
     label = r.TLatex()
     label.SetTextFont(42)
     label.SetTextSize(0.04)
@@ -28,12 +28,12 @@ def labelLayer(text):
     label.SetNDC()    
     # r.gStyle.SetOptStat("")
     # label.DrawLatex(0.5,  0.85,  'Just raw ADC sums')
-    label.DrawLatex(0.3,  0.85,  'Strict track-like cuts on layers 1 & 15')
+    label.DrawLatex(0.3,  0.85,  'Loose diagonal cut based on layers 1 & 9')
     label.DrawLatex(0.4,  0.8,  'MIPeq >= 0.9')
     label.DrawLatex(0.4,  0.75,  text)
     return label     
 
-fileName= '287_both_sides_170k'
+fileName= '287_300k'
 pedestals ={}
 if '287' in fileName:     
     csv_reader = csv.reader(open('pedestals/pedestals_20220424_22.csv'), delimiter=',')
@@ -77,7 +77,7 @@ def get_inID(targetLayer,targetStrip,targetEnd):
         return  DD.HcalDigiID(0, layer,targetStrip+2,targetEnd).raw()    
 
 def get_outID(targetLayer,targetStrip,targetEnd):
-    layer = 15
+    layer = 9
     if layer <= 9:
         return  DD.HcalDigiID(0, layer,targetStrip,targetEnd).raw()
     elif layer >= 10:
@@ -97,7 +97,7 @@ def recreate_MIP_response_plot(targetLayer,targetStrip,targetEnd,diagonal=0):
 
 
     c=r.TCanvas('t','The canvas of anything', 1100, 900)
-    hist=r.TH1F('cuts','4 GeV muons', 60,0,6)
+    hist=r.TH1F('cuts','4 GeV muons', 60,0,0)
     # hist2=r.TH1F('no cuts','Sum ADC EID '+str(targetID), 60,0,2000)
 
     hist.SetYTitle('Events')
@@ -115,8 +115,7 @@ def recreate_MIP_response_plot(targetLayer,targetStrip,targetEnd,diagonal=0):
         MIPresponse = -10000
 
         
-        # for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
-        for ih,h in enumerate(getattr(event, "HcalRawDigis_")):
+        for ih,h in enumerate(getattr(event, "ChipSettingsTestDigis_unpack")):
             ID=h.id()
             # print(h.id(),ID.raw())
 
@@ -140,17 +139,14 @@ def recreate_MIP_response_plot(targetLayer,targetStrip,targetEnd,diagonal=0):
                 #     muonComesOut=True
                 # else:
                 #     break
-
-            else: 
-                pass
-                # ADCs = [h.at(i).adc_t()-pedestals[outID] for i in range(h.size())] 
-                # ADCsum = sum(ADCs[1:])
-                # investigatingID = DD.HcalDigiID(ID)  
-                # if investigatingID.layer()<=9  and targetStrip == investigatingID.strip():
-                #     pass
-                # elif investigatingID.layer()>=10 and targetStrip == investigatingID.strip()+2 :
-                #     pass
-                # elif passes_threshold(ID,ADCsum): break      
+            # else: 
+            #     ADCs = [h.at(i).adc_t()-pedestals[outID] for i in range(h.size())] 
+            #     ADCsum = sum(ADCs[1:])
+            #     investigatingID = DD.HcalDigiID(ID)  
+            #     if targetStrip-1 <= investigatingID.strip() <= targetStrip+1:
+            #         pass
+            #         # print(investigatingID.strip()) 
+            #     elif passes_threshold(ID,ADCsum): break    
       
         else: 
             if MIPresponse != -10000:
@@ -164,7 +160,8 @@ def recreate_MIP_response_plot(targetLayer,targetStrip,targetEnd,diagonal=0):
 
 
 
-    hist.Scale(1/hist.GetEntries())
+    try: hist.Scale(1/hist.GetEntries())
+    except: pass
     hist.GetXaxis().SetRangeUser(0, 6)
 
     # hist2.Scale(1/hist.GetEntries())
@@ -181,13 +178,12 @@ def recreate_MIP_response_plot(targetLayer,targetStrip,targetEnd,diagonal=0):
     # hist2.Draw("same e")  
     hist.Draw("e")  
     label = "Layer: "+str(targetLayer)+", Strip: "+str(targetStrip)+", End: "+str(targetEnd)
-    labelLayer(label)
+    labelLayer(label,targetStrip+diagonal)
 
     
-    if diagonal == 0:
-        # c.SaveAs("plots/StrictPulseHeightROOT"+label+".png")
-        file = r.TFile("extractions/Strict Pulse height analysis layer "+str(targetLayer)+', strip '+str(targetStrip)+', end '+str(targetEnd)+".root", "RECREATE")
-        print ('Extracted',"extractions/Strict Pulse height analysis layer "+str(targetLayer)+', strip '+str(targetStrip)+', end '+str(targetEnd)+".root")
+   
+    c.SaveAs("plots/LoosePulseHeightDiagonalROOT"+str(diagonal)+label+".png")
+    file = r.TFile("extractions/Loose Pulse height diagonal"+str(diagonal)+" analysis layer "+str(targetLayer)+', strip '+str(targetStrip)+', end '+str(targetEnd)+".root", "RECREATE") 
     hist.SetDirectory(file)
     hist.Write()
     file.Close()
@@ -197,14 +193,15 @@ def recreate_MIP_response_plot(targetLayer,targetStrip,targetEnd,diagonal=0):
 
 
 # for layer in (3,5,7,9):
-for layer in (7,):
-    for strip in range(0,8):
-        for end in (0,1):
-            recreate_MIP_response_plot(layer, strip, end)
-# for layer in (7,):
-#     for strip in (6,):
+# for layer in (9,):
+#     for strip in range(0,8):
 #         for end in (0,1):
-#             recreate_MIP_response_plot(layer, strip, end)                
+#             recreate_MIP_response_plot(layer, strip, end)
+for layer in (5,):
+    for strip in range(1,7):
+        for end in (0,1):
+            recreate_MIP_response_plot(layer, strip, end, 1)            
+            recreate_MIP_response_plot(layer, strip, end, -1)            
 
 # ID=DD.HcalDigiID(411567620)
 # print(ID.layer(),ID.strip(),ID.end())
