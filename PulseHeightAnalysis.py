@@ -17,7 +17,6 @@ r.gSystem.Load("libFramework.so") #this library is vital for it to run. It might
 def landau(x,a,b,c,d):
     x=x*c-d
     p = 1/sqrt(2*pi)*np.exp(-(x+np.exp(-x)/2))*a +b
-    # if p > 900: return 900
     return p
 
 def labelLayer(text):
@@ -141,8 +140,8 @@ def recreate_MIP_response_plot(targetLayer,targetStrip,targetEnd,diagonal=0):
                 # else:
                 #     break
 
-            else: 
-                pass
+            # else: 
+            #     pass
                 # ADCs = [h.at(i).adc_t()-pedestals[outID] for i in range(h.size())] 
                 # ADCsum = sum(ADCs[1:])
                 # investigatingID = DD.HcalDigiID(ID)  
@@ -185,9 +184,9 @@ def recreate_MIP_response_plot(targetLayer,targetStrip,targetEnd,diagonal=0):
 
     
     if diagonal == 0:
-        # c.SaveAs("plots/StrictPulseHeightROOT"+label+".png")
-        file = r.TFile("extractions/Strict Pulse height analysis layer "+str(targetLayer)+', strip '+str(targetStrip)+', end '+str(targetEnd)+".root", "RECREATE")
-        print ('Extracted',"extractions/Strict Pulse height analysis layer "+str(targetLayer)+', strip '+str(targetStrip)+', end '+str(targetEnd)+".root")
+        # c.SaveAs("plots/PulseHeightROOT"+label+".png")
+        file = r.TFile("extractions/Pulse height analysis layer "+str(targetLayer)+', strip '+str(targetStrip)+', end '+str(targetEnd)+".root", "RECREATE")
+        print ('Extracted',"extractions/Pulse height analysis layer "+str(targetLayer)+', strip '+str(targetStrip)+', end '+str(targetEnd)+".root")
     hist.SetDirectory(file)
     hist.Write()
     file.Close()
