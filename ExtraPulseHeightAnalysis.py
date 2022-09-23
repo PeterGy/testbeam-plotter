@@ -25,45 +25,38 @@ x = np.linspace(0.1-1,6-1, nbins)
 
 
 
-def landau_to_gauss(a,c,d):
-    A= a/60.933003910531106
-    x0 =  d-8.360117191318869
-    sigma = c/6.126095028799307
-    return [A,x0,sigma]
+def landau_to_gauss(LA,Lσ,Lμ):
+    GA= LA/60.933003910531106
+    Gσ = Lσ/16.870424240685622
+    Gμ =  Lμ-7.689142543201334
 
-def landau(x,a,c,d):
-    x=x*c-d
-    # p = 1/sqrt(2*pi)*np.exp(-(x+np.exp(-x)/2))*a +b
-    p = 1/sqrt(2*pi)*np.exp(-(x+np.exp(-x)/2))*a
+    return [GA,Gμ,Gσ]
+
+def landau(x,LA,Lσ,Lμ):
+    x=x*Lσ-Lμ
+    p = 1/sqrt(2*pi)*np.exp(-(x+np.exp(-x)/2))*LA
     return p
 
-def gauss(x, A, x0, sigma):
-    return  A * np.exp(-(x - x0) ** 2 / (2 * sigma ** 2))
+def gauss(x, GA, Gμ, Gσ):
+    return  GA * np.exp(-(x - Gμ) ** 2 / (2 * Gσ ** 2))
 
-def fixed_gauss_component(x,a,c,d):
-    [A,x0,sigma] = landau_to_gauss(a,c,d)
-    return  A * np.exp(-(x - x0) ** 2 / (2 * sigma ** 2))    
+def fixed_gauss_component(x,LA,Lσ,Lμ):
+    [GA,Gμ,Gσ] = landau_to_gauss(LA,Lσ,Lμ)
+    return  GA * np.exp(-(x - Gμ) ** 2 / (2 * Gσ ** 2))    
 
-def landau_gauss(x,a,c,d, A, x0, sigma ):
-    return landau(x,a,c,d)+gauss(x, A, x0, sigma)   
+def landau_gauss(x,LA,Lσ,Lμ, GA,Gμ,Gσ):
+    return landau(x,LA,Lσ,Lμ)+gauss(x, GA, Gμ, Gσ)   
 
-def landau_fixed_gauss(x,a,c,d):
-    [A,x0,sigma] = landau_to_gauss(a,c,d)
-    print('but then it turns into',[a,c,d,A, x0, sigma])
-    return landau(x,a,c,d)+gauss(x, A, x0, sigma)       
-
-def landau_gauss_convolusion(x,a,c,d, A, x0, sigma ):
-    convolusion = sig.convolve(landau(x,a,c,d),gauss(x, A, x0, sigma),'same')
-    return convolusion 
+def landau_fixed_gauss(x,LA,Lσ,Lμ):
+    [GA,Gμ,Gσ] = landau_to_gauss(LA,Lσ,Lμ)
+    return landau(x,LA,Lσ,Lμ)+gauss(x, GA, Gμ, Gσ)       
 
 
-def cn(n,   y,x_axis):
-   c = y*np.exp(-1j*2*n*np.pi*x_axis/period)
-   return c.sum()/c.size
+def print_parameters(LA,Lσ,Lμ, GA,Gμ,Gσ):
+    print ("{:<20} {:<20} {:<20} {:<20}".format('Amplitudes',LA,GA,LA/GA))
+    print ("{:<20} {:<20} {:<20} {:<20}".format('Widths',Lσ,Gσ,Lσ/Gσ))
+    print ("{:<20} {:<20} {:<20} {:<20}".format('Positions',Lμ,Gμ,Lμ-Gμ,))
 
-def taylor(x, Nh,   y, x_axis):
-   f = np.array([2*cn(i,y,x_axis)*np.exp(1j*2*i*np.pi*x/period) for i in range(1,Nh+1)])
-   return f.sum()
 
 
 def analyse_bar(layer,strip,end):
@@ -130,8 +123,8 @@ def analyse_bar(layer,strip,end):
 
     landau_gauss_fit = landau_gauss(x,*landau_gauss_params)
     landau_fixed_gauss_fit = landau_fixed_gauss(x,*landau_fixed_gauss_params)
-    the_rest = y-landau_fixed_gauss_fit
-    # the_rest = y-landau_gauss_fit
+    # the_rest = y-landau_fixed_gauss_fit
+    the_rest = y-landau_gauss_fit
     # the_rest = y-landau_fit
     # Δ=zeros(len(y))
     # Δ[int(len(y)/2)] = 1
@@ -162,10 +155,10 @@ def analyse_bar(layer,strip,end):
     plot(x,landau_fixed_gauss_fit,'yellow', label='Mixed fit 2')
     plot(x,the_rest,'blue', label='Fit subtracted from data')
 
-    print(layer,strip,end,landau_gauss_params)
-    print('Landua/Gauss height ratio',landau_gauss_params[0]/landau_gauss_params[3])
-    print('Landua/Gauss width ratio',landau_gauss_params[2]/landau_gauss_params[4])
-    print('Landua-gauss position displacement',landau_gauss_params[1]-landau_gauss_params[5])
+    # print('Bar is:',layer,strip,end)
+    # print_parameters(*landau_gauss_params)
+    # print_parameters(*landau_fixed_gauss_params,*landau_to_gauss(*landau_fixed_gauss_params))
+
 
     # plot(x,small_convolve,'b--', label='Convolved a little')
     # plot(x,gauss_fit,'y', label='Gauss')
@@ -186,7 +179,7 @@ landau_sum = np.zeros(nbins)
 gauss_sum = np.zeros(nbins)
 rest_sum = np.zeros(nbins)
 single_mode=False
-single_mode=True
+# single_mode=True
 
 analysis=[]
 
@@ -210,130 +203,17 @@ for i in analysis:
 landau_sum = landau_sum/len(analysis)
 gauss_sum = gauss_sum/len(analysis)
 rest_sum = rest_sum/len(analysis)
+distribution_for_simulation = landau_sum + gauss_sum + rest_sum
 
 ylim(-0.05,0.3)
+grid(True)
 
 
 plot(x,landau_sum,'teal', label='Landau average')
 plot(x,gauss_sum,'green', label='Gauss average')
-plot(x,rest_sum,'red', label='Remaining average')
+plot(x,rest_sum,'lime', label='Remaining average')
+plot(x,distribution_for_simulation ,'blue', label='Proposed probability distribution')
+legend()
 savefig('plots/sum.png', dpi=300)
 
 
-# x=time
-# y=landau(x,1,1,4)
-# yfit=np.array([taylor(t,50).real for t in x])
-
-# # print(y)
-# plot(x,y)
-# plot(x,yfit)
-
-# savefig('plots/taylor.png', dpi=300)
-
-
-            
-    # the_rest = y-gauss_fit
-
-
-    # poly = polyfit(x,the_rest,9)
-    # the_rest_fit = polyval(poly, x)
-    # the_rest_fit = polyval(poly, x)
-    # x_fit_range = x[0:30]
-    # the_rest_fit=np.array([taylor(t,40,the_rest[0:30],x_fit_range).real for t in x_fit_range])
-
-    # cs = scipy.interpolate.CubicSpline(x, the_rest, axis=0, bc_type='not-a-knot', extrapolate=None)
-    # print(hm)
-
-    # gauss_fit = gauss(x, 0.01,1,1)
-
-    # the_rest = y-landau_fit
- # plot(x,y-landau_fit,'r*')
-    # plot(x,y-gauss_fit,'g*')
-    # plot(x_fit_range,the_rest_fit,'r')
-    # plot(x,cs(x,3),'r')
-
-
-
-
-    # scipy.optimize.curve_fit(landau, x, y, p0=None, sigma=None, absolute_sigma=False, check_finite=True, bounds=(- inf, inf), method=None, jac=None, *, full_output=False, **kwargs)
-
-    # params2,_ = scipy.optimize.curve_fit(landau_gauss, x, y, p0=(intitial_landau_params[0],intitial_landau_params[1],intitial_landau_params[2],1,0,0), bounds=((0,0,0,0,0,0),(1,10,10,10,10,10)) , maxfev=5000 )
-    # params2,_ = scipy.optimize.curve_fit(landau_gauss, x, y, p0=(0,0,0,1,0,0), bounds=((0,0,0,0,0,0),(1,10,10,10,10,10)) , maxfev=5000 )
-    # landau_gauss_params,_ = scipy.optimize.curve_fit(landau_gauss, x, y, p0=(0.1,0,0,1,1,1), bounds=((0.1,0,0,0.01,0.01,0.01),(1,10,10,10,10,10)) , maxfev=5000 )
-
-
-
-        # plot(x,gauss_fit,'g', label='Gauss')
-    # plot(x,landau_gauss_fit,'b', label='Mixed')
-    # plot(x,y-landau_gauss_fit,'b*', label='Data vs fit')
-
-    # convolution = convolve(landau_fit,gauss_fit)
-
-    # try:
-
-    # c = sig.convolve(landau_fit,gauss_fit)
-    # print(len(c))
-    # d, reeeee = sig.deconvolve(c,gauss_fit)
-    # print(len(c))
-    # print(len(d))'
-    # d, reeeee = sig.deconvolve(c,gauss_fit)
-
-
-    # figure('wager')
-    # noise, reeeee = sig.deconvolve(y_extended,landau_fit)
-    # noise, reeeee = sig.deconvolve(y_extended,gauss_fit)
-    # print(len(noise))
-    # plot(x,y,'k*', label='Data')
-    # plot(x,landau_fit,'g', label='Landau')
-    # plot(x,noise,'b', label='Noise')
-    # ylim(-0.04,0.2)
-
-
-    # figure('taylor')
-    # x_fit_range = x[0:30]
-    # y_taylor = np.array([taylor(t,4,y[0:30],x_fit_range).real for t in x_fit_range])
-    # # print(y_taylor)
-    # # print(y_taylor)
-    # y_taylor_extended = concatenate((zeros(30),y_taylor,zeros(59)))
-    # plot(x,y,'k*', label='Data')
-    # # plot(x,landau_fit,'g', label='Landau')
-    # plot(x_fit_range,y_taylor,'k', label='taylor')
-    # # plot(x_extended,y_taylor_extended,'k', label='taylor')
-    # noise, reeeee = sig.deconvolve(y_taylor_extended,landau_fit)
-    # plot(x,noise,'g', label='Noise')
-    # ylim(-0.04,0.2)
-
-
-
-
-    # plot(x,y_taylor,'b', label='Noise')
-
-
-    # e, reeeee = sig.deconvolve(landau_fit,c)
-    # plot(x,d,'g', label='Data')
-    # figure('the deconvolution')
-    # x = [i for i in range (len(c))]
-    # plot(x,c)
-    # plot(x,e,'b', label='Data')
-
-
-
-        # c2 = sig.convolve(gauss_fit,landau_fit)
-        # print('attempting')
-    # plot(x,y,'r', label='Data')
-    # plot(x,landau_fit,'g-', label='Landau')
-    
-    # d, reeeee = sig.deconvolve(y,landau_fit)
-    # y2=[i+0.1 for i in y]
-    # d, reeeee = sig.deconvolve(y,y2)
-    #     # print(d)
-    #     # print(len(c),len(d))
-    # plot(x,c,'k', label='')
-
-        # plot(linspace(0,6,119),c,'k', label='')
-        # plot(linspace(0,6,119),c2,'y', label='')
-    # except: 
-    #     print ('bad attempt') 
-    # d, reeeee = sig.deconvolve(y,landau_fit)
-
-    # plot(x,d,'k', label='')       
