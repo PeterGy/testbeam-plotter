@@ -134,7 +134,22 @@ def analyse_bar(layer,strip,end):
 
 
 
-
+    proposal = [ 
+    0.00000000e+00,0.00000000e+00,0.00000000e+00,0.00000000e+00
+    ,0.00000000e+00,0.00000000e+00,0.00000000e+00,1.16477104e-04
+    ,5.94130180e-04,1.17457141e-03,9.58016902e-04,1.71428954e-03
+    ,1.45163908e-03,1.99879726e-03,5.76383301e-03,1.26993840e-02
+    ,3.10653063e-02,7.41646661e-02,1.44236828e-01,1.87842896e-01
+    ,1.51131332e-01,1.00318547e-01,6.39160078e-02,4.20373793e-02
+    ,2.95516523e-02,2.26741700e-02,1.82093043e-02,1.48281237e-02
+    ,1.26991504e-02,1.05787809e-02,9.41504300e-03,7.97188841e-03
+    ,6.64759974e-03,5.75086835e-03,4.87037892e-03,4.41926165e-03
+    ,3.66156450e-03,3.16001255e-03,2.62357435e-03,2.29209575e-03
+    ,1.80851103e-03,1.75819209e-03,1.42790608e-03,1.28882542e-03
+    ,1.15239533e-03,9.25152926e-04,6.41595656e-04,5.48832307e-04
+    ,4.52433095e-04,1.47800749e-04,3.58326985e-05,1.61951043e-05
+    ,1.33195531e-05,1.37314350e-06,6.77626358e-21, -1.35525272e-20
+    ,-3.38813179e-21,6.77626358e-21,6.77626358e-21,0.00000000e+00]
 
 
 
@@ -151,9 +166,11 @@ def analyse_bar(layer,strip,end):
     plot(x,landau_fit,'teal', label='Landau component')
     plot(x,gauss_fit,'green', label='Gauss component')
     # plot(x,fixed_gauss_fit,'green', label='Gauss component')
-    plot(x,landau_gauss_fit,'red', label='Mixed fit')
-    plot(x,landau_fixed_gauss_fit,'yellow', label='Mixed fit 2')
-    plot(x,the_rest,'blue', label='Fit subtracted from data')
+    # plot(x,landau_gauss_fit,'red', label='Mixed fit')
+    # plot(x,landau_fixed_gauss_fit,'yellow', label='Mixed fit 2')
+    # plot(x,the_rest,'blue', label='Fit subtracted from data')
+
+    plot(x,proposal,'red', label='Proposed distribution')
 
     # print('Bar is:',layer,strip,end)
     # print_parameters(*landau_gauss_params)
@@ -204,6 +221,8 @@ landau_sum = landau_sum/len(analysis)
 gauss_sum = gauss_sum/len(analysis)
 rest_sum = rest_sum/len(analysis)
 distribution_for_simulation = landau_sum + gauss_sum + rest_sum
+
+print(distribution_for_simulation)
 
 ylim(-0.05,0.3)
 grid(True)
