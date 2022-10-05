@@ -140,7 +140,7 @@ def analyse_bar(layer,strip,end):
     # triangle = [1,0.75,0.5,0.25,0]
     convolve =  sig.convolve(landau_fit,triangle(),'same')
 
-    print(len(convolve))
+    # print(len(convolve))
 
 
 
@@ -178,7 +178,7 @@ def analyse_bar(layer,strip,end):
     # plot(x_extended[0:-1],c3,'g', label='test data')
 
 
-    print(len(x))
+    # print(len(x))
 
     legend()
     savefig('plots/subtractive analysis '+name+'.png', dpi=300)
