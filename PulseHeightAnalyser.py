@@ -26,7 +26,7 @@ def convolution_function( energy, landau_amplitude=1, landau_mean=3, landau_widt
 
 def gaussian( energy, amplitude, mean, width ): 
     noise = amplitude * np.exp( -( energy - mean )**2 / ( 2 * width**2 ) )
-    noise=[max(1e-7,i) for i in noise]  # set noise minimum to prevent deconvolution bug
+    # noise=[max(1e-7,i) for i in noise]  # set noise minimum to prevent deconvolution bug
     return noise
 
 def landau( energy, amplitude, mean, width ):
