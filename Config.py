@@ -19,7 +19,7 @@ options = parser.parse_args()[0]
 # incidentAngleDegrees = float(options.angle)
 
 
-max_events = 1000
+max_events = 100000
 energy= 4 # GeV, certified
 particle_id='mu-'
 incidentAngleDegrees=0
@@ -34,7 +34,7 @@ beamSmear=[smear,smear,0.]
 # simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k_barsslide000mm_"+str(options.seed)
 # simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"kLYSO"
 # simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"kBad"
-simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"
+simulation_name="pure_bars"
 # simulation_name=particle_id+str(energy)+"GeV"+str(int(max_events/1000))+"k"+str(xOffset)+"xpos"
 
 

@@ -14,8 +14,11 @@ testbeamPlotGroups = [
 
 
 plotGroups = [
-    # (('simE','e-1GeV1k'),),
-    (('Pulses','287'),),
+    # (('simE','pure_bars'),),
+    # (('Pulses','287'),),
+    # (('simEBar','pure_bars'),),
+    (('Simulated energy deposits in one specific bar','pure_bars'),),
+
 
     ]     
 
