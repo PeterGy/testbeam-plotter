@@ -10,7 +10,7 @@ matplotlib.use('Agg')
 
 failed_plots=[]
 
-toy_pdf_scaling_factor = 0.4
+
 toy_landau_parameters = [0.08 , 1 , 0.08]
 toy_gauss_parameters =  [0.3 , 3 , 0.1]
 signal_wiggle_room_down = 0.5
@@ -19,7 +19,7 @@ signal_wiggle_room_up = 1.5
 # toy_gauss_parameters =  [0.32132375 , 3.04389941 , 0.07263753]
 
 
-    # #obtain the Landau-Birk distribution
+# #obtain the Landau-Birk distribution
 idealDistributionFile = r.TFile("extractions/Landau_Birk.root","READ")    
 hist=idealDistributionFile.Get('Simulated energy deposits in one specific bar')
 
@@ -34,7 +34,9 @@ for i in range (0,int(nbins/2)-1):
 
 Landau_Birk = np.array(Landau_Birk)
 Landau_Birk = np.roll(Landau_Birk,-10)
+
 # #normalizes sample to the signal's size
+
 Landau_Birk_integral = sum(Landau_Birk)
 Landau_Birk_normalised  = Landau_Birk / Landau_Birk_integral 
 
@@ -118,19 +120,7 @@ def analyse_bar(layer,strip,end):
     initial_guess_detected_signal = sig.convolve(initial_guess_noise, initial_guess_pure_signal ) 
 
 
-    #generate fake sample
-    # #samples amount from the detected signal
-    # sample_size=100000
-    # sample_as_individual_entries = np.array(choices( energy_extended,detected_signal,k=sample_size)) 
-    # #converts detected signal into a plottable function
-    # sample_as_function = np.zeros(len(energy_extended))
-    # for i in sample_as_individual_entries:
-    #     index = np.where(energy_extended == i)[0][0]
-    #     sample_as_function[index] += 1
-    # #normalizes sample to the signal's size
-    # signal_pdf_integral = sum(detected_signal)
-    # sample_function_integral = sum(sample_as_function) #alos just sample size
-    # sample_as_normalised_function  = sample_as_function / sample_function_integral * signal_pdf_integral #/ sample_size *len(energy) # normalizes
+
 
 
     #deconvolve the convolution pdf as a sanity check
@@ -138,25 +128,22 @@ def analyse_bar(layer,strip,end):
 
 
 
-    try:
-        convolution_fit_parameters, _ = optimize.curve_fit(convolution_function, energy, sample_as_normalised_function, 
-        # p0=(*toy_landau_parameters,*toy_gauss_parameters ),
-        # bounds = ((0,toy_landau_parameters[1]-0.1,0,1e-5,0,1e-5),(1,toy_landau_parameters[1]+0.3,1,2,6,2)),
-        # maxfev=50 )
-        p0=(*toy_landau_parameters,*toy_gauss_parameters ),
-        bounds = ((toy_landau_parameters[0]*signal_wiggle_room_down,toy_landau_parameters[1]-0.1,toy_landau_parameters[2]*signal_wiggle_room_down,1e-5,0,1e-5),
-        (toy_landau_parameters[0]*signal_wiggle_room_up,toy_landau_parameters[1]+0.1,toy_landau_parameters[2]*signal_wiggle_room_up,2,6,2)),
-        maxfev=50 )
-    except:
-        print('unsuccesful fit')    
-        failed_plots.append(name)
-        plt.text(2.5, 0.15, 'failed to fit', fontsize = 15)
-        convolution_fit_parameters = [1e-6,-2,1e-6,1e-6,-2,1e-6, ]
+    # try:
+    #     convolution_fit_parameters, _ = optimize.curve_fit(convolution_function, energy, sample_as_normalised_function, 
+    #     p0=(*toy_landau_parameters,*toy_gauss_parameters ),
+    #     bounds = ((toy_landau_parameters[0]*signal_wiggle_room_down,toy_landau_parameters[1]-0.1,toy_landau_parameters[2]*signal_wiggle_room_down,1e-5,0,1e-5),
+    #     (toy_landau_parameters[0]*signal_wiggle_room_up,toy_landau_parameters[1]+0.1,toy_landau_parameters[2]*signal_wiggle_room_up,2,6,2)),
+    #     maxfev=50 )
+    # except:
+    #     print('unsuccesful fit')    
+    #     failed_plots.append(name)
+    #     plt.text(2.5, 0.15, 'failed to fit', fontsize = 15)
+    #     convolution_fit_parameters = [1e-6,-2,1e-6,1e-6,-2,1e-6, ]
 
     try:
         fixed_convolution_fit_parameters, _ = optimize.curve_fit(fixed_convolution_function , energy, sample_as_normalised_function, 
-        p0=(*toy_gauss_parameters,1),
-        bounds = ((1e-5,0,1e-5,0.5),(2,6,2,1.5)),
+        p0=(*toy_gauss_parameters,),
+        bounds = ((1e-5,0,1e-5),(2,6,2)),
         maxfev=50 )
     except:
         print('unsuccesful advanced fit')    
@@ -168,32 +155,57 @@ def analyse_bar(layer,strip,end):
 
 
     #create fit functions
-    print(convolution_fit_parameters)
-    convolution_fit = convolution_function( energy, *convolution_fit_parameters )
+    # convolution_fit = convolution_function( energy, *convolution_fit_parameters )
+    # deduced_signal = landau( energy, *convolution_fit_parameters[0:3] )
+    # deduced_noise = gaussian( energy, *convolution_fit_parameters[3:6] )
+
+
     fixed_convolution_fit = fixed_convolution_function( energy, *fixed_convolution_fit_parameters )
-    deduced_signal = landau( energy, *convolution_fit_parameters[0:3] )
-    deduced_noise = gaussian( energy, *convolution_fit_parameters[3:6] )
-
-    fixed_deduced_signal = fixed_landau( energy, fixed_convolution_fit_parameters[3] )
+    fixed_deduced_signal = fixed_landau( energy, 1 )
     fixed_deduced_noise = gaussian( energy, *fixed_convolution_fit_parameters[0:3] )
+    print(fixed_convolution_fit_parameters)
 
 
 
+    #generate new sample smeared with noise function
+
+    # a=choices(range(len(Landau_Birk_normalised_short)), Landau_Birk_normalised_short)
+    # print(a)
+
+
+    #generate fake sample
+    #samples amount from the detected signal
+    def generate_sample(sample_signal,sample_noise):
+        sample_size=1000
+        sample_signal = Landau_Birk_normalised_short
+        sample_noise = fixed_deduced_noise
+        sample_function = np.zeros(len(sample_signal))
+        for i in range(sample_size):
+            true_deposit = choices(range(len(sample_signal)), sample_signal) [0]
+            smeared_deposit = true_deposit + choices(range(len(sample_noise)), sample_noise) [0]-30
+            sample_function[smeared_deposit] += 1
+        sample_normalised_function = sample_function / sum(sample_function)
+        return sample_normalised_function
+
+    
 
     #plot the data
     # plt.plot( energy, initial_guess_pure_signal, linestyle='dashed', color='black', label='initial guess signal' )
     # plt.plot( energy-3, initial_guess_noise, linestyle='dashed', color='gray', label='initial guess noise' )
 
-    plt.plot( energy, deduced_signal,  linestyle='dashed', color='black', label='Previous method signal' )
-    plt.plot( energy-3, deduced_noise,  linestyle='dashed', color='gray', label='Previous method r/o response' )
-    plt.plot( energy_extended, convolution_fit, linestyle='dashed', color='slategray', label='Previous method fit of data', zorder=3)
+    # plt.plot( energy, deduced_signal,  linestyle='dashed', color='black', label='Previous method signal', zorder=2 )
+    # plt.plot( energy-3, deduced_noise,  linestyle='dashed', color='gray', label='Previous method r/o response', zorder=2 )
+    # plt.plot( energy_extended, convolution_fit, linestyle='dashed', color='slategray', label='Previous method fit of data', zorder=2)
+
+    plt.errorbar( energy_extended, sample_as_normalised_function, yerr=sample_error_bars, linestyle = 'None', marker='_', color='blue', label='Testbeam data', zorder=3) 
+    plt.plot( energy, fixed_deduced_signal,  linestyle='solid', color='green', label='Assumed signal', zorder=1 )
+    plt.plot( energy-3, fixed_deduced_noise,  linestyle='solid', color='lime', label='Deduced r/o response', zorder=1 )
+    plt.plot( energy_extended, fixed_convolution_fit, linestyle='solid', color='cyan', label='Fit of data', zorder=1)
+
+    # sample_normalised_function = generate_sample(Landau_Birk_normalised_short,fixed_deduced_noise)
+    # plt.plot( energy, sample_normalised_function, linestyle = 'None', marker='_', color='red', label='Generated sample', zorder=1)
 
 
-    plt.plot( energy, fixed_deduced_signal,  linestyle='solid', color='green', label='Improved method signal' )
-    plt.plot( energy-3, fixed_deduced_noise,  linestyle='solid', color='lime', label='Improved method r/o response' )
-    plt.plot( energy_extended, fixed_convolution_fit, linestyle='solid', color='cyan', label='Improved method fit of data', zorder=3)
-
-    plt.errorbar( energy_extended, sample_as_normalised_function, yerr=sample_error_bars, linestyle = 'None', marker='_', color='blue', label='Data', zorder=4) 
 
     # plt.plot( energy_extended, Landau_Birk_normalised , color='red', label='Landau Birk', zorder=4) 
 
@@ -210,15 +222,15 @@ def analyse_bar(layer,strip,end):
     plt.close()
 
 single_mode=False
-# single_mode=True
+single_mode=True
 
 if single_mode:
     # analyse_bar(5,1,1)
-    analyse_bar(13,1,0)
+    analyse_bar(3,1,0)
 
 else:
-    # for layer in (3,5,7,9):
-    for layer in (3,):
+    for layer in (3,5,7,9):
+    # for layer in (3,):
         print(layer)
         for strip in range(0,8):
             for end in (0,1):
