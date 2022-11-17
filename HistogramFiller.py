@@ -63,14 +63,31 @@ def fillHist(hist, plotVar, allData, processName="protosim" , minEDeposit=0, max
 
     if False: pass
 
+    elif plotVar == 'Simulated energy deposits in one specific bar in MIPeq': 
+        for event in allData: 
+            Edep = 0
+            for ih,h in enumerate(getattr(event, "HcalSimHits_"+processName)):
+                if h.getID() == 402654211:
+                    Edep += h.getEdep()/3.4
+            hist.Fill(Edep)    
+
+
     elif plotVar == 'Simulated energy deposits in one specific bar': 
         for event in allData: 
             Edep = 0
             for ih,h in enumerate(getattr(event, "HcalSimHits_"+processName)):
+                if h.getID() == 402654211:
+                    Edep += h.getEdep()#/4.66
+            hist.Fill(Edep)    
+
+    elif plotVar == 'Reconstructed energy deposits in one specific bar': 
+        for event in allData: 
+            Edep = 0
+            for ih,h in enumerate(getattr(event, "HcalRecHits_"+processName)):
                 # print(h.getID())
                 if h.getID() == 402654211:
-                    Edep += h.getEdep()
-            hist.Fill(Edep)    
+                    Edep += h.getEnergy()*energyErrorCorrection#/4.66
+            hist.Fill(Edep)            
 
     elif 'Pulses' == plotVar:  
         plotsMade=0

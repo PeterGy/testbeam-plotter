@@ -95,7 +95,9 @@ barBinsY = range(-1000,1001,50)
 barBinsZ = hcalBinning()
 
 plotDict = {
-    'Simulated energy deposits in one specific bar' :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Counts', 'binning' : {'nBins':60, 'min':0, 'max':10}, 'dimension' : 1 },
+    'Simulated energy deposits in one specific bar in MIPeq' :{'xaxis' : 'Energy [MIPeq]', 'yaxis' : 'Counts', 'binning' : {'nBins':600, 'min':0, 'max':6}, 'dimension' : 1 },
+    'Simulated energy deposits in one specific bar' :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Counts', 'binning' : {'nBins':800, 'min':2, 'max':10}, 'dimension' : 1 },
+    'Reconstructed energy deposits in one specific bar' :{'xaxis' : 'Energy [MeV]', 'yaxis' : 'Counts', 'binning' : {'nBins':40, 'min':2, 'max':6}, 'dimension' : 1 },
 
     'Total number of hits per event'   :{'xaxis' : 'Hits', 'yaxis' : 'Event count', 'binning' : {'nBins':60, 'min':0, 'max':60}, 'dimension' : 1 }, #0,0 min-max makes the xrange automatic. nbins must be 10 so my program can manually set nbins to be the value it should really be automatically
     'Total number of hits per run'   :{'xaxis' : 'Hits', 'yaxis' : 'Run count', 'binning' : {'nBins':100, 'min':0, 'max':0}, 'dimension' : 1 }, #0,0 min-max makes the xrange automatic. nbins must be 10 so my program can manually set nbins to be the value it should really be automatically

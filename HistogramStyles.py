@@ -125,7 +125,7 @@ def createContext(fileName,plotName,μ=None,σ=None,χ2=None):
     label.SetTextSize(0.05)
     label.SetNDC()      
     # print(fileName)
-    sample='2'
+    sample='100'
     if '225' in fileName:    particle="e-"; energy = '2'
     elif '226' in fileName:    particle="e-"; energy = '1'
     elif '288' in fileName:    particle="#pi-"; energy = '4'

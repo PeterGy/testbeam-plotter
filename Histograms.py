@@ -17,7 +17,8 @@ plotGroups = [
     # (('simE','pure_bars'),),
     # (('Pulses','287'),),
     # (('simEBar','pure_bars'),),
-    (('Simulated energy deposits in one specific bar','pure_bars'),),
+    (('Simulated energy deposits in one specific bar in MIPeq','pure_bars'),),
+    # (('Reconstructed energy deposits in one specific bar','pure_bars'),),
 
 
     ]     

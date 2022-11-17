@@ -53,18 +53,21 @@ def main():
                 label2D()   
 
             elif True:
+                
                 dualPlotMode=False
                 prepareDualPlots(dualPlotMode,c)   
                 c.SetBottomMargin(0.14)
+                c.SetGrid()
                 lines=[]
                 legend = r.TLegend(0.0,0.9,0.18,1)
                 # r.gStyle.SetOptStat("n")
-                r.gStyle.SetOptStat("")
+                r.gStyle.SetOptStat("nerm")
 
                 for i in range(len(plot)):
                     plotName = plot[i][0]
                     # hist=inFile.Get(plotName+barName(id)+";")
                     hist=inFile.Get(plotName+barName(id)+";"+str(i+1))
+                    
                     # if id != False: hist.SetName(barName(id)) 
 
                     # hist.GetYaxis().SetRangeUser(0, 800)
