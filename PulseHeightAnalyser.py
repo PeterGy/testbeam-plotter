@@ -39,8 +39,7 @@ def get_landau_birk():
     #obtain the Landau-Birk distribution
     idealDistributionFile = r.TFile("extractions/Simulated energy deposits in one specific bar in MIPeq___pure_bars.root","READ")    
     hist=idealDistributionFile.Get('Simulated energy deposits in one specific bar in MIPeq')
-    nbins = 600
-    Landau_Birk  = np.array([hist.GetBinContent(i) for i in range (1,nbins+1)])
+    Landau_Birk  = np.array([hist.GetBinContent(i) for i in range (1,resolution+1)])
     Landau_Birk_integral = sum(Landau_Birk)
     Landau_Birk_normalised  = Landau_Birk / Landau_Birk_integral 
     return Landau_Birk_normalised
@@ -75,12 +74,11 @@ def convolution_function(energy, gauss_amplitude=1, gauss_mean=3, gauss_width=0.
 
 #the main function which finds the landau-gauss convolution for a given SiPM
 def analyse_SiPM(layer,strip,end): 
-    #define plot
     name = "Layer "+str(layer)+", Strip "+str(strip)+", End "+str(end)
     plt.figure(name)
 
     #Define x axes.
-    resolution = 600 #aka the number of bins
+
     #energy is the x axis for non-convolved values
     energy = np.linspace( 0, 6, resolution,endpoint=False) # Define energy range in MIP equivalents
     #energy_extended is the x axis for convolved values. It has to be double-1 the bins of the non-convolved values
@@ -161,6 +159,9 @@ layer_count = len(layer_numbers)
 bar_count = len(bar_numbers)
 toy_gauss_parameters =  [0.3 , 3 , 0.1]
 
+# sets the resolution - as in the number of bins - the program uses. 
+# Specifically, the number of bins in the detector data and the Landau-Birk function file   
+resolution = 600 
 
 #obtains provided Landau function once for the whole program
 Landau_Birk_normalised_short = get_landau_birk()
@@ -196,7 +197,7 @@ else:
 
 
 
-#If any plots fail to fit, it displays them
+#If any plots fail to fit, it tells us about them
 if len(failed_plots) > 0:
     print(str(len(failed_plots))+'/'+str(plots_made)+' failed. These are:')
     for i in failed_plots:
